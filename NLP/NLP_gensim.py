@@ -4,7 +4,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 import matplotlib.pyplot as plt
 import pandas as pd
 
-path = r'C:\Users\aurelie\PycharmProjects\NLP'
+path = r'C:\Users\K1774755\PycharmProjects\aurelie_NLP\NLP'
 data = "All work and no play makes jack a dull boy. all work and no play"
 
 phrases = sent_tokenize(data)
