@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
 
-# test
+# test github account
 # Hyper-parameters
 input_size = 1
 output_size = 1
