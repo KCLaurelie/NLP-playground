@@ -18,10 +18,10 @@ import HVASS.imdb as imdb
 
 imdb.maybe_download_and_extract()
 
-# tl.files.maybe_download_and_extract(filename='aclImdb_v1.tar.gz',
-#                                     url_source='http://ai.stanford.edu/~amaas/data/sentiment/',
-#                                     working_directory='data/',
-#                                     extract=True)
+tl.files.maybe_download_and_extract(filename='aclImdb_v1.tar.gz',
+                                    url_source='http://ai.stanford.edu/~amaas/data/sentiment/',
+                                    working_directory='data/',
+                                    extract=True)
 x_train_text, y_train = imdb.load_data(train=True)
 x_test_text, y_test = imdb.load_data(train=False)
 data_text = x_train_text + x_test_text
