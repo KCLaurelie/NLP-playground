@@ -29,7 +29,7 @@ print("Done loading")
 
 #Can you find any cool word combinations? What differences are there in the datasets?
 glove.most_similar('company', topn=5)
-glove.most_similar(positive=['biggest', 'small'], negative=['big'], topn=5)
+glove.most_similar(positive=['biggest', 'small'], negative=['big'], topn=5) #hoping to get smallest
 glove.most_similar(positive=['woman', 'king'], negative=['man'])
 glove.similarity('car', 'bike')
-glove.doesnt_match("breakfast cereal dinner lunch".split()
+glove.doesnt_match("breakfast cereal dinner lunch".split())
