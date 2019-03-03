@@ -3,7 +3,7 @@
 # These reviews are available as a pre-prepared dataset that can be downloaded by the Keras distribution.
 #The dataset is constructed from very polarised reviews, and has been used in text classification evaluations for several years.
 
-from __future__ import print_function
+# from __future__ import print_function
 
 from keras.preprocessing import sequence
 from keras.models import Sequential
@@ -105,7 +105,7 @@ print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
 #####################################
-# 4. SAVE THE TRAINED THE MODEL
+# 4. SAVE THE TRAINED MODEL
 #####################################
 from keras.models import model_from_json
 
@@ -159,7 +159,7 @@ example = 'A truly awful movie. I never want to see rubbish like this again.'
 
 
 # Download NLTK stopwords
-nltk.download('stopwords')
+#nltk.download('stopwords')
 
 # Prepare the stopwords
 stopwords_nltk = set(stopwords.words('english'))
