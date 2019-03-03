@@ -2,7 +2,7 @@
 import spacy
 
 # Load the English model
-nlp = spacy.load(r'C:\Users\K1774755\anaconda3\Lib\site-packages\en_core_web_sm\en_core_web_sm-2.0.0')
+nlp = spacy.load(r'C:\Users\K1774755\AppData\Local\Continuum\anaconda3\lib\site-packages\en_core_web_sm\en_core_web_sm-2.0.0')
 
 # text = open('data/brexit.txt').read() # We could load a text from file, but let's use the text string declared below as input this time
 text = "The patient denies having very suicidal thoughts. This is not a test. It doesn't have a meaning. Brexit was never a good idea. There is no good deal for the UK."
