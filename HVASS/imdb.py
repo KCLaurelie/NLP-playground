@@ -39,7 +39,7 @@ import glob
 
 # Directory where you want to download and save the data-set.
 # Set this before you start calling any of the functions below.
-data_dir = "C:/Users/aurelie/PycharmProjects/data/IMDB/"
+data_dir = "C:/Users/aurelie/PycharmProjects/data/IMDB/" # default directory
 
 # URL for the data-set on the internet.
 data_url = "http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz"
@@ -54,7 +54,7 @@ def _read_text_file(path):
     It is returned as a single string where all lines are concatenated.
     """
 
-    with open(path, 'rt') as file:
+    with open(path, 'rt', errors='ignore') as file:
         # Read a list of strings.
         lines = file.readlines()
 
@@ -78,7 +78,7 @@ def maybe_download_and_extract(url=data_url, download_dir=data_dir):
     download.maybe_download_and_extract(url=url, download_dir=download_dir)
 
 
-def load_data(train=True):
+def load_data(train=True,download_dir=data_dir):
     """
     Load all the data from the IMDB Review data-set for sentiment analysis.
 
@@ -94,7 +94,7 @@ def load_data(train=True):
     train_test_path = "train" if train else "test"
 
     # Base-directory where the extracted data is located.
-    dir_base = os.path.join(data_dir, "aclImdb", train_test_path)
+    dir_base = os.path.join(download_dir, "aclImdb", train_test_path)
 
     # Filename-patterns for the data-files.
     path_pattern_pos = os.path.join(dir_base, "pos", "*.txt")
