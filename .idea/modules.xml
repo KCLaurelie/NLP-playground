@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../mimic-code/.idea/mimic-code.iml" filepath="$PROJECT_DIR$/../mimic-code/.idea/mimic-code.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tdy_ehr/.idea/tdy_ehr.iml" filepath="$PROJECT_DIR$/../tdy_ehr/.idea/tdy_ehr.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/toy-models.iml" filepath="$PROJECT_DIR$/.idea/toy-models.iml" />
     </modules>
   </component>
