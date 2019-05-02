@@ -1,12 +1,11 @@
 ## Creating a Stigma Classification Model for Tweets
 
 import nltk
-import numpy as np, pandas as pd
+import pandas as pd
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 import string
 from textblob.classifiers import NaiveBayesClassifier
-import numpy as np
 from textblob import TextBlob
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -18,8 +17,8 @@ pd.set_option('display.max_columns', 500)
 ##########################################
 ## (0) Import Data
 ##########################################
-fn = 'C:\\Users\\k1641795\\Dropbox\\KCL_PostDoc\\Social Media\\ALL_Schizophrenia_tweets.csv'
-data = pd.read_csv(fn, header=None, encoding = 'Latin1', names = ['body_text', 'label', 'wat', 'wat2'], skiprows=1)#, sep='\t')
+fn = r'C:\Users\K1774755\PycharmProjects\data\tweet_data_testing.csv'
+data = pd.read_csv(fn, header=None, encoding='Latin1', names=['label', 'tweet_nb', 'date', 'topic', 'user', 'body_text'])
 data = data[['label', 'body_text']]
 print("The first 5 rows of the dataset look like:")
 data.head()
@@ -33,6 +32,9 @@ data.label.replace('o' , "0", inplace=True)
 # We will also drop the tweets with missing labels
 # 0 = Not stigmatizing
 # 1 = Stigmatizing
+# 0 = negative
+# 2 = neutral
+# 4 = positive
 
 data = data[data.label != '1']
 data['label'] = data.label.replace('2', '1')
@@ -55,6 +57,7 @@ def sentAnal(df):
 
 data = sentAnal(data)
 
+
 def count_punct(text):
     count = sum([1 for char in text if char in string.punctuation])
     return round(count/(len(text) - text.count(" ")), 3)*100
@@ -62,6 +65,7 @@ def count_punct(text):
 
 data['body_len'] = data['body_text'].apply(lambda x: len(x) - x.count(" "))
 data['punct%'] = data['body_text'].apply(lambda x: count_punct(x))
+
 
 def clean_text(text):
     text = "".join([word.lower() for word in text if word not in string.punctuation])
