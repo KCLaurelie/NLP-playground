@@ -5,6 +5,8 @@ import pandas as pd
 import re
 import nltk
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Qt5Agg')  # need to use active backend to visualize plots (to get it run matplotlib.get_backend())
 
 data_source_url = "https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv"
 airline_tweets = pd.read_csv(data_source_url)
@@ -19,6 +21,8 @@ airline_tweets.airline.value_counts().plot(kind='pie', autopct='%1.0f%%')
 airline_tweets.airline_sentiment.value_counts().plot(kind='pie', autopct='%1.0f%%', colors=["red", "yellow", "green"])
 airline_sentiment = airline_tweets.groupby(['airline', 'airline_sentiment']).airline_sentiment.count().unstack()
 airline_sentiment.plot(kind='bar')
+#plt.show(block=True)
+
 
 #airline sentiment confidence
 import seaborn as sns
