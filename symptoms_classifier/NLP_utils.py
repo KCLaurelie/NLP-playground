@@ -45,7 +45,7 @@ def all_words(text):
 #word_dic = Counter(all_words(open('constants/big.txt').read()))
 
 def P(word, word_dic):
-    N=sum(word_dic.values())
+    N = sum(word_dic.values())
     """Probability of `word`."""
     return word_dic[word] / N
 
@@ -61,6 +61,7 @@ def known(words, word_dic):
     """The subset of `words` that appear in the dictionary of WORDS."""
     return set((w for w in words if w in word_dic))
 
+
 def edits1(word):
     """All edits that are one edit away from `word`."""
     letters = 'abcdefghijklmnopqrstuvwxyz'
@@ -70,6 +71,7 @@ def edits1(word):
     replaces = [ L + c + R[1:] for L, R in splits if R for c in letters ]
     inserts = [ L + c + R for L, R in splits for c in letters ]
     return set(deletes + transposes + replaces + inserts)
+
 
 def edits2(word):
     """All edits that are two edits away from `word`."""

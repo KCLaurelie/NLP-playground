@@ -1,5 +1,4 @@
 import os
-os.chdir(r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier')
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
 from sys import stdout, argv
@@ -8,6 +7,7 @@ import itertools
 import matplotlib.pyplot as plt
 import pandas
 import re
+os.chdir(r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier')
 
 file_name = argv[1]
 test = False

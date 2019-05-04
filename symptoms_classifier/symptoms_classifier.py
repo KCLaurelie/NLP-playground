@@ -24,6 +24,21 @@ models = {
     'SVM with poly kernel': svm.SVC(kernel='poly')
 }
 
+def preprocess_text(text): # text = pandas series of texts
+    from nltk.corpus import stopwords
+    from nltk.stem import PorterStemmer
+    # to lower case
+    text = text.apply(lambda x: " ".join(x.lower() for x in x.split()))
+    # Removing punctuation
+    text = text.str.replace('[^\w\s]', '')
+    # Stop word removal
+    stop = stopwords.words('english')
+    text = text.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
+    # Stemming
+    st = PorterStemmer()
+    text = text.apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
+    return text
+
 
 def vectorizer(train_texts, test_texts=[]):
     _vectorizer = text.TfidfVectorizer(
@@ -35,9 +50,32 @@ def vectorizer(train_texts, test_texts=[]):
         ngram_range=(1, 5)
     )
     train_vectors = _vectorizer.fit_transform(train_texts)
-    test_vectors = _vectorizer.transform(test_texts) if test_texts else []
-    return train_vectors, test_vectors
+    test_vectors = _vectorizer.transform(test_texts) if len(test_texts) > 0 else []
+    return train_vectors.to_array, test_vectors.to_array
 
+
+def run_model(model, train_data, test_data):
+    train_text = train_data[['text']]
+    test_text = test_data[['text']]
+    train_class = train_data[['class']]
+    test_class = test_data[['class']]
+    [train_data_features, test_data_features] = vectorizer(train_text, test_text)
+    classifier = models[model]
+    classifier = classifier.fit(train_data_features, train_class)
+    test_preds = classifier.predict(test_data_features)
+    train_preds = cross_val_predict(classifier, train_data_features, train_class, cv=10)
+    test_metrics = perf_metrics(test_class, test_preds)
+    train_metrics = perf_metrics(train_class, train_preds)
+    return 0
+
+def perf_metrics(data_labels , data_preds):
+    labels = list(data_labels.unique())
+    #labels = [1, -1]
+    acc_score = accuracy_score(data_labels, data_preds)
+    precision = precision_score(data_labels, data_preds, average=None, labels=labels)
+    recall = recall_score(data_labels, data_preds, average=None, labels=labels)
+    f1score = f1_score(data_labels, data_preds, average=None, labels=labels)
+    return acc_score, precision, recall, f1score
 
 def feature_generation(train_file, test_file=''):
     with open(train_file, "r") as train_data_text:
@@ -85,7 +123,7 @@ def classify(classifier, train_vectors, train_class, test_vectors, test=False):
         return preds
     else:
         preds = cross_val_predict(classifier, train_vectors, train_class, cv=10)
-        acc_score = accuracy_score(train_class,preds)
+        acc_score = accuracy_score(train_class, preds)
         labels = [1, -1]
         precision = precision_score(train_class, preds, average=None, labels=labels)
         recall = recall_score(train_class, preds, average=None, labels=labels)
