@@ -102,15 +102,15 @@ def create_word_dictionary(word_dic):
     for alphabet in 'bcdefghjklmnopqrstuvwxyz':
         word_dictionary.remove(alphabet)
 
-    useless_two_letter_words = pandas.read_csv('constants/useless_two_letter_words.csv')
+    useless_two_letter_words = pd.read_csv('constants/useless_two_letter_words.csv')
     for word in useless_two_letter_words:
         word_dictionary.remove(word)
 
-    useful_words = pandas.read_csv('constants/useful_words.csv')
+    useful_words = pd.read_csv('constants/useful_words.csv')
     for word in useful_words:
         word_dictionary.append(word)
 
-    contractions = pandas.read_csv('constants/contractions.csv')
+    contractions = pd.read_csv('constants/contractions.csv')
     for key in contractions:
         word_dictionary.append(key)
 
