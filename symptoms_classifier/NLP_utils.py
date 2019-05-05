@@ -1,52 +1,70 @@
 # from https://github.com/sachinbiradar9/Sentiment-Classification/blob/master/utils.py
 from collections import Counter
 from nltk.corpus import stopwords, words
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
 from nltk.stem.snowball import SnowballStemmer
-import json, pandas, re
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.feature_extraction import text
+import pandas as pd
+import re
 
-# save trained model
-def save_model_json(model,output_file):
-    # serialize model to JSON
-    model_json = model.to_json()
-    with open("model.json", "w") as json_file:
-        json_file.write(model_json)
-    # serialize weights to HDF5
-    model.save_weights("model.h5")
-    return 0
 
-# load json and create model
-def load_model_json(json_file):
-    from keras.models import model_from_json
-    json_file = open(json_file, 'r')
-    loaded_model_json = json_file.read()
-    json_file.close()
-    loaded_model = model_from_json(loaded_model_json)
-    # load weights into new model & compile model
-    loaded_model.load_weights("model.h5")
-    loaded_model.compile(loss='binary_crossentropy',
-                         optimizer='adam',
-                         metrics=['accuracy'])
-    print("Loaded model from disk")
+def preprocess_text(text):  # text = series of texts
+    # Remove all the special characters
+    text = re.sub(r'\W', ' ', str(text))
+    # to lower case
+    text = text.apply(lambda x: " ".join(x.lower() for x in x.split()))
+    # Removing punctuation
+    text = text.str.replace('[^\w\s]', '')
+    # Substituting multiple spaces with single space
+    text = re.sub(r'\s+', ' ', text, flags=re.I)
 
-    #score_saved_model = loaded_model.evaluate(x_test, y_test, verbose=0)
-    return loaded_model
+    # Stop word removal
+    stop = stopwords.words('english')
+    text = text.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
 
-# stemming_____________________________________________________________________________________________________________
-stemmer = SnowballStemmer('english')
+    # Stemming
+    st = PorterStemmer() #SnowballStemmer('english')
+    text = text.apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
 
-# stopword_____________________________________________________________________________________________________________
-stop_words = stopwords.words('english')
-stop_words.remove('not')
+    res = " ".join(words)
+    return res
 
-# correction__________________________________________________________________________________________________________
+
+def vectorizer(texts):
+    _vectorizer = text.TfidfVectorizer(
+        min_df=0.00125,
+        max_df=0.7,
+        sublinear_tf=True,
+        use_idf=True,
+        analyzer='word',
+        ngram_range=(1, 5)
+    )
+    vectors = _vectorizer.fit_transform(texts)
+    return vectors.toarray()
+
+
+def perf_metrics(data_labels, data_preds):
+    data_labels = pd.Series(data_labels)
+    data_preds = pd.Series(data_preds)
+    labels = list(data_labels.unique())
+    #labels = [1, -1]
+    acc_score = accuracy_score(data_labels, data_preds)
+    precision = precision_score(data_labels, data_preds, average=None, labels=labels)
+    recall = recall_score(data_labels, data_preds, average=None, labels=labels)
+    f1score = f1_score(data_labels, data_preds, average=None, labels=labels)
+    return acc_score, precision, recall, f1score
+
 def all_words(text):
     return re.findall('\\w+', text.lower())
 
-#word_dic = Counter(all_words(open('constants/big.txt').read()))
 
-def P(word, word_dic):
-    N = sum(word_dic.values())
+def P(word, word_dic_file):
+    #word_dic_file = 'constants/big.txt'
     """Probability of `word`."""
+    word_dic = Counter(all_words(open(word_dic_file).read()))
+    N = sum(word_dic.values())
     return word_dic[word] / N
 
 def correction(word):
@@ -79,8 +97,8 @@ def edits2(word):
 
 
 # word dictionary______________________________________________________________________________________________________
-def create_word_dictionary():
-    word_dictionary = list(set(words.words()))
+def create_word_dictionary(word_dic):
+    word_dictionary = list(set(word_dic.words()))
     for alphabet in 'bcdefghjklmnopqrstuvwxyz':
         word_dictionary.remove(alphabet)
 
@@ -97,22 +115,3 @@ def create_word_dictionary():
         word_dictionary.append(key)
 
     return word_dictionary
-
-
-# split hashtags_______________________________________________________________________________________________________
-def split_hashtag(hashtag, contractions, word_dictionary):
-    found = False
-    for i in reversed(range(1, len(hashtag) + 1)):
-        if stemmer.stem(hashtag[:i]) in word_dictionary or hashtag[:i] in word_dictionary:
-            found = True
-            if i == len(hashtag):
-                if hashtag[:i] in contractions:
-                    contractions[hashtag[:i]]
-                else:
-                    return hashtag[:i]
-            else:
-                child = split_hashtag(hashtag[i:])
-                if child:
-                    return hashtag[:i] + ' ' + child
-    if not found:
-        return False

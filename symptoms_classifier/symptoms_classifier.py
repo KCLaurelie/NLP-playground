@@ -1,15 +1,17 @@
 import os
 from imblearn.over_sampling import SMOTE
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
-from sklearn.feature_extraction import text
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.model_selection import cross_val_predict
-from sys import argv
-import json
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Qt5Agg')
 import numpy as np
 import pandas as pd
+
 os.chdir(r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier')
+import symptoms_classifier.NLP_utils as nutils
+import symptoms_classifier.general_utils as gutils
 
 models = {
     'Multinomial NB': naive_bayes.MultinomialNB(),
@@ -24,77 +26,37 @@ models = {
     'SVM with poly kernel': svm.SVC(kernel='poly')
 }
 
-def preprocess_text(text): # text = pandas series of texts
-    from nltk.corpus import stopwords
-    from nltk.stem import PorterStemmer
-    # to lower case
-    text = text.apply(lambda x: " ".join(x.lower() for x in x.split()))
-    # Removing punctuation
-    text = text.str.replace('[^\w\s]', '')
-    # Stop word removal
-    stop = stopwords.words('english')
-    text = text.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
-    # Stemming
-    st = PorterStemmer()
-    text = text.apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
-    return text
+def test():
+    data = pd.read_csv("https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv")
+    data_clean = data[['airline_sentiment', 'text']].rename(columns={'airline_sentiment': 'class'})
+    data_clean['text'] = nutils.preprocess_text(data_clean['text'])
+    processed_features = nutils.vectorizer(data_clean['text'])
+    from sklearn.model_selection import train_test_split
+    x_train, x_test, y_train, y_test = train_test_split(processed_features, data_clean['class'], test_size=0.8, random_state=0)
 
+    classifier = models['SVM']
+    classifier.fit(x_train, y_train)
+    preds = classifier.predict(x_train)
+    #test_metrics = nutils.perf_metrics(y_train, preds)
 
-def vectorizer(train_texts, test_texts=[]):
-    _vectorizer = text.TfidfVectorizer(
-        min_df=0.00125,
-        max_df=0.7,
-        sublinear_tf=True,
-        use_idf=True,
-        analyzer='word',
-        ngram_range=(1, 5)
-    )
-    train_vectors = _vectorizer.fit_transform(train_texts)
-    test_vectors = _vectorizer.transform(test_texts) if len(test_texts) > 0 else []
-    return train_vectors.to_array, test_vectors.to_array
-
+    print(confusion_matrix(y_train, preds))
+    print(classification_report(y_train, preds))
+    print(accuracy_score(y_train, preds))
+    return 0
 
 def run_model(model, train_data, test_data):
     train_text = train_data[['text']]
     test_text = test_data[['text']]
     train_class = train_data[['class']]
     test_class = test_data[['class']]
-    [train_data_features, test_data_features] = vectorizer(train_text, test_text)
+    [train_data_features, test_data_features] = nutils.vectorizer(train_text, test_text)
     classifier = models[model]
-    classifier = classifier.fit(train_data_features, train_class)
+    classifier.fit(train_data_features, train_class)
     test_preds = classifier.predict(test_data_features)
     train_preds = cross_val_predict(classifier, train_data_features, train_class, cv=10)
-    test_metrics = perf_metrics(test_class, test_preds)
-    train_metrics = perf_metrics(train_class, train_preds)
+    test_metrics = nutils.perf_metrics(test_class, test_preds)
+    train_metrics = nutils.perf_metrics(train_class, train_preds)
     return 0
-
-def perf_metrics(data_labels , data_preds):
-    labels = list(data_labels.unique())
-    #labels = [1, -1]
-    acc_score = accuracy_score(data_labels, data_preds)
-    precision = precision_score(data_labels, data_preds, average=None, labels=labels)
-    recall = recall_score(data_labels, data_preds, average=None, labels=labels)
-    f1score = f1_score(data_labels, data_preds, average=None, labels=labels)
-    return acc_score, precision, recall, f1score
-
-def feature_generation(train_file, test_file=''):
-    with open(train_file, "r") as train_data_text:
-        train_data = json.load(train_data_text)
-    train_texts = []
-    train_class = []
-    for doc in train_data:
-        train_texts.append(doc['text'])
-        train_class.append(doc['label'])
-
-    test_texts = []
-    if test_file:
-        with open(test_file, "r") as test_data_text:
-            test_data = json.load(test_data_text)
-        for doc in test_data:
-            test_texts.append(doc['text'])
-
-    train_vectors, test_vectors = vectorizer(train_texts, test_texts)
-    return train_vectors, train_class, test_vectors
 
 
 def plot_distribution(class_array, title):
@@ -123,52 +85,10 @@ def classify(classifier, train_vectors, train_class, test_vectors, test=False):
         return preds
     else:
         preds = cross_val_predict(classifier, train_vectors, train_class, cv=10)
-        acc_score = accuracy_score(train_class, preds)
+        acc_score = nutils.accuracy_score(train_class, preds)
         labels = [1, -1]
-        precision = precision_score(train_class, preds, average=None, labels=labels)
-        recall = recall_score(train_class, preds, average=None, labels=labels)
-        f1score = f1_score(train_class, preds, average=None, labels=labels)
+        precision = nutils.precision_score(train_class, preds, average=None, labels=labels)
+        recall = nutils.recall_score(train_class, preds, average=None, labels=labels)
+        f1score = nutils.f1_score(train_class, preds, average=None, labels=labels)
         return acc_score, precision, recall, f1score
 
-
-def train_classify(train_file, test_file, test=False):
-    train_vectors, train_class, test_vectors = feature_generation(train_file, test_file)
-    plot_distribution(train_class, train_file + ' Before sampling')
-    train_vectors, train_class = over_sample(train_vectors, train_class)
-
-    if test:
-        eclf = ensemble.VotingClassifier(estimators=[
-            ('nbm', models['Multinomial NB']),
-            ('tree', models['Decision Tree']),
-            ('rf', models['Random Forest']),
-            ('lr', models['Logistic Regression']),
-        ], voting='soft')
-        preds = classify(eclf, train_vectors, train_class, test_vectors)
-        f = open('data/obama_predictions.text', 'w+')
-        for index, pred in enumerate(preds):
-            f.write(str(index+1)+';;'+str(preds[index])+'\n')
-        f.close()
-    else:
-        metrics = []
-        for index, model in enumerate(models):
-            print("Classifying using", model)
-            acc_score, precision, recall, f1_score = classify(models[model], train_vectors, train_class, test_vectors)
-            metrics.append({})
-            metrics[index]['Classifier'] = model
-            metrics[index]['accuracy'] = acc_score
-            metrics[index]['possitive f1score'] = f1_score[0]
-            metrics[index]['negative f1score'] = f1_score[1]
-        pd.io.json.json_normalize(metrics).plot(kind='bar', x='Classifier')
-        plt.title(train_file)
-        plt.grid(True, axis='y')
-        plt.ylim(ymax=1)
-        plt.xticks(rotation=0)
-        plt.show()
-
-
-def testing():
-    for candidate in ['obama', 'romney']:
-        print('Running for', candidate, '...')
-        try: test_file = 'data/' + candidate + '_test_cleaned.json'
-        except: test_file = ''
-        train_classify('data/' + candidate + '_cleaned.json', test_file)
