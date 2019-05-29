@@ -13,25 +13,57 @@ import numpy as np
 import re
 
 
-def preprocess_text(my_text):  # text = series of texts
+def preprocess_text(my_text, remove_stopwords=False, stemmer='porter'):  # text = series of texts
     my_text = my_text.str.strip()  # remove leading/trailing characters
     # to lower case
     my_text = my_text.str.lower()
-    # Removing punctuation / special characters
-    my_text = my_text.str.replace('[^\w\s]', ' ')
+    # Removing special characters
+    my_text = my_text.apply(lambda x: re.sub('\W+',' ', x))  # my_text.str.replace('[^\w]', ' ')
     # Substituting multiple spaces with single space
     my_text = my_text.apply(lambda x: ' '.join(x.split()))
-    # Stop word removal
-    stop = stopwords.words('english')
-    my_text = my_text.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
+    # Removing stop words
+    if remove_stopwords:
+        stop = stopwords.words('english')
+        my_text = my_text.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
     # Stemming
-    st = PorterStemmer() #SnowballStemmer('english')
+    if stemmer is None:
+        return my_text
+    elif stemmer == 'porter':
+        st = PorterStemmer()
+    else:
+        st = SnowballStemmer('english')
     my_text = my_text.apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
 
     return my_text
 
 
-def vectorizer(texts, min_df=0.00125, max_df=0.7, algo='tfidf'):
+def transform_text2vec(texts, w2v_model, algo='tfidf', _size=100):
+    if algo in ('tfidf', 'counter'):
+        vectors = w2v_model.transform(texts).toarray()
+    elif algo == 'word2vec':
+        sentences = texts.to_list()
+        vectors = np.zeros((len(sentences), _size))
+
+        # shall i do that?
+        for idx, snt in enumerate(sentences):
+            vectors[idx] = [w2v_model.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
+        vectors = np.zeros((len(sentences), _size))
+
+        # or that???
+        # Loop over sentences
+        for i_snt, snt in enumerate(sentences):
+            cnt = 0
+            for i_word, word in enumerate(snt):  # Loop over the words of a sentence
+                if word in w2v_model.wv:
+                    vectors[i_snt] += w2v_model.wv.get_vector(word)
+                    cnt += 1
+            if cnt > 0:
+                vectors[i_snt] = vectors[i_snt] / cnt
+            i_snt += 1
+    return vectors
+
+
+def fit_text2vec(texts, min_df=0.00125, max_df=0.7, algo='tfidf', _size=100):
     stop_words = stopwords.words('english')
     if algo == 'tfidf':
         _vectorizer = text.TfidfVectorizer(
@@ -43,12 +75,11 @@ def vectorizer(texts, min_df=0.00125, max_df=0.7, algo='tfidf'):
             ngram_range=(1, 5),
             stop_words=stop_words
         )
-        vectors = _vectorizer.fit_transform(texts).toarray()
+        w2v = _vectorizer.fit(texts)
     elif algo == 'counter':
         _vectorizer = CountVectorizer(max_features=2500, min_df=min_df, max_df=max_df, stop_words=stop_words)
-        vectors = _vectorizer.fit_transform(texts).toarray()
+        w2v = _vectorizer.fit(texts)
     elif algo == 'word2vec':
-        _size = 100
         #vocab = [["cat", "say", "meow"], ["dog", "say", "woof"]]
         sentences = texts.to_list()  # tokenize.sent_tokenize(texts.str.cat(sep='. '))
         vocab = []
@@ -56,24 +87,9 @@ def vectorizer(texts, min_df=0.00125, max_df=0.7, algo='tfidf'):
             vocab.append(tokenize.word_tokenize(snt))
         w2v = Word2Vec(vocab, min_count=1, size=_size)  #, window=6, min_count=5, workers=4)
         #list(w2v.wv.vocab)
-
-        vectors = np.zeros((len(sentences), _size))
-        for idx, snt in enumerate(sentences):
-            vectors[idx] = [w2v.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
-        vectors = np.zeros((len(sentences), _size))
-        # Loop over sentences
-        for i_snt, snt in enumerate(sentences):
-            cnt = 0
-            for i_word, word in enumerate(snt):  # Loop over the words of a sentence
-                if word in w2v.wv:
-                    vectors[i_snt] += w2v.wv.get_vector(word)
-                    cnt += 1
-            if cnt > 0:
-                vectors[i_snt] = vectors[i_snt] / cnt
-            i_snt += 1
     else:
-        vectors = 'unknown'
-    return vectors
+        w2v = 'unknown'
+    return w2v
 
 
 def perf_metrics(data_labels, data_preds):

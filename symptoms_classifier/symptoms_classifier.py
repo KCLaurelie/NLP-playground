@@ -30,7 +30,8 @@ def test():
     data = pd.read_csv("https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv")
     data_clean = data[['airline_sentiment', 'text']].rename(columns={'airline_sentiment': 'class'})
     data_clean['text'] = nutils.preprocess_text(data_clean['text'])
-    processed_features = nutils.vectorizer(data_clean['text'])
+    vectorizer = nutils.fit_text2vec(data_clean['text'])
+    processed_features = nutils.transform_text2vec(data_clean['text'], vectorizer)
     from sklearn.model_selection import train_test_split
     x_train, x_test, y_train, y_test = train_test_split(processed_features, data_clean['class'], test_size=0.8, random_state=0)
 
@@ -44,14 +45,23 @@ def test():
     print(accuracy_score(y_train, preds))
     return 0
 
+
 def run_model(model, train_data, test_data):
     train_text = train_data[['text']]
     test_text = test_data[['text']]
     train_class = train_data[['class']]
     test_class = test_data[['class']]
-    [train_data_features, test_data_features] = nutils.vectorizer(train_text, test_text)
+
+    # vectorize text data
+    vectorizer = nutils.fit_text2vec(train_text)
+    train_data_features = nutils.transform_text2vec(train_text, vectorizer)
+    test_data_features = nutils.transform_text2vec(test_text, vectorizer)
+
+    # train classifier
     classifier = models[model]
     classifier.fit(train_data_features, train_class)
+
+    # test classifier
     test_preds = classifier.predict(test_data_features)
     train_preds = cross_val_predict(classifier, train_data_features, train_class, cv=10)
     test_metrics = nutils.perf_metrics(test_class, test_preds)
@@ -69,6 +79,7 @@ def plot_distribution(class_array, title):
     plt.title(title)
 
 
+# WHAT IS THIS ???
 def over_sample(train_vectors, train_class):
     train_vectors = train_vectors.toarray()
     sm = SMOTE(random_state=42)
@@ -76,19 +87,4 @@ def over_sample(train_vectors, train_class):
 
     plot_distribution(train_class, 'After sampling')
     return train_vectors, train_class
-
-
-def classify(classifier, train_vectors, train_class, test_vectors, test=False):
-    if test:
-        classifier.fit(train_vectors, train_class)
-        preds = classifier.predict(test_vectors)
-        return preds
-    else:
-        preds = cross_val_predict(classifier, train_vectors, train_class, cv=10)
-        acc_score = nutils.accuracy_score(train_class, preds)
-        labels = [1, -1]
-        precision = nutils.precision_score(train_class, preds, average=None, labels=labels)
-        recall = nutils.recall_score(train_class, preds, average=None, labels=labels)
-        f1score = nutils.f1_score(train_class, preds, average=None, labels=labels)
-        return acc_score, precision, recall, f1score
 
