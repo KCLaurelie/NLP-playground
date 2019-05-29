@@ -1,48 +1,79 @@
 # from https://github.com/sachinbiradar9/Sentiment-Classification/blob/master/utils.py
 from collections import Counter
-from nltk.corpus import stopwords, words
-from nltk.tokenize import word_tokenize
+from nltk import tokenize
 from nltk.stem import PorterStemmer
 from nltk.stem.snowball import SnowballStemmer
+from nltk.corpus import stopwords
+from gensim.models import Word2Vec
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.feature_extraction import text
 import pandas as pd
+import numpy as np
 import re
 
 
-def preprocess_text(text):  # text = series of texts
-    # Remove all the special characters
-    text = re.sub(r'\W', ' ', str(text))
+def preprocess_text(my_text):  # text = series of texts
+    my_text = my_text.str.strip()  # remove leading/trailing characters
     # to lower case
-    text = text.apply(lambda x: " ".join(x.lower() for x in x.split()))
-    # Removing punctuation
-    text = text.str.replace('[^\w\s]', '')
+    my_text = my_text.str.lower()
+    # Removing punctuation / special characters
+    my_text = my_text.str.replace('[^\w\s]', ' ')
     # Substituting multiple spaces with single space
-    text = re.sub(r'\s+', ' ', text, flags=re.I)
-
+    my_text = my_text.apply(lambda x: ' '.join(x.split()))
     # Stop word removal
     stop = stopwords.words('english')
-    text = text.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
-
+    my_text = my_text.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
     # Stemming
     st = PorterStemmer() #SnowballStemmer('english')
-    text = text.apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
+    my_text = my_text.apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
 
-    res = " ".join(words)
-    return res
+    return my_text
 
 
-def vectorizer(texts):
-    _vectorizer = text.TfidfVectorizer(
-        min_df=0.00125,
-        max_df=0.7,
-        sublinear_tf=True,
-        use_idf=True,
-        analyzer='word',
-        ngram_range=(1, 5)
-    )
-    vectors = _vectorizer.fit_transform(texts)
-    return vectors.toarray()
+def vectorizer(texts, min_df=0.00125, max_df=0.7, algo='tfidf'):
+    stop_words = stopwords.words('english')
+    if algo == 'tfidf':
+        _vectorizer = text.TfidfVectorizer(
+            min_df=min_df,
+            max_df=max_df,
+            sublinear_tf=True,
+            use_idf=True,
+            analyzer='word',
+            ngram_range=(1, 5),
+            stop_words=stop_words
+        )
+        vectors = _vectorizer.fit_transform(texts).toarray()
+    elif algo == 'counter':
+        _vectorizer = CountVectorizer(max_features=2500, min_df=min_df, max_df=max_df, stop_words=stop_words)
+        vectors = _vectorizer.fit_transform(texts).toarray()
+    elif algo == 'word2vec':
+        _size = 100
+        #vocab = [["cat", "say", "meow"], ["dog", "say", "woof"]]
+        sentences = texts.to_list()  # tokenize.sent_tokenize(texts.str.cat(sep='. '))
+        vocab = []
+        for snt in sentences:
+            vocab.append(tokenize.word_tokenize(snt))
+        w2v = Word2Vec(vocab, min_count=1, size=_size)  #, window=6, min_count=5, workers=4)
+        #list(w2v.wv.vocab)
+
+        vectors = np.zeros((len(sentences), _size))
+        for idx, snt in enumerate(sentences):
+            vectors[idx] = [w2v.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
+        vectors = np.zeros((len(sentences), _size))
+        # Loop over sentences
+        for i_snt, snt in enumerate(sentences):
+            cnt = 0
+            for i_word, word in enumerate(snt):  # Loop over the words of a sentence
+                if word in w2v.wv:
+                    vectors[i_snt] += w2v.wv.get_vector(word)
+                    cnt += 1
+            if cnt > 0:
+                vectors[i_snt] = vectors[i_snt] / cnt
+            i_snt += 1
+    else:
+        vectors = 'unknown'
+    return vectors
 
 
 def perf_metrics(data_labels, data_preds):

@@ -20,7 +20,7 @@ models = {
     'Decision Tree': tree.DecisionTreeClassifier(random_state=0),
     'Random Forest': ensemble.RandomForestClassifier(criterion='entropy', n_jobs=10),
     'Logistic Regression': linear_model.LogisticRegression(),
-    'SVM': svm.SVC(),
+    'SVM': svm.SVC(gamma='scale'),
     'SVM with linear kernel': svm.SVC(kernel='linear'),
     'SVM with sigmoid kernel': svm.SVC(kernel='sigmoid'),
     'SVM with poly kernel': svm.SVC(kernel='poly')
