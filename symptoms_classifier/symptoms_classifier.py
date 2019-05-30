@@ -5,13 +5,12 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('Qt5Agg')
 import numpy as np
 import pandas as pd
-
-os.chdir(r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier')
 import symptoms_classifier.NLP_utils as nutils
 import symptoms_classifier.general_utils as gutils
+os.chdir(r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier')
+matplotlib.use('Qt5Agg')
 
 models = {
     'Multinomial NB': naive_bayes.MultinomialNB(),
