@@ -7,6 +7,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction import text
 import pandas as pd
 import numpy as np
+from collections import defaultdict
 from symptoms_classifier.NLP_text_cleaning import clean_string, text2sentences, preprocess_text
 
 
@@ -31,10 +32,21 @@ def test():
     preprocess_text(txt, remove_stopwords=True, stemmer='snowball', lemmatizer=None)
     #vocab = [["cat", "say", "meow"], ["dog", "say", "woof"]]
     w2v = fit_text2vec(clean_text, min_df=0.00125, max_df=0.7, algo='tfidf', _size=100)
+    list(w2v.vocabulary_.keys())[:10]
+    processed_features = transform_text2vec(clean_text, w2v, algo='tfidf')
+
     w2v = fit_text2vec(clean_text, min_df=0.00125, max_df=0.7, algo='word2vec', _size=100)
     list(w2v.wv.vocab)
     return 0
 
+
+def top_features(vectorizer, top_n=2):
+    indices = np.argsort(vectorizer.idf_)[::-1]
+    features = vectorizer.get_feature_names()
+    _top_features = [features[i] for i in indices[:top_n]]
+    return _top_features
+
+# TODO check http://kavita-ganesan.com/extracting-keywords-from-text-tfidf/#.XPFMnohKiUk
 
 def transform_text2vec(my_text, w2v_model, algo='tfidf', _size=100, load_vectorizer=False):
     """
@@ -55,12 +67,14 @@ def transform_text2vec(my_text, w2v_model, algo='tfidf', _size=100, load_vectori
         sentences = my_text.to_list()
         vectors = np.zeros((len(sentences), _size))
 
+        # TODO
         # shall i do that?
         for idx, snt in enumerate(sentences):
             vectors[idx] = [w2v_model.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
         vectors = np.zeros((len(sentences), _size))
 
         # or that???
+        """# Convert each sentence into the average sum of its tokens"""
         # Loop over sentences
         for i_snt, snt in enumerate(sentences):
             cnt = 0

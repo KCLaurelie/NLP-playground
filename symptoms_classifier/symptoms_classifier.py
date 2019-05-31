@@ -46,7 +46,7 @@ def test():
 
 
 def run_model(model, train_data, test_data):
-    train_text = train_data[['text']]
+    train_text = preprocess_text(train_data['text'], remove_stopwords=True, stemmer=None, lemmatizer=None)
     test_text = test_data[['text']]
     train_class = train_data[['class']]
     test_class = test_data[['class']]
