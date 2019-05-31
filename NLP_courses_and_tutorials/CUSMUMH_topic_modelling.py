@@ -30,7 +30,7 @@ import seaborn as sns
 # These are transcribed medical transcriptions sample reports and examples from a variety of clinical disciplines, such as radiology, surgery, discharge summaries. Note that one document can belong to several categories.
 # We will save each document, all its words, and which clinical specialty it belongs to, in a dataframe.
 
-data_folder = r"""C:\Users\K1774755\King's College London\Cognitive Impairment in Schizophrenia - Documents\Courses\CUSMUMH\week 7 - NLP with nltk & spacy"""
+data_folder = r"""C:\Users\K1774755\King's College London\Cognitive Impairment in Schizophrenia - Documents\Courses\CUSMUMH\week 7 - NLP_courses_and_tutorials with nltk & spacy"""
 
 ## get all documents - the data folder contains a zip file with nested folders and .txt documents
 d = os.path.join(data_folder, 'mtsamples_for_topic_model.zip')

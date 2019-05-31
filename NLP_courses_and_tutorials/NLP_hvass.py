@@ -1,7 +1,7 @@
 # import matplotlib.pyplot as plt
 # import tensorflow as tf
 # import tensorlayer as tl
-# import NLP.NLP_Utils
+# import NLP_courses_and_tutorials.NLP_Utils
 # from scipy.spatial.distance import cdist
 
 import numpy as np

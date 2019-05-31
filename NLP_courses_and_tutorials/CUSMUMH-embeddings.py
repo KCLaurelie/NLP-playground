@@ -1,7 +1,7 @@
 from gensim.models import Word2Vec
 from nltk.corpus import brown, movie_reviews
 import os
-data_folder = r"""C:\Users\K1774755\King's College London\Cognitive Impairment in Schizophrenia - Documents\Courses\CUSMUMH\week 7 - NLP with nltk & spacy"""
+data_folder = r"""C:\Users\K1774755\King's College London\Cognitive Impairment in Schizophrenia - Documents\Courses\CUSMUMH\week 7 - NLP_courses_and_tutorials with nltk & spacy"""
 pycharm_folder = r'C:\Users\K1774755\PycharmProjects\toy-models\NLP'
 
 # Let's generate word vectors over the Brown corpus text.

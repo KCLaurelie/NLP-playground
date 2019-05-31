@@ -3,7 +3,7 @@ import nltk
 #import pandas as pd
 import os
 
-data_folder=r'C:\Users\K1774755\Desktop\New folder\SharePoint\Cognitive Impairment in Schiz - Doc\Courses\CUSMUMH\week 7 - NLP with nltk & spacy\data'
+data_folder=r'C:\Users\K1774755\Desktop\New folder\SharePoint\Cognitive Impairment in Schiz - Doc\Courses\CUSMUMH\week 7 - NLP_courses_and_tutorials with nltk & spacy\data'
 input_text=os.path.join(data_folder,'brexit.txt')
 # Open our text file and read the text into a string
 file=open(input_text,encoding="utf8")

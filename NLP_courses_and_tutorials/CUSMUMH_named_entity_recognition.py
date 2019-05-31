@@ -22,7 +22,7 @@ import random
 import os
 
 from collections import OrderedDict
-data_folder = r"""C:\Users\K1774755\King's College London\Cognitive Impairment in Schizophrenia - Documents\Courses\CUSMUMH\week 8 - unsupervized NLP"""
+data_folder = r"""C:\Users\K1774755\King's College London\Cognitive Impairment in Schizophrenia - Documents\Courses\CUSMUMH\week 8 - unsupervized NLP_courses_and_tutorials"""
 
 # 1: corpus
 # We have prepared training and test data in a json format.
