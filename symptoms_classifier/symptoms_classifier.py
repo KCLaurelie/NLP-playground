@@ -5,9 +5,9 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 import matplotlib.pyplot as plt
 import matplotlib
-import numpy as np
 import pandas as pd
-import symptoms_classifier.NLP_utils as nutils
+from symptoms_classifier.NLP_embedding import fit_text2vec, transform_text2vec
+from symptoms_classifier.NLP_text_cleaning import preprocess_text
 import symptoms_classifier.general_utils as gutils
 os.chdir(r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier')
 matplotlib.use('Qt5Agg')
@@ -28,16 +28,16 @@ models = {
 def test():
     data = pd.read_csv("https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv")
     data_clean = data[['airline_sentiment', 'text']].rename(columns={'airline_sentiment': 'class'})
-    data_clean['text'] = nutils.preprocess_text(data_clean['text'])
-    vectorizer = nutils.fit_text2vec(data_clean['text'])
-    processed_features = nutils.transform_text2vec(data_clean['text'], vectorizer)
+    data_clean['text'] = preprocess_text(data_clean['text'])
+    vectorizer = fit_text2vec(data_clean['text'], algo='word2vec', _size=100)
+    processed_features = transform_text2vec(data_clean['text'], vectorizer, algo='word2vec')
     from sklearn.model_selection import train_test_split
     x_train, x_test, y_train, y_test = train_test_split(processed_features, data_clean['class'], test_size=0.8, random_state=0)
 
     classifier = models['SVM']
     classifier.fit(x_train, y_train)
     preds = classifier.predict(x_train)
-    #test_metrics = nutils.perf_metrics(y_train, preds)
+    #test_metrics = gutils.perf_metrics(y_train, preds)
 
     print(confusion_matrix(y_train, preds))
     print(classification_report(y_train, preds))
@@ -52,9 +52,9 @@ def run_model(model, train_data, test_data):
     test_class = test_data[['class']]
 
     # vectorize text data
-    vectorizer = nutils.fit_text2vec(train_text)
-    train_data_features = nutils.transform_text2vec(train_text, vectorizer)
-    test_data_features = nutils.transform_text2vec(test_text, vectorizer)
+    vectorizer = fit_text2vec(train_text)
+    train_data_features = transform_text2vec(train_text, vectorizer)
+    test_data_features = transform_text2vec(test_text, vectorizer)
 
     # train classifier
     classifier = models[model]
@@ -63,8 +63,8 @@ def run_model(model, train_data, test_data):
     # test classifier
     test_preds = classifier.predict(test_data_features)
     train_preds = cross_val_predict(classifier, train_data_features, train_class, cv=10)
-    test_metrics = nutils.perf_metrics(test_class, test_preds)
-    train_metrics = nutils.perf_metrics(train_class, train_preds)
+    test_metrics = gutils.perf_metrics(test_class, test_preds)
+    train_metrics = gutils.perf_metrics(train_class, train_preds)
     return 0
 
 
