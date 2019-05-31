@@ -19,15 +19,19 @@ my_text is a pd.Series of sentences (1 row = 1 sentence)
 def test():
     data = pd.read_csv("https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv")
     data_clean = data[['airline_sentiment', 'text']].rename(columns={'airline_sentiment': 'class'})
-    my_text = data_clean['text'][0:10]
+    txt = data_clean['text'][0:10]
     raw_text = "hi my name is link...I like to fight, And i'm in love with princess zelda.bim. bam.Boum. Bom"
     raw_text = clean_string(raw_text)
     raw_text = text2sentences(raw_text)
 
-    my_text = preprocess_text(my_text)
+    txt = 'C:\\temp\\bla.txt'
+    text2sentences(txt)
+
+    clean_text = preprocess_text(txt)
+    preprocess_text(txt, remove_stopwords=True, stemmer='snowball', lemmatizer=None)
     #vocab = [["cat", "say", "meow"], ["dog", "say", "woof"]]
-    w2v = fit_text2vec(my_text, min_df=0.00125, max_df=0.7, algo='tfidf', _size=100)
-    w2v = fit_text2vec(my_text, min_df=0.00125, max_df=0.7, algo='word2vec', _size=100)
+    w2v = fit_text2vec(clean_text, min_df=0.00125, max_df=0.7, algo='tfidf', _size=100)
+    w2v = fit_text2vec(clean_text, min_df=0.00125, max_df=0.7, algo='word2vec', _size=100)
     list(w2v.wv.vocab)
     return 0
 
@@ -102,7 +106,10 @@ def fit_text2vec(my_text, min_df=0.00125, max_df=0.7, algo='tfidf', _size=100, s
         w2v = _vectorizer.fit(my_text)
         if save_vectorizer: pickle.dump(w2v, open("vectorizer.pickle", "wb"))
     elif 'word2vec' in algo:
-        sentences = my_text.to_list()  # tokenize.sent_tokenize(texts.str.cat(sep='. '))
+        if isinstance(my_text, str):
+            sentences = tokenize.sent_tokenize(my_text)
+        else:
+            sentences = my_text.to_list()
         vocab = []
         for snt in sentences:
             vocab.append(tokenize.word_tokenize(snt))
