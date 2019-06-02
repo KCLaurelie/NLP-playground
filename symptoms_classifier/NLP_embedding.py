@@ -1,5 +1,5 @@
-from collections import Counter
 import pickle  # to save models
+import nltk
 from nltk import tokenize
 from nltk.corpus import stopwords
 from gensim.models import Word2Vec
@@ -7,9 +7,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction import text
 import pandas as pd
 import numpy as np
-from collections import defaultdict
 from symptoms_classifier.NLP_text_cleaning import clean_string, text2sentences, preprocess_text
-
+nltk.download('wordnet')
 
 """
 FOR ALL THE FUNCTIONS BELOW:
@@ -48,43 +47,48 @@ def top_features(vectorizer, top_n=2):
 
 # TODO check http://kavita-ganesan.com/extracting-keywords-from-text-tfidf/#.XPFMnohKiUk
 
-def transform_text2vec(my_text, w2v_model, algo='tfidf', _size=100, load_vectorizer=False):
+
+def transform_text2vec(my_text, w2v_model, algo='tfidf', _size=100, saved_vectorizer=None, word2vec_option='word'):
     """
 
     :param my_text: pd.Series of texts (1 row = 1 sentence)
     :param w2v_model: pre-trained embedding model to use
     :param algo: embedding model type (can be either tfidf, counter or word2vec)
     :param _size: size of vector desired
-    :param load_vectorizer: option to load pre-trained model from file
+    :param saved_vectorizer: option to load pre-trained model from file
+    :param word2vec_option: represent each word separately ('word') or do an average sum by sentence (default)
     :return: vectorized text
     """
     algo = str(algo).lower()
     if any(substring in algo for substring in ('idf', 'count')):
-        if load_vectorizer: w2v_model = pickle.load(open("vectorizer.pickle"), "rb")
+        if saved_vectorizer is not None:
+            w2v_model = pickle.load(open(saved_vectorizer), "rb")
         vectors = w2v_model.transform(my_text).toarray()
     elif 'word2vec' in algo:
-        if load_vectorizer: w2v_model = Word2Vec.load("word2vec.model")
+        if saved_vectorizer is not None:
+            w2v_model = Word2Vec.load(saved_vectorizer)
         sentences = my_text.to_list()
-        vectors = np.zeros((len(sentences), _size))
 
-        # TODO
-        # shall i do that?
-        for idx, snt in enumerate(sentences):
-            vectors[idx] = [w2v_model.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
-        vectors = np.zeros((len(sentences), _size))
-
-        # or that???
-        """# Convert each sentence into the average sum of its tokens"""
-        # Loop over sentences
-        for i_snt, snt in enumerate(sentences):
-            cnt = 0
-            for i_word, word in enumerate(snt):  # Loop over the words of a sentence
-                if word in w2v_model.wv:
-                    vectors[i_snt] += w2v_model.wv.get_vector(word)
-                    cnt += 1
-            if cnt > 0:
-                vectors[i_snt] = vectors[i_snt] / cnt
-            i_snt += 1
+        if word2vec_option == 'word':
+            # TODO
+            # shall i do that?
+            vectors = np.zeros((len(sentences), _size))
+            for idx, snt in enumerate(sentences):
+                vectors[idx] = [w2v_model.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
+        else:
+            # or that???
+            """# Convert each sentence into the average sum of its tokens"""
+            vectors = np.zeros((len(sentences), _size))
+            # Loop over sentences
+            for i_snt, snt in enumerate(sentences):
+                cnt = 0
+                for i_word, word in enumerate(snt):  # Loop over the words of a sentence
+                    if word in w2v_model.wv:
+                        vectors[i_snt] += w2v_model.wv.get_vector(word)
+                        cnt += 1
+                if cnt > 0:
+                    vectors[i_snt] = vectors[i_snt] / cnt
+                i_snt += 1
     else:
         return 'unknown algo'
     return vectors
@@ -94,8 +98,8 @@ def fit_text2vec(my_text, min_df=0.00125, max_df=0.7, algo='tfidf', _size=100, s
     """
 
     :param my_text: pd.Series of texts (1 row = 1 sentence)
-    :param min_df: ignore words below that frequency (used for tfidf and couter)
-    :param max_df: ignore words above that frequency (used for tfidf and couter)
+    :param min_df: ignore words below that frequency (used for tfidf and counter)
+    :param max_df: ignore words above that frequency (used for tfidf and counter)
     :param algo: embedding model type (can be either tfidf, counter or word2vec)
     :param _size: desired vector size
     :param save_vectorizer: option to save trained model
@@ -118,7 +122,8 @@ def fit_text2vec(my_text, min_df=0.00125, max_df=0.7, algo='tfidf', _size=100, s
     elif 'count' in algo:
         _vectorizer = CountVectorizer(max_features=2500, min_df=min_df, max_df=max_df, stop_words=stop_words)
         w2v = _vectorizer.fit(my_text)
-        if save_vectorizer: pickle.dump(w2v, open("vectorizer.pickle", "wb"))
+        if save_vectorizer:
+            pickle.dump(w2v, open("vectorizer.pickle", "wb"))
     elif 'word2vec' in algo:
         if isinstance(my_text, str):
             sentences = tokenize.sent_tokenize(my_text)
@@ -128,7 +133,8 @@ def fit_text2vec(my_text, min_df=0.00125, max_df=0.7, algo='tfidf', _size=100, s
         for snt in sentences:
             vocab.append(tokenize.word_tokenize(snt))
         w2v = Word2Vec(vocab, min_count=1, size=_size)  #, window=6, min_count=5, workers=4)
-        if save_vectorizer: w2v.save("word2vec.model")
+        if save_vectorizer:
+            w2v.save("word2vec.model")
     else:
         return 'unknown algo'
     return w2v
