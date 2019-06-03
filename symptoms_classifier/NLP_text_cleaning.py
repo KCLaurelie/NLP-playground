@@ -9,18 +9,17 @@ import contractions
 import unicodedata
 
 
-
 """
 FOR ALL THE FUNCTIONS BELOW:
-my_text is either a string or a pd.Series of sentences (1 row = 1 sentence)
+my_text can either be a string or a pd.Series of sentences (1 row = 1 sentence)
 """
 
 
 def text2sentences(raw_text):
     """
-
+    converts text into a series of sentences
     :param raw_text: string or file of the path containing the text
-    :return: dataframe of sentences (1 row = 1 sentence)
+    :return: pd.Series of sentences (1 row = 1 sentence)
     """
     if raw_text.endswith('.txt'):
         with open(raw_text, encoding='utf8') as f:
@@ -33,6 +32,12 @@ def text2sentences(raw_text):
 
 
 def keywords_filter(my_string, keywords):
+    """
+    checks if a string contains any keywords from a list, and returns the string if so
+    :param my_string: string to check
+    :param keywords: list of keywords
+    :return: original string if it contains any keywords from the string, NaN if not
+    """
     if any(s in my_string for s in list(keywords)):
         return my_string
     else:
@@ -41,7 +46,7 @@ def keywords_filter(my_string, keywords):
 
 def preprocess_text(my_text, remove_stopwords=False, stemmer=None, lemmatizer=None, keywords=None):
     """
-
+    cleans text and outputs series of pre-processed sentences
     :param my_text: raw text, can be either string, .txt file containing text or pd.Series of sentences
     :param remove_stopwords: option to remove or keep stopwords (nltk function)
     :param stemmer: can be either porter, snowball, lancaster or None
@@ -71,6 +76,13 @@ def preprocess_text(my_text, remove_stopwords=False, stemmer=None, lemmatizer=No
 
 
 def clean_string(my_string, remove_punctuation=False):
+    """
+
+    :param my_string: string to clean
+    :param remove_punctuation: select True to remove all punctuation/special characters from the text.
+    otherwise only special characters will be removed.
+    :return: clean string, ready to be tokenized
+    """
     my_string = my_string.strip()  # remove leading/trailing characters
     my_string = unicodedata.normalize('NFKD', my_string).\
         encode('ascii', 'ignore').decode('utf-8', 'ignore')  # remove non ascii characters
@@ -113,6 +125,12 @@ def stem_text(my_text, stemmer='snowball'):
 
 
 def lemmatize_verbs(my_text, lemmatizer='wordnet'):
+    """
+
+    :param my_text: pd.Series of texts
+    :param lemmatizer: type of lemmatizer to use
+    :return: lemmatized pd.Series of texts
+    """
     lemmatizer = lemmatizer.lower()
     if 'wordnet' in lemmatizer:
         lm = WordNetLemmatizer()
