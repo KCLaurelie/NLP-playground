@@ -8,7 +8,6 @@ import re
 import contractions
 import unicodedata
 
-
 """
 FOR ALL THE FUNCTIONS BELOW:
 my_text can either be a string or a pd.Series of sentences (1 row = 1 sentence)
@@ -42,6 +41,16 @@ def keywords_filter(my_string, keywords):
         return my_string
     else:
         return np.nan
+
+
+def find_with_context(haystack, needle, context_length=10, escape=True):
+    if escape:
+        needle = re.escape(needle)
+    # res = re.findall(r'((?:\S+\s+){,%d}\b(%s)\b(?:\s+\S+){,%d})' % (context_length, needle, context_length), haystack)
+    res = re.findall(r'((?:\S+\s+){,%d}[^.]*?(%s)[^.](?:\s+\S+){,%d})' % (context_length, needle, context_length),
+                     haystack)
+    # re.findall(r"([^.]*?(%s)[^.]*\.?!)" % needle, haystack)
+    return res
 
 
 def preprocess_text(my_text, remove_stopwords=False, stemmer=None, lemmatizer=None, keywords=None):
@@ -84,7 +93,7 @@ def clean_string(my_string, remove_punctuation=False):
     :return: clean string, ready to be tokenized
     """
     my_string = my_string.strip()  # remove leading/trailing characters
-    my_string = unicodedata.normalize('NFKD', my_string).\
+    my_string = unicodedata.normalize('NFKD', my_string). \
         encode('ascii', 'ignore').decode('utf-8', 'ignore')  # remove non ascii characters
     my_string = my_string.replace('i', 'I')  # to allow expansion of i'm, i've...
     my_string = contractions.fix(my_string)  # expand english contractions (didn't -> did not)
@@ -114,12 +123,13 @@ def stem_text(my_text, stemmer='snowball'):
     stemmer = stemmer.lower()
     if 'porter' in stemmer:
         st = PorterStemmer()
-    elif 'snowball' in stemmer:
+    elif 'snowball' in stemmer or 'default' in stemmer:
         st = SnowballStemmer('english')
     elif 'lancaster' in stemmer:
         st = LancasterStemmer()
     else:
-        return 'unknow stemmer'
+        print('unknown stemmer, skipping stemming')
+        return my_text
     my_text = my_text.apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
     return my_text
 
@@ -132,10 +142,10 @@ def lemmatize_verbs(my_text, lemmatizer='wordnet'):
     :return: lemmatized pd.Series of texts
     """
     lemmatizer = lemmatizer.lower()
-    if 'wordnet' in lemmatizer:
+    if 'wordnet' in lemmatizer or 'default' in lemmatizer:
         lm = WordNetLemmatizer()
     else:
-        return 'unknow lemmatizer'
+        print('unknown lemmatizer, skipping lemmatizing')
+        return my_text
     my_text = my_text.apply(lambda x: " ".join([lm.lemmatize(word, pos='v') for word in x.split()]))
     return my_text
-
