@@ -43,14 +43,48 @@ def keywords_filter(my_string, keywords):
         return np.nan
 
 
-def find_with_context(haystack, needle, context_length=10, escape=True):
-    if escape:
-        needle = re.escape(needle)
-    # res = re.findall(r'((?:\S+\s+){,%d}\b(%s)\b(?:\s+\S+){,%d})' % (context_length, needle, context_length), haystack)
-    res = re.findall(r'((?:\S+\s+){,%d}[^.]*?(%s)[^.](?:\s+\S+){,%d})' % (context_length, needle, context_length),
-                     haystack)
-    # re.findall(r"([^.]*?(%s)[^.]*\.?!)" % needle, haystack)
-    return res
+def find_with_context(raw_text, keywords, context_length=20, context_type='portion', keyword_search='together'):
+    """
+    extracts portion of text containing specific keyword
+    :param raw_text: string or file of the path containing the text
+    :param keywords: the list of keywords that has to be contained in the text portion
+    :param context_length: the size of the portion of text (each side) in number of words to extract
+                            e.g. context_length = 3 means we want to retrieve 3 words surrounding the keyword
+    :param context_type: option to return either the portion of text surrounding the keyword ('portion')
+                        or extract the sentences ('sentence')
+    :param keyword_search: ways to search for keywords
+                            together: if 2 keywords are in the same text portion, will only return the joint portion
+                            separate: if 2 keywords are in the same text portion, will return 2 portions
+    :return: series of portions of text that contain the keyword
+    """
+    # convert keywords input to list
+    keywords = [keywords] if isinstance(keywords, str) else list(keywords)
+
+    # read text from file if applicable
+    if raw_text.endswith('.txt'):
+        with open(raw_text, encoding='utf8') as f:
+            raw_text = f.read().strip().replace('\n', '. ')
+
+    # now extract portions of text containing the keywords
+    if 'sentence' in context_type.lower():  # extract sentences containing the keywords
+        # res = re.findall(r"([^.]*?{}[^.]*\.)".format(keyword), raw_text.lower())
+        if keyword_search == 'together':
+            res = [s + '.' for s in raw_text.split('.') if any(key in s.lower() for key in keywords)]  # faster than regex
+        else:
+            res = []
+            for key in keywords:
+                res.extend([s + '.' for s in raw_text.split('.') if key in s.lower()])  # this seems faster than regex
+    else:  # extract portions of text containing the keywords
+        if keyword_search == 'together':
+            key = '|'.join(list(keywords))
+            regex = r'\w*\W*' * context_length + key + r'\w*\W*' * context_length
+            res = re.findall(regex, raw_text, re.I)
+        else:
+            res = []
+            for key in keywords:
+                regex = r'\w*\W*'*context_length + key + r'\w*\W*'*context_length
+                res.extend(re.findall(regex, raw_text, re.I))
+    return pd.Series(res)
 
 
 def preprocess_text(my_text, remove_stopwords=False, stemmer=None, lemmatizer=None, keywords=None):

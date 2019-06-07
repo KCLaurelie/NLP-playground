@@ -16,7 +16,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-73">
+            <state relative-caret-position="374">
               <caret line="32" column="92" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="92" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -28,8 +28,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="11">
-              <caret line="25" selection-start-line="25" selection-end-line="25" />
+            <state relative-caret-position="289">
+              <caret line="26" column="4" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="29" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -40,8 +40,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="493">
-              <caret line="50" column="21" selection-start-line="50" selection-start-column="21" selection-end-line="50" selection-end-column="21" />
+            <state relative-caret-position="-17">
+              <caret line="55" column="116" selection-start-line="55" selection-start-column="116" selection-end-line="55" selection-end-column="116" />
             </state>
           </provider>
         </entry>
@@ -61,7 +61,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/NN_pytorch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1360">
+            <state relative-caret-position="-181">
               <caret line="80" column="47" selection-start-line="80" selection-start-column="47" selection-end-line="80" selection-end-column="47" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
@@ -73,8 +73,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NLP_courses_and_tutorials/NLP_hvass.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="397">
-              <caret line="105" column="5" lean-forward="true" selection-start-line="105" selection-start-column="5" selection-end-line="105" selection-end-column="5" />
+            <state relative-caret-position="1683">
+              <caret line="105" column="5" selection-start-line="105" selection-start-column="5" selection-end-line="105" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -154,10 +154,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-3848" />
-    <option name="y" value="-8" />
-    <option name="width" value="797" />
-    <option name="height" value="438" />
+    <option name="x" value="-1732" />
+    <option name="y" value="126" />
+    <option name="width" value="1292" />
+    <option name="height" value="732" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -434,12 +434,18 @@
       <option name="project" value="LOCAL" />
       <updated>1559559970611</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="added keyword filtering functions">
+      <created>1559839531871</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1559839531871</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-3848" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
+    <frame x="-1928" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15858799" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -454,14 +460,13 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.25568798" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50146973" side_tool="true" weight="0.22617681" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="10" sideWeight="0.49853027" visible="true" weight="0.22426869" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="10" sideWeight="0.49853027" visible="true" weight="0.22318527" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="test github account" />
     <MESSAGE value="changed en model location" />
     <MESSAGE value="changed paths&#10;removed ltsm" />
     <MESSAGE value="made data dir configurable&#10;added option to ignore errors when reading files" />
@@ -486,7 +491,8 @@
     <MESSAGE value="cleanup" />
     <MESSAGE value="added keyword filter" />
     <MESSAGE value="added comments" />
-    <option name="LAST_COMMIT_MESSAGE" value="added comments" />
+    <MESSAGE value="added keyword filtering functions" />
+    <option name="LAST_COMMIT_MESSAGE" value="added keyword filtering functions" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/NLP/CUSMUMH-lstm.py" />
@@ -648,6 +654,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/symptoms_classifier/general_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-149">
+          <caret line="3" selection-start-line="3" selection-end-line="3" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="32" column="92" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="92" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/NLP_courses_and_tutorials/ZK_022_sentiment_detection.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1054">
@@ -655,6 +681,13 @@
           <folding>
             <element signature="e#211#230#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NLP_courses_and_tutorials/NLP_hvass.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1683">
+          <caret line="105" column="5" selection-start-line="105" selection-start-column="5" selection-end-line="105" selection-end-column="5" />
         </state>
       </provider>
     </entry>
@@ -668,19 +701,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/general_utils.py">
+    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-149">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        <state relative-caret-position="289">
+          <caret line="26" column="4" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="29" />
           <folding>
-            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/symptoms_classifier/NN_pytorch.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1360">
+        <state relative-caret-position="-181">
           <caret line="80" column="47" selection-start-line="80" selection-start-column="47" selection-end-line="80" selection-end-column="47" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
@@ -688,37 +721,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NLP_courses_and_tutorials/NLP_hvass.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="397">
-          <caret line="105" column="5" lean-forward="true" selection-start-line="105" selection-start-column="5" selection-end-line="105" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="11">
-          <caret line="25" selection-start-line="25" selection-end-line="25" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-73">
-          <caret line="32" column="92" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="92" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="50" column="21" selection-start-line="50" selection-start-column="21" selection-end-line="50" selection-end-column="21" />
+        <state relative-caret-position="-17">
+          <caret line="55" column="116" selection-start-line="55" selection-start-column="116" selection-end-line="55" selection-end-column="116" />
         </state>
       </provider>
     </entry>
