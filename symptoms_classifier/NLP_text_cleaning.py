@@ -58,14 +58,14 @@ def find_with_context(raw_text, keywords, context_length=20, context_type='porti
     :return: series of portions of text that contain the keyword
     """
     # convert keywords input to list
-    keywords = [keywords] if isinstance(keywords, str) else list(keywords)
+    keywords = [keywords.lower()] if isinstance(keywords, str) else [x.lower() for x in keywords]
 
     # read text from file if applicable
     if raw_text.endswith('.txt'):
         with open(raw_text, encoding='utf8') as f:
             raw_text = f.read().strip().replace('\n', '. ')
 
-    # now extract portions of text containing the keywords
+    # now extract portions/sentences of text containing the keywords
     if 'sentence' in context_type.lower():  # extract sentences containing the keywords
         # res = re.findall(r"([^.]*?{}[^.]*\.)".format(keyword), raw_text.lower())
         if keyword_search == 'together':
@@ -127,13 +127,13 @@ def clean_string(my_string, remove_punctuation=False):
     :return: clean string, ready to be tokenized
     """
     my_string = my_string.strip()  # remove leading/trailing characters
-    my_string = unicodedata.normalize('NFKD', my_string). \
-        encode('ascii', 'ignore').decode('utf-8', 'ignore')  # remove non ascii characters
+    my_string = unicodedata.normalize('NFKD', my_string).encode('ascii', 'ignore').decode('utf-8', 'ignore')  # remove non ascii characters
     my_string = my_string.replace('i', 'I')  # to allow expansion of i'm, i've...
     my_string = contractions.fix(my_string)  # expand english contractions (didn't -> did not)
     my_string = my_string.lower()  # to lower case
     my_string = my_string.replace('e.g.', 'exempli gratia')  # replace e.g. (otherwise punkt tokenizer breaks)
     my_string = my_string.replace('i.e.', 'id est')  # replace i.e. (otherwise punkt tokenizer breaks)
+    my_string = my_string.replace('. ', '.')  # remove spaces after dot to get rid of escapes
     my_string = re.sub(r'\.+', ".", my_string)  # replace multiple dots by single dot
     my_string = my_string.replace('.', '. ').replace('.  ', '. ')  # ensure dots are followed by space for tokenization
 
