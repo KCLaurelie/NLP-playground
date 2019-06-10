@@ -7,11 +7,21 @@ import numpy as np
 import re
 import contractions
 import unicodedata
+import itertools
 
 """
 FOR ALL THE FUNCTIONS BELOW:
 my_text can either be a string or a pd.Series of sentences (1 row = 1 sentence)
 """
+
+
+def parse_text(raw_text, convert_to_series=False):
+    if raw_text.endswith('.txt'):
+        with open(raw_text, encoding='utf8') as f:
+            raw_text = f.read().strip().replace('\n', '. ')
+    if isinstance(raw_text, str) and convert_to_series:  # convert text to sentences if not already done
+        raw_text = text2sentences(raw_text)
+    return raw_text
 
 
 def text2sentences(raw_text):
@@ -20,9 +30,6 @@ def text2sentences(raw_text):
     :param raw_text: string or file of the path containing the text
     :return: pd.Series of sentences (1 row = 1 sentence)
     """
-    if raw_text.endswith('.txt'):
-        with open(raw_text, encoding='utf8') as f:
-            raw_text = f.read().strip().replace('\n', '. ')
     # some pre-cleaning before using punkt tokenizer
     raw_text = clean_string(raw_text, remove_punctuation=False)  # we keep punctuation for tokenizing
     sentences = tokenize.sent_tokenize(raw_text)
@@ -41,6 +48,50 @@ def keywords_filter(my_string, keywords):
         return my_string
     else:
         return np.nan
+
+
+def near_words_filter(raw_text, word1, word2, max_distance=float('inf'), either_side=True):
+    """
+    finds 2 words near each other in a string
+    :param raw_text: string to look into
+    :param word1: first word
+    :param word2: second word
+    :param max_distance: max number of words separating word1 and word2
+    :param either_side: looking for word1...word2 only (False) or word2...word1 as well (True)
+    :return: 1 if a match is found, 0 otherwise
+    """
+    word1 = word1.lower()
+    word2 = word2.lower()
+    raw_text = raw_text.lower()
+    if max_distance == float('inf'):  # no need to do regex if max distance is infinity
+        res = 1 if word1 in raw_text and word2 in raw_text else 0
+    else:
+        max_distance = str(max_distance)
+        side1 = '?:' + word1 + r'\W+(?:\w+\W+){0,' + max_distance + r'}?' + word2
+        side2 = word2 + r'\W+(?:\w+\W+){0,' + max_distance + r'}?' + word1
+        regex = r'(' + side1 + '|' + side2 + r')' if either_side else side1
+        match = re.search(regex, raw_text, re.I)
+        res = 0 if match is None else 1
+    return res
+
+
+def distance_between_words(raw_text, word1, word2):
+    """
+    determines proximity of 2 words in a sentence
+    :param raw_text: string to look into
+    :param word1: first word
+    :param word2: second word
+    :return: minimum distance between the occurences of word1 and word2 in the string
+    """
+    words = raw_text.split()
+    if word1 in words and word2 in words:
+        w1_indexes = [index for index, value in enumerate(words) if value == word1]
+        w2_indexes = [index for index, value in enumerate(words) if value == word2]
+        distances = [abs(item[0] - item[1]) for item in itertools.product(w1_indexes, w2_indexes)]
+        res = min(distances)
+    else:
+        res = np.nan
+    return res
 
 
 def find_with_context(raw_text, keywords, context_length=20, context_type='portion', keyword_search='together'):
@@ -87,70 +138,69 @@ def find_with_context(raw_text, keywords, context_length=20, context_type='porti
     return pd.Series(res)
 
 
-def preprocess_text(my_text, remove_stopwords=False, stemmer=None, lemmatizer=None, keywords=None):
+def preprocess_text(raw_text, remove_stopwords=False, stemmer=None, lemmatizer=None, keywords=None):
     """
     cleans text and outputs series of pre-processed sentences
-    :param my_text: raw text, can be either string, .txt file containing text or pd.Series of sentences
+    :param raw_text: raw text, can be either string, .txt file containing text or pd.Series of sentences
     :param remove_stopwords: option to remove or keep stopwords (nltk function)
     :param stemmer: can be either porter, snowball, lancaster or None
     :param lemmatizer: for verb lemmatization. can be either wordnet or None
     :param keywords: list of keywords to select sentences of interest
     :return: pd.Series of cleaned sentences
     """
-    if isinstance(my_text, str):  # convert text to sentences if not already done
-        my_text = text2sentences(my_text)
-    else:  # otherwise just clean the text
-        my_text = my_text.apply(lambda x: clean_string(x, remove_punctuation=True))
+    raw_text = parse_text(raw_text, convert_to_series=True)
+    # clean the text
+    raw_text = raw_text.apply(lambda x: clean_string(x, remove_punctuation=True))
     # keep only sentences with relevant keywords
     if keywords is not None:
         keywords = [x.lower() for x in keywords]
-        my_text = my_text.apply(lambda x: keywords_filter(x, keywords=keywords)).dropna()
+        raw_text = raw_text.apply(lambda x: keywords_filter(x, keywords=keywords)).dropna()
     # removing stop words
     if remove_stopwords:
         stop = stopwords.words('english')
-        my_text = my_text.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
+        raw_text = raw_text.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
     # stemming
     if stemmer is not None:
-        my_text = stem_text(my_text, stemmer)
+        raw_text = raw_text.apply(lambda x: stem_text(x, stemmer))
     # lemming with respect to verbs
     if lemmatizer is not None:
-        my_text = lemmatize_verbs(my_text, lemmatizer)
-    return my_text.replace('', np.nan).dropna()
+        raw_text = raw_text.apply(lambda x: lemmatize_verbs(x, lemmatizer))
+    return raw_text.replace('', np.nan).dropna()
 
 
-def clean_string(my_string, remove_punctuation=False):
+def clean_string(raw_text, remove_punctuation=False):
     """
 
-    :param my_string: string to clean
+    :param raw_text: string to clean
     :param remove_punctuation: select True to remove all punctuation/special characters from the text.
     otherwise only special characters will be removed.
     :return: clean string, ready to be tokenized
     """
-    my_string = my_string.strip()  # remove leading/trailing characters
-    my_string = unicodedata.normalize('NFKD', my_string).encode('ascii', 'ignore').decode('utf-8', 'ignore')  # remove non ascii characters
-    my_string = my_string.replace('i', 'I')  # to allow expansion of i'm, i've...
-    my_string = contractions.fix(my_string)  # expand english contractions (didn't -> did not)
-    my_string = my_string.lower()  # to lower case
-    my_string = my_string.replace('e.g.', 'exempli gratia')  # replace e.g. (otherwise punkt tokenizer breaks)
-    my_string = my_string.replace('i.e.', 'id est')  # replace i.e. (otherwise punkt tokenizer breaks)
-    my_string = my_string.replace('. ', '.')  # remove spaces after dot to get rid of escapes
-    my_string = re.sub(r'\.+', ".", my_string)  # replace multiple dots by single dot
-    my_string = my_string.replace('.', '. ').replace('.  ', '. ')  # ensure dots are followed by space for tokenization
+    raw_text = raw_text.strip()  # remove leading/trailing characters
+    raw_text = unicodedata.normalize('NFKD', raw_text).encode('ascii', 'ignore').decode('utf-8', 'ignore')  # remove non ascii characters
+    raw_text = raw_text.replace('i', 'I')  # to allow expansion of i'm, i've...
+    raw_text = contractions.fix(raw_text)  # expand english contractions (didn't -> did not)
+    raw_text = raw_text.lower()  # to lower case
+    raw_text = raw_text.replace('e.g.', 'exempli gratia')  # replace e.g. (otherwise punkt tokenizer breaks)
+    raw_text = raw_text.replace('i.e.', 'id est')  # replace i.e. (otherwise punkt tokenizer breaks)
+    raw_text = raw_text.replace('. ', '.')  # remove spaces after dot to get rid of escapes
+    raw_text = re.sub(r'\.+', ".", raw_text)  # replace multiple dots by single dot
+    raw_text = raw_text.replace('.', '. ').replace('.  ', '. ')  # ensure dots are followed by space for tokenization
 
     # remove special characters
     if remove_punctuation:
-        my_string = re.sub(r'[^\w\s]', ' ', my_string)
+        raw_text = re.sub(r'[^\w\s]', ' ', raw_text)
     else:  # keep bare minimum punctuation
-        my_string = re.sub(r'[^a-zA-Z0-9.,-?!()\s]+', ' ', my_string)
-    my_string = ' '.join(my_string.split())  # substitute multiple spaces with single space
+        raw_text = re.sub(r'[^a-zA-Z0-9.,-?!()\s]+', ' ', raw_text)
+    raw_text = ' '.join(raw_text.split())  # substitute multiple spaces with single space
 
-    return my_string
+    return raw_text
 
 
-def stem_text(my_text, stemmer='snowball'):
+def stem_text(raw_text, stemmer='snowball'):
     """
 
-    :param my_text: pd.Series of texts
+    :param raw_text: string to stem
     :param stemmer: type of stemmer to use, can be either porter, snowball or lancaster
     :return: stemmed pd.Series of texts
     """
@@ -163,15 +213,16 @@ def stem_text(my_text, stemmer='snowball'):
         st = LancasterStemmer()
     else:
         print('unknown stemmer, skipping stemming')
-        return my_text
-    my_text = my_text.apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
-    return my_text
+        return raw_text
+    # raw_text = raw_text.apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
+    raw_text = " ".join([st.stem(word) for word in raw_text.split()])
+    return raw_text
 
 
-def lemmatize_verbs(my_text, lemmatizer='wordnet'):
+def lemmatize_verbs(raw_text, lemmatizer='wordnet'):
     """
 
-    :param my_text: pd.Series of texts
+    :param raw_text: string to lemmatize
     :param lemmatizer: type of lemmatizer to use
     :return: lemmatized pd.Series of texts
     """
@@ -180,6 +231,7 @@ def lemmatize_verbs(my_text, lemmatizer='wordnet'):
         lm = WordNetLemmatizer()
     else:
         print('unknown lemmatizer, skipping lemmatizing')
-        return my_text
-    my_text = my_text.apply(lambda x: " ".join([lm.lemmatize(word, pos='v') for word in x.split()]))
-    return my_text
+        return raw_text
+    # raw_text = raw_text.apply(lambda x: " ".join([lm.lemmatize(word, pos='v') for word in x.split()]))
+    raw_text = " ".join([lm.lemmatize(word, pos='v') for word in raw_text.split()])
+    return raw_text
