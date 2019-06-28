@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/brcphd-master/Big+Data+-+BRC+PhD+Teaching_no+output.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/brcphd-master/Big+Data+-+BRC+PhD+Teaching_no+output.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py" beforeDir="false" afterPath="$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,8 +17,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="32" column="92" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="92" />
+            <state relative-caret-position="425">
+              <caret line="35" selection-start-line="35" selection-end-line="35" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -28,11 +29,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="27" column="11" selection-start-line="27" selection-start-column="11" selection-end-line="27" selection-end-column="11" />
-              <folding>
-                <element signature="e#0#31#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-318">
+              <caret line="9" column="34" selection-start-line="9" selection-start-column="34" selection-end-line="9" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -40,8 +38,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7">
-              <caret line="36" column="23" lean-forward="true" selection-start-line="36" selection-start-column="23" selection-end-line="36" selection-end-column="23" />
+            <state relative-caret-position="141">
+              <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+              <folding>
+                <element signature="e#0#25#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -61,7 +62,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/NN_pytorch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-181">
+            <state relative-caret-position="1224">
               <caret line="80" column="47" selection-start-line="80" selection-start-column="47" selection-end-line="80" selection-end-column="47" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
@@ -157,7 +158,7 @@
     <option name="x" value="-18" />
     <option name="y" value="-18" />
     <option name="width" value="3876" />
-    <option name="height" value="2076" />
+    <option name="height" value="2196" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -175,12 +176,7 @@
             <path>
               <item name="toy-models" type="b2602c69:ProjectViewProjectNode" />
               <item name="toy-models" type="462c0819:PsiDirectoryNode" />
-              <item name="NLP_courses_and_tutorials" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="toy-models" type="b2602c69:ProjectViewProjectNode" />
-              <item name="toy-models" type="462c0819:PsiDirectoryNode" />
-              <item name="symptoms_classifier" type="462c0819:PsiDirectoryNode" />
+              <item name="longitudinal_models" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -448,18 +444,38 @@
       <option name="project" value="LOCAL" />
       <updated>1559911927829</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="modified find_with_context function">
+      <created>1560008152178</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1560008152178</updated>
+    </task>
+    <task id="LOCAL-00035" summary="added words distance functions and refactored code">
+      <created>1560160590986</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1560160590986</updated>
+    </task>
+    <task id="LOCAL-00036" summary="added">
+      <created>1561749903393</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1561749903393</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="-6" width="1292" height="692" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23926868" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23926868" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3280142" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -468,15 +484,13 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.25568798" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50146973" side_tool="true" weight="0.22617681" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="10" sideWeight="0.49853027" visible="true" weight="0.36524823" />
+      <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.49853027" visible="true" weight="0.2677305" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="changed paths&#10;removed ltsm" />
-    <MESSAGE value="made data dir configurable&#10;added option to ignore errors when reading files" />
     <MESSAGE value="upload" />
     <MESSAGE value="added templates" />
     <MESSAGE value="updated python version" />
@@ -494,13 +508,15 @@
     <MESSAGE value="refactored code" />
     <MESSAGE value="deleted" />
     <MESSAGE value="added spell checking / refactored" />
-    <MESSAGE value="added" />
     <MESSAGE value="cleanup" />
     <MESSAGE value="added keyword filter" />
     <MESSAGE value="added comments" />
     <MESSAGE value="added keyword filtering functions" />
     <MESSAGE value="added find_with_context function" />
-    <option name="LAST_COMMIT_MESSAGE" value="added find_with_context function" />
+    <MESSAGE value="modified find_with_context function" />
+    <MESSAGE value="added words distance functions and refactored code" />
+    <MESSAGE value="added" />
+    <option name="LAST_COMMIT_MESSAGE" value="added" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/NLP/CUSMUMH-lstm.py" />
@@ -674,8 +690,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="32" column="92" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="92" />
+        <state relative-caret-position="425">
+          <caret line="35" selection-start-line="35" selection-end-line="35" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
@@ -688,6 +704,16 @@
           <caret line="77" column="27" selection-start-line="77" selection-start-column="27" selection-end-line="77" selection-end-column="27" />
           <folding>
             <element signature="e#211#230#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NN_pytorch.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1224">
+          <caret line="80" column="47" selection-start-line="80" selection-start-column="47" selection-end-line="80" selection-end-column="47" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -709,30 +735,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NN_pytorch.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-181">
-          <caret line="80" column="47" selection-start-line="80" selection-start-column="47" selection-end-line="80" selection-end-column="47" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="27" column="11" selection-start-line="27" selection-start-column="11" selection-end-line="27" selection-end-column="11" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-318">
+          <caret line="9" column="34" selection-start-line="9" selection-start-column="34" selection-end-line="9" selection-end-column="34" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7">
-          <caret line="36" column="23" lean-forward="true" selection-start-line="36" selection-start-column="23" selection-end-line="36" selection-end-column="23" />
+        <state relative-caret-position="141">
+          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

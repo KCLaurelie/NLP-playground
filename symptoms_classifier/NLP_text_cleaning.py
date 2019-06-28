@@ -16,6 +16,12 @@ my_text can either be a string or a pd.Series of sentences (1 row = 1 sentence)
 
 
 def parse_text(raw_text, convert_to_series=False):
+    """
+
+    :param raw_text:
+    :param convert_to_series:
+    :return:
+    """
     if raw_text.endswith('.txt'):
         with open(raw_text, encoding='utf8') as f:
             raw_text = f.read().strip().replace('\n', '. ')
@@ -156,8 +162,8 @@ def preprocess_text(raw_text, remove_stopwords=False, stemmer=None, lemmatizer=N
         keywords = [x.lower() for x in keywords]
         raw_text = raw_text.apply(lambda x: keywords_filter(x, keywords=keywords)).dropna()
     # removing stop words
-    if remove_stopwords:
-        stop = stopwords.words('english')
+    if remove_stopwords: # we want to keep negations
+        stop = [x for x in stopwords.words('english') if 'no' not in x]
         raw_text = raw_text.apply(lambda x: " ".join(x for x in x.split() if x not in stop))
     # stemming
     if stemmer is not None:
@@ -165,6 +171,7 @@ def preprocess_text(raw_text, remove_stopwords=False, stemmer=None, lemmatizer=N
     # lemming with respect to verbs
     if lemmatizer is not None:
         raw_text = raw_text.apply(lambda x: lemmatize_verbs(x, lemmatizer))
+
     return raw_text.replace('', np.nan).dropna()
 
 
