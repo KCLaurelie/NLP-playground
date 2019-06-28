@@ -6,22 +6,23 @@ Created on Mon May 20 11:24:18 2019
 """
 
 import os
-os.chdir(r'T:\aurelie_mascio\python_scripts') #directory with python library
+try: os.chdir(r'T:\aurelie_mascio\python_scripts') #directory with python library
+except: pass
 import pandas as pd
 import numpy as np
 from scipy import stats
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
-import general_utils as gutils
+import longitudinal_models.general_utils as gutils
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
 import time
 
 
-root_path = r'T:\aurelie_mascio\multimorbidity\mmse_work'      
-file_path = os.path.join(root_path, 'mmse_trajectory_data_final6.csv')
+root_path = r'C:\Users\K1774755\Downloads'
+file_path = os.path.join(root_path, 'mmse_trajectory_synthetic.csv')
 #file_path = os.path.join(root_path, 'honos_trajectory_data3.csv')
 #aggfuncs=['count', pd.Series.nunique]
 score_funcs = ['count', np.mean, np.std]

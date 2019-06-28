@@ -20,7 +20,8 @@ csv.field_size_limit(200000000)
 root_path=r'T:\aurelie_mascio'
 CRIS_data_path=root_path+'\\CRIS data'
 SQL_path=root_path+'\\SQL queries'
-os.chdir(root_path+r'\python_scripts') #directory with python library
+try: os.chdir(root_path+r'\python_scripts') #directory with python library
+except: pass
 headers_dict_file=root_path+r'\python_scripts\CRIS_data_dict.csv'
 patients_data_file=CRIS_data_path+r'\F20_patients_documents_details_from_DB.csv'
 
