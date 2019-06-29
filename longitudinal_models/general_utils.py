@@ -17,31 +17,32 @@ pyximport.install()
 sys.maxsize
 csv.field_size_limit(200000000)
 
-root_path=r'T:\aurelie_mascio'
-CRIS_data_path=root_path+'\\CRIS data'
+root_path = r'T:\aurelie_mascio'
+CRIS_data_path = root_path+'\\CRIS data'
 SQL_path=root_path+'\\SQL queries'
-try: os.chdir(root_path+r'\python_scripts') #directory with python library
+try: os.chdir(root_path+r'\python_scripts')  # directory with python library
 except: pass
-headers_dict_file=root_path+r'\python_scripts\CRIS_data_dict.csv'
-patients_data_file=CRIS_data_path+r'\F20_patients_documents_details_from_DB.csv'
+headers_dict_file = root_path+r'\python_scripts\CRIS_data_dict.csv'
+patients_data_file = CRIS_data_path+r'\F20_patients_documents_details_from_DB.csv'
 
 ##############################################################################
-## GENERAL UTILS FUNCTIONS
+# GENERAL UTILS FUNCTIONS
 ############################################################################## 
 # standardize dataframe data
 def clean_df(df,to_numeric=True,filter_col=None,filter_value=None, threshold_col=None, threshold_value=None):
     df.columns = df.columns.str.lower()
-    df=df.rename(columns={'brc_id': 'brcid'})
+    df = df.rename(columns={'brc_id': 'brcid'})
     if 'brcid' in df.columns: df.dropna(subset=['brcid'],inplace=True)
-    date_cols=[x for x in df.columns if 'date' in x]
-    df[date_cols]=df[date_cols].apply(pd.to_datetime, errors='ignore')
+    date_cols = [x for x in df.columns if 'date' in x]
+    df[date_cols] = df[date_cols].apply(pd.to_datetime, errors='ignore')
     if to_numeric:
-        non_date_cols=[col for col in df.columns if df[col].dtype != 'datetime64[ns]']
-        df[non_date_cols]=df[non_date_cols].apply(pd.to_numeric,errors='ignore')
+        non_date_cols = [col for col in df.columns if df[col].dtype != 'datetime64[ns]']
+        df[non_date_cols] = df[non_date_cols].apply(pd.to_numeric,errors='ignore')
     if filter_col is not None: df = df[df[filter_col].isin(filter_value)]
     if threshold_col is not None: df = df.loc[df[threshold_col]>=threshold_value]
     df.drop_duplicates(inplace=True)
     return df
+
 
 def getDuplicateColumns(df):
     '''
