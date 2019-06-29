@@ -50,9 +50,8 @@ def create_report(file_path, root_path, cols_to_pivot, index_to_pivot, score_fun
 def run_model(file_path, baseline_cols, to_predict, regressors):
     df = read_and_clean_data(file_path, baseline_cols)[0]
     df_grouped = prep_data_for_model(df, to_predict=to_predict, regressors=regressors)
-    df_test = df[df.brcid == 10000028][['age_at_score','score_combined']]
-    df_grouped_test = df_grouped[df_grouped.brcid == 10000028][['age_at_score','score_combined']]
-    return 0
+    df_test = df[df.brcid == 9][['age_at_score', 'score_combined']]
+    df_grouped_test = df_grouped[df_grouped.brcid == 9][['age_at_score', 'score_combined']]
 
 
 ##############################################################################################
