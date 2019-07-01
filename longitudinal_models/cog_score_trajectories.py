@@ -96,7 +96,7 @@ def concat_clean(df1, df2):
 # READING/CLEANING/ENRICHING THE DATA
 ##############################################################################################
 def prep_data_for_model(df, regressors, to_predict, col_to_bucket='age_at_score',
-                        bucket_min=50, bucket_max=80, interval=0.5, min_obs=3, na_values=None):
+                        bucket_min=50, bucket_max=90, interval=0.5, min_obs=3, na_values=None):
     cols_to_keep = ['brcid'] + regressors + [to_predict]
     # only use data within bucket boundaries
     bucket_col = col_to_bucket + '_upper_bound'
@@ -214,7 +214,7 @@ def model(file_path,
           regressors,
           to_predict='score_combined',
           intercept_col='score_combined_baseline',
-          col_to_bucket='age_at_score', bucket_min=50, bucket_max=80, interval=0.5, min_obs=3, na_values=None,
+          col_to_bucket='age_at_score', bucket_min=50, bucket_max=90, interval=0.5, min_obs=3, na_values=None,
           ):
     df = read_and_clean_data(file_path)[0]
     df = prep_data_for_model(df, regressors=regressors, to_predict=to_predict, na_values=na_values, col_to_bucket=col_to_bucket,

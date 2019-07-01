@@ -3,8 +3,7 @@ import matplotlib
 import seaborn as sns
 import numpy as np
 
-try: matplotlib.use('Qt5Agg')
-except: pass
+#matplotlib.use('Qt5Agg')
 
 
 def plot_multiple_ts(df,
@@ -28,8 +27,7 @@ def plot_multiple_ts2(df,
 
 def plot_missing_values(df, cols_to_plot):
     # heatmap of missing values
-    # TODO replace does not work, why?
-    df.replace(['null', 'unknown', np.nan, 'other', 'not disclosed', 'not known'], 'None', inplace=True)
+    df.replace(['null', 'unknown', 'other', 'not disclosed', 'not known'], np.nan, inplace=True)
     to_plot = [x for x in cols_to_plot if x in df.columns]
     print('excluded values:', [x for x in cols_to_plot if x not in df.columns])
     sns.heatmap(df[to_plot].isnull(), cbar=False)
