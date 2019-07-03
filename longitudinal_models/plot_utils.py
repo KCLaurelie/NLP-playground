@@ -14,17 +14,6 @@ def plot_multiple_ts(df,
     to_plot.plot()
 
 
-def plot_multiple_ts2(df,
-                      group='brcid',
-                      x_axis='score_date',
-                      y_axis='score_combined'):
-    # multiline plot with group by
-    for key, grp in df.groupby([group]):
-        df.plot(grp[x_axis], grp[y_axis], label=x_axis.format(key))
-    plt.legend(loc='best')
-    plt.show()
-
-
 def plot_missing_values(df, cols_to_plot):
     # heatmap of missing values
     df.replace(['null', 'unknown', 'other', 'not disclosed', 'not known'], np.nan, inplace=True)

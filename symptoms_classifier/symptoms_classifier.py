@@ -1,5 +1,4 @@
 import os
-from imblearn.over_sampling import SMOTE
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
@@ -78,12 +77,5 @@ def plot_distribution(class_array, title):
     plt.title(title)
 
 
-# WHAT IS THIS ???
-def over_sample(train_vectors, train_class):
-    train_vectors = train_vectors.toarray()
-    sm = SMOTE(random_state=42)
-    train_vectors, train_class = sm.fit_sample(train_vectors, train_class)
 
-    plot_distribution(train_class, 'After sampling')
-    return train_vectors, train_class
 

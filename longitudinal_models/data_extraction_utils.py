@@ -5,16 +5,16 @@ Created on Sat Mar 30 08:26:08 2019
 @author: AMascio
 """
 import os
-root_path=r'T:\aurelie_mascio'
-CRIS_data_path=root_path+'\\CRIS data'
-os.chdir(root_path+r'\python_scripts') #directory with python library
-headers_dict_file=root_path+r'\python_scripts\CRIS_data_dict.csv'
 import pandas as pd
-import general_utils as gutils
-
+import longitudinal_models.general_utils as gutils
 import nltk.data
 from nltk import tokenize
+root_path=r'T:\aurelie_mascio'
+CRIS_data_path=root_path+'\\CRIS data'
+os.chdir(root_path+r'\python_scripts') # directory with python library
+headers_dict_file=root_path+r'\python_scripts\CRIS_data_dict.csv'
 nltk.data.path.append(root_path+'\\software')
+
 
 # GENERATE RANDOM SAMPLE OF FILES
 def generate_sample(patients_file=r'T:\aurelie_mascio\F20 corpus\patients_static_data.csv',

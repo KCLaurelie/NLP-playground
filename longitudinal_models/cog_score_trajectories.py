@@ -14,8 +14,7 @@ except: pass
 
 # to do some testing
 def init_params():
-    root_path = r'C:\Users\K1774755\Downloads'
-    file_path = os.path.join(root_path, 'mmse_trajectory_synthetic.csv')
+    file_path = 'https://raw.githubusercontent.com/KCLaurelie/toy-models/master/longitudinal_models/mmse_trajectory_synthetic.csv?token=ALKII2U7IKICWCAEWC22H7S5EZQBW'
     # file_path = os.path.join(root_path, 'honos_trajectory_data3.csv')
     score_funcs = ['count', np.mean, np.std]  # pd.Series.nunique]
     cols_to_pivot = ['patient_diagnosis_super_class', 'patient_diagnosis_class']
@@ -29,10 +28,10 @@ def init_params():
                   'education_bucket_raw', 'is_active', 'has_depression_anxiety_diagnosis', 'has_agitation_diagnosis',
                   'smoking_status',  'aggression_status', 'plasma_glucose_value', 'diabetes_bucket', 'diastolic_value',
                   'systolic_value',  'bp_bucket', 'bmi_score', 'bmi_bucket']
-    intercept, na_values, age_min, age_max, interval = ['score_combined_baseline', None, 50, 90, 0.5]
+    intercept, na_values, bucket_min, bucket_max, interval = ['score_combined_baseline', None, 50, 90, 0.5]
 
     return [file_path, score_funcs, cols_to_pivot, index_to_pivot, health_numeric_cols, baseline_cols, to_predict,
-            regressors, intercept, na_values, age_min, age_max, interval]
+            regressors, intercept, na_values, bucket_min, bucket_max, interval]
 
 
 ##############################################################################################
@@ -41,8 +40,8 @@ def init_params():
 def create_report(file_path, root_path, cols_to_pivot, index_to_pivot, score_funcs, health_numeric_cols, baseline_cols):
     metric = 'honos' if 'honos' in file_path else 'mmse'
     output_file_path = os.path.join(root_path, metric+'_trajectory_report.xlsx')
-    df_all, df_baseline = read_and_clean_data(file_path, baseline_cols)
-    write_report(output_file_path, df_all, df_baseline, cols_to_pivot, index_to_pivot, score_funcs, health_numeric_cols)
+    df, df_baseline = read_and_clean_data(file_path, baseline_cols)
+    write_report(output_file_path, df, df_baseline, cols_to_pivot, index_to_pivot, score_funcs, health_numeric_cols)
     df_baseline.info()
     df_baseline.describe(include='all')
 
@@ -99,7 +98,6 @@ def prep_data_for_model(df, regressors, to_predict, col_to_bucket='age_at_score'
                         bucket_min=50, bucket_max=90, interval=0.5, min_obs=3, na_values=None):
     cols_to_keep = ['brcid'] + regressors + [to_predict]
     # only use data within bucket boundaries
-    bucket_col = col_to_bucket + '_upper_bound'
     df = df[(df[col_to_bucket] >= bucket_min) & (df[col_to_bucket] <= bucket_max)][cols_to_keep]
     if na_values is not None:
         df.fillna(na_values, inplace=True)
@@ -110,6 +108,7 @@ def prep_data_for_model(df, regressors, to_predict, col_to_bucket='age_at_score'
     static_data_col = [col for col in df.select_dtypes(include=['object', 'category']).columns if ('brcid' not in col)]
     numeric_col = [col for col in df._get_numeric_data().columns if ('brcid' not in col)]
     # group by buckets
+    bucket_col = col_to_bucket + '_upper_bound'
     df[bucket_col] = np.ceil(df[col_to_bucket]/interval)*interval
     # we aggregate by average for numeric variables and baseline value for categorical variables
     keys = static_data_col + numeric_col
@@ -117,7 +116,7 @@ def prep_data_for_model(df, regressors, to_predict, col_to_bucket='age_at_score'
     grouping_dict = dict(zip(keys, values))
     
     df_grouped = df.groupby(['brcid']+[bucket_col], as_index=False).agg(grouping_dict)
-    df_baseline = df_grouped.sort_values(['brcid', 'age_at_score']).groupby('brcid').first().reset_index()
+    df_baseline = df_grouped.sort_values(['brcid', 'age_at_score']).groupby('brcid').first()
     df_grouped = df_grouped.merge(df_baseline, on='brcid', suffixes=('', '_baseline'))
     df_grouped = df_grouped.sort_values(['brcid', 'age_at_score'])
     
@@ -128,7 +127,7 @@ def prep_data_for_model(df, regressors, to_predict, col_to_bucket='age_at_score'
     all_buckets['counter'] = np.arange(start=1, stop=len(all_buckets)+1, step=1)
     df_grouped = df_grouped.merge(all_buckets, on=bucket_col).sort_values(['brcid', bucket_col])
     
-    return df_grouped.reset_index()
+    return df_grouped.reset_index(drop=True)
 
 
 def read_and_clean_data(file_path, baseline_cols):
