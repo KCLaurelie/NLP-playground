@@ -2,8 +2,7 @@ from matplotlib import pyplot as plt
 import matplotlib
 import seaborn as sns
 import numpy as np
-
-#matplotlib.use('Qt5Agg')
+# matplotlib.use('Qt5Agg')
 
 
 def plot_multiple_ts(df,
