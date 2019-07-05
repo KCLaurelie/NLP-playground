@@ -12,52 +12,37 @@ except:
     pass
 
 
-# to do some testing
-def init_params():
-    file_path = 'https://raw.githubusercontent.com/KCLaurelie/toy-models/master/longitudinal_models/mmse_trajectory_synthetic.csv?token=ALKII2U7IKICWCAEWC22H7S5EZQBW'
-    # file_path = os.path.join(root_path, 'honos_trajectory_data3.csv')
-    score_funcs = ['count', np.mean, np.std]  # pd.Series.nunique]
-    cols_to_pivot = ['patient_diagnosis_super_class', 'patient_diagnosis_class']
-    index_to_pivot = ['age_bucket_at_score2', 'gender', 'ethnicity_group', 'first_language', 'occupation',
-                      'living_status', 'marital_status', 'education_bucket_raw']
-    health_numeric_cols = ['bmi_score', 'plasma_glucose_value', 'diastolic_value', 'systolic_value']
-    baseline_cols = ['brcid', 'age_at_score', 'score_combined', 'bmi_score', 'plasma_glucose_value', 'diastolic_value',
-                     'systolic_value', 'smoking_status', 'bmi_bucket', 'diabetes_bucket', 'bp_bucket']
-    to_predict = 'score_combined'
-    regressors = ['patient_diagnosis_class', 'patient_diagnosis_super_class', 'score_date', 'age_at_score',
-                  'gender', 'ethnicity_group', 'first_language', 'occupation', 'living_status', 'marital_status',
-                  'education_bucket_raw', 'is_active', 'has_depression_anxiety_diagnosis', 'has_agitation_diagnosis',
-                  'smoking_status', 'aggression_status', 'plasma_glucose_value', 'diabetes_bucket', 'diastolic_value',
-                  'systolic_value', 'bp_bucket', 'bmi_score', 'bmi_bucket']
-    intercept, na_values, bucket_min, bucket_max, interval = ['score_combined_baseline', None, 50, 90, 0.5]
-
-    return [file_path, score_funcs, cols_to_pivot, index_to_pivot, health_numeric_cols, baseline_cols, to_predict,
-            regressors, intercept, na_values, bucket_min, bucket_max, interval]
-
-
 class Dataset:
-    def __init__(self, file_path, baseline_cols,
-                 group='brcid',
-                 to_predict='score_combined',
-                 regressors='age_at_score',
-                 na_values=None,
-                 bucket_min=50,
-                 bucket_max=90,
-                 interval=0.5):
+    def __init__(self, file_path, key='brcid',  # data path and key
+                 baseline_cols=None, health_numeric_cols=None, na_values=None,  # identify columns
+                 to_predict='score_combined', regressors=['age_at_score'],  # for regression model
+                 to_bucket='age_at_score', bucket_min=50, bucket_max=90, interval=0.5, min_obs=3,  # to create groups
+                 cols_to_pivot=None, index_to_pivot=None, index_to_pivot_baseline=None, agg_funcs=None  # for reporting
+                 ):
         self.file_path = file_path
         self.baseline_cols = baseline_cols
-        self.group = group
+        self.key = key
+        self.health_numeric_cols = health_numeric_cols
         self.to_predict = to_predict
         self.regressors = list(regressors)
         self.na_values = na_values
+        self.to_bucket = to_bucket
         self.bucket_min = bucket_min
         self.bucket_max = bucket_max
         self.interval = interval
+        self.min_obs = min_obs
+        self.cols_to_pivot = cols_to_pivot
+        self.index_to_pivot = index_to_pivot
+        self.index_to_pivot_baseline = index_to_pivot_baseline
+        self.agg_funcs = agg_funcs
 
     def load_data(self, load_type='all'):
         df, df_baseline = read_and_clean_data(self.file_path, self.baseline_cols)
         if load_type == 'all':
-            df_grouped = prep_data_for_model(df, to_predict=self.to_predict, regressors=self.regressors)
+            df_grouped = prep_data_for_model(df, regressors=self.regressors, to_predict=self.to_predict,
+                                             col_to_bucket=self.to_bucket, bucket_min=self.bucket_min,
+                                             bucket_max=self.bucket_max, interval=self.interval, min_obs=self.min_obs,
+                                             na_values=self.na_values)
         else:
             df_grouped = pd.DataFrame()
         res = {'data': df,
@@ -65,43 +50,49 @@ class Dataset:
                'data_grouped': df_grouped}
         return res
 
+    def create_report(self, output_file_path, data=None):
+        if data is None:
+            data = self.load_data(load_type='not all')
+        write_report(output_file_path=output_file_path, df_all=data['data'], df_baseline=data['data_baseline'],
+                     cols_to_pivot=self.cols_to_pivot, index_to_pivot=self.index_to_pivot,
+                     index_to_pivot_baseline=self.index_to_pivot_baseline, score_funcs=self.agg_funcs,
+                     health_numeric_cols=self.health_numeric_cols, key=self.key, score_metric=self.to_predict)
+
     def check(self):
         print("Dataset object created from", self.file_path)
 
 
 default_dataset = Dataset(
     file_path='https://raw.githubusercontent.com/KCLaurelie/toy-models/master/longitudinal_models/mmse_trajectory_synthetic.csv?token=ALKII2U7IKICWCAEWC22H7S5EZQBW',
-    baseline_cols=['brcid', 'age_at_score', 'score_combined', 'bmi_score', 'plasma_glucose_value',
-                   'diastolic_value',
+    baseline_cols=['brcid', 'age_at_score', 'score_combined', 'bmi_score', 'plasma_glucose_value', 'diastolic_value',
                    'systolic_value', 'smoking_status', 'bmi_bucket', 'diabetes_bucket', 'bp_bucket'],
+    key='brcid',
+    health_numeric_cols=['bmi_score', 'plasma_glucose_value', 'diastolic_value', 'systolic_value'],
+    to_predict='score_combined',
     regressors=['patient_diagnosis_class', 'patient_diagnosis_super_class', 'score_date', 'age_at_score',
                 'gender', 'ethnicity_group', 'first_language', 'occupation', 'living_status', 'marital_status',
                 'education_bucket_raw', 'is_active', 'has_depression_anxiety_diagnosis', 'has_agitation_diagnosis',
                 'smoking_status', 'aggression_status', 'plasma_glucose_value', 'diabetes_bucket', 'diastolic_value',
-                'systolic_value', 'bp_bucket', 'bmi_score', 'bmi_bucket']
+                'systolic_value', 'bp_bucket', 'bmi_score', 'bmi_bucket'],
+    na_values=None,
+    to_bucket='age_at_score',
+    bucket_min=50,
+    bucket_max=90,
+    interval=0.5,
+    min_obs=3,
+    cols_to_pivot=['patient_diagnosis_super_class', 'patient_diagnosis_class'],
+    index_to_pivot=['age_bucket_report', 'gender', 'ethnicity_group', 'first_language', 'occupation', 'living_status',
+                    'marital_status', 'education_bucket_raw'],
+    index_to_pivot_baseline='age_bucket_report',
+    agg_funcs=['count', np.mean, np.std]
 )
-
-
-##############################################################################################
-# MAIN
-##############################################################################################
-def create_report(file_path, root_path, cols_to_pivot, index_to_pivot, score_funcs, health_numeric_cols, baseline_cols):
-    metric = 'honos' if 'honos' in file_path else 'mmse'
-    output_file_path = os.path.join(root_path, metric + '_trajectory_report.xlsx')
-    df, df_baseline = read_and_clean_data(file_path, baseline_cols)
-    write_report(output_file_path, df, df_baseline, cols_to_pivot, index_to_pivot, score_funcs, health_numeric_cols)
-    df_baseline.info()
-    df_baseline.describe(include='all')
+# default_dataset.create_report(r'C:\Users\K1774755\Downloads\testmmsereport.xlsx')
 
 
 ##############################################################################################
 # UTIL FUNCTIONS
 ##############################################################################################
-def my_pivot(df,
-             cols_to_pivot,
-             aggfunc=pd.Series.nunique,
-             values='score_combined',
-             index='gender'):
+def my_pivot(df, cols_to_pivot, values, index, aggfunc=pd.Series.nunique):
     pv0 = df.pivot_table(values=values, index=index, columns=cols_to_pivot[0], aggfunc=aggfunc, margins=True).fillna(0)
     try:  # to avoid duplicates between super class and class: for multi-index
         pv0.drop(['organic only', 'All'], level=0, axis=1, inplace=True)  # if only 1 agg function
@@ -171,13 +162,14 @@ def prep_data_for_model(df, regressors, to_predict, col_to_bucket='age_at_score'
     return df_grouped.reset_index(drop=True)
 
 
-def read_and_clean_data(file_path, baseline_cols):
+def read_and_clean_data(file_path, baseline_cols=None):
     df = pd.read_csv(file_path, header=0, low_memory=False)
     df.columns = df.columns.str.lower()
-    # df['age_at_score_upper_bound']=np.ceil(df['age_at_score']/interval)*interval
     static_data_col = [col for col in df.select_dtypes(include=['object']).columns if
-                       ('date' not in col) and ('age' not in col) and ('score_bucket') not in col]
+                       ('date' not in col) and ('age' not in col) and ('score_bucket' not in col)]
     df[static_data_col] = df[static_data_col].apply(lambda x: x.astype(str).str.lower())
+    df['age_bucket_report'] = '[' + (np.ceil(df['age_at_score'] / 5) * 5 - 5).astype(str) + '-' + \
+                              (np.ceil(df['age_at_score'] / 5) * 5).astype(str) + ']'
     df.loc[df['first_language'].str.contains('other', case=False, na=False), 'first_language'] = 'other language'
     df.loc[df['ethnicity'].str.contains('other', case=False, na=False), 'ethnicity'] = 'other ethnicity'
     df[static_data_col] = df[static_data_col].replace(
@@ -210,11 +202,13 @@ def read_and_clean_data(file_path, baseline_cols):
 
     df['score_time_period'] = pd.PeriodIndex(pd.to_datetime(df.score_date), freq='Q').astype(str)
     df.score_time_period.replace({'Q1': 'H1', 'Q2': 'H1', 'Q3': 'H2', 'Q4': 'H2'}, regex=True, inplace=True)
-
-    df_baseline = df.sort_values(['brcid', 'age_at_score']).groupby('brcid').first().reset_index()
-    df_all = df.merge(df_baseline[baseline_cols], on='brcid', suffixes=('', '_baseline'))
-    df_all = df_all.sort_values(['brcid', 'age_at_score'])
-    return [df_all, df_baseline]
+    if baseline_cols is not None:
+        df_baseline = df.sort_values(['brcid', 'age_at_score']).groupby('brcid').first().reset_index()
+        df = df.merge(df_baseline[baseline_cols], on='brcid', suffixes=('', '_baseline'))
+        df = df.sort_values(['brcid', 'age_at_score'])
+    else:
+        df_baseline = pd.DataFrame()
+    return [df, df_baseline]
 
 
 ##############################################################################################
@@ -222,17 +216,16 @@ def read_and_clean_data(file_path, baseline_cols):
 ##############################################################################################
 
 def write_report(output_file_path, df_all, df_baseline, cols_to_pivot, index_to_pivot, score_funcs,
-                 health_numeric_cols):
-    index_to_pivot_baseline = [col for col in df_all.columns if 'bucket_baseline' in col or 'smoking_status' in col]
+                 health_numeric_cols, key, score_metric, index_to_pivot_baseline):
+    index_baseline = [col for col in df_all.columns if 'bucket_baseline' in col or 'smoking_status' in col]
     st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S')
     writer = pd.ExcelWriter(output_file_path.replace('.xlsx', '_' + st + '.xlsx'), engine='xlsxwriter')
     cpt_row = 0
     pv_master = pd.DataFrame()
-    for var in index_to_pivot + index_to_pivot_baseline:
-        pv_scores = my_pivot(df_all, values='score_combined', index=var, cols_to_pivot=cols_to_pivot,
-                             aggfunc=score_funcs)
-        pv_pop = my_pivot(df_all, values='brcid', index=var, cols_to_pivot=cols_to_pivot, aggfunc=pd.Series.nunique)
-        pv_pop.columns = [x + '_brcid' for x in pv_pop.columns]
+    for var in index_to_pivot + index_baseline:
+        pv_scores = my_pivot(df_all, values=score_metric, index=var, cols_to_pivot=cols_to_pivot, aggfunc=score_funcs)
+        pv_pop = my_pivot(df_all, values=key, index=var, cols_to_pivot=cols_to_pivot, aggfunc=pd.Series.nunique)
+        pv_pop.columns = [x + '_' + str(key) for x in pv_pop.columns]
         pv = concat_clean(pv_scores, pv_pop)
         pv_master = pd.concat([pv_master, pv], axis=0, sort=False)
         pv.to_excel(writer, sheet_name='summary_separate', startrow=cpt_row)
@@ -244,7 +237,7 @@ def write_report(output_file_path, df_all, df_baseline, cols_to_pivot, index_to_
     header.to_excel(writer, sheet_name='summary', startrow=0)
     pv_master.to_excel(writer, sheet_name='summary', startrow=len(header) + 1, header=False)
 
-    pv_baseline = df_baseline.pivot_table(values='brcid', index='age_bucket_at_score2', columns=cols_to_pivot,
+    pv_baseline = df_baseline.pivot_table(values=key, index=index_to_pivot_baseline, columns=cols_to_pivot,
                                           aggfunc=pd.Series.nunique, margins=True).fillna(0)
     pv_baseline.to_excel(writer, sheet_name='first_measure', startrow=0)
 
