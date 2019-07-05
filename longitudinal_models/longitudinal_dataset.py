@@ -35,6 +35,53 @@ def init_params():
             regressors, intercept, na_values, bucket_min, bucket_max, interval]
 
 
+class Dataset:
+    def __init__(self, file_path, baseline_cols,
+                 group='brcid',
+                 to_predict='score_combined',
+                 regressors='age_at_score',
+                 na_values=None,
+                 bucket_min=50,
+                 bucket_max=90,
+                 interval=0.5):
+        self.file_path = file_path
+        self.baseline_cols = baseline_cols
+        self.group = group
+        self.to_predict = to_predict
+        self.regressors = list(regressors)
+        self.na_values = na_values
+        self.bucket_min = bucket_min
+        self.bucket_max = bucket_max
+        self.interval = interval
+
+    def load_data(self, load_type='all'):
+        df, df_baseline = read_and_clean_data(self.file_path, self.baseline_cols)
+        if load_type == 'all':
+            df_grouped = prep_data_for_model(df, to_predict=self.to_predict, regressors=self.regressors)
+        else:
+            df_grouped = pd.DataFrame()
+        res = {'data': df,
+               'data_baseline': df_baseline,
+               'data_grouped': df_grouped}
+        return res
+
+    def check(self):
+        print("Dataset object created from", self.file_path)
+
+
+default_dataset = Dataset(
+    file_path='https://raw.githubusercontent.com/KCLaurelie/toy-models/master/longitudinal_models/mmse_trajectory_synthetic.csv?token=ALKII2U7IKICWCAEWC22H7S5EZQBW',
+    baseline_cols=['brcid', 'age_at_score', 'score_combined', 'bmi_score', 'plasma_glucose_value',
+                   'diastolic_value',
+                   'systolic_value', 'smoking_status', 'bmi_bucket', 'diabetes_bucket', 'bp_bucket'],
+    regressors=['patient_diagnosis_class', 'patient_diagnosis_super_class', 'score_date', 'age_at_score',
+                'gender', 'ethnicity_group', 'first_language', 'occupation', 'living_status', 'marital_status',
+                'education_bucket_raw', 'is_active', 'has_depression_anxiety_diagnosis', 'has_agitation_diagnosis',
+                'smoking_status', 'aggression_status', 'plasma_glucose_value', 'diabetes_bucket', 'diastolic_value',
+                'systolic_value', 'bp_bucket', 'bmi_score', 'bmi_bucket']
+)
+
+
 ##############################################################################################
 # MAIN
 ##############################################################################################

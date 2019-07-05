@@ -4,12 +4,25 @@ import numpy as np
 from scipy import stats
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
-import longitudinal_models.longitudinal_data_prep as dataprep
+import longitudinal_models.longitudinal_dataset as dataprep
+from pymer4.models import Lm, Lmer
 
-try:
-    os.chdir(r'T:\aurelie_mascio\python_scripts')  # for use on CRIS computers
+try:  # for use on CRIS computers
+    os.chdir(r'T:\aurelie_mascio\python_scripts')
 except:
     pass
+
+"""
+OPTION A)
+- MODEL 1: Unconditional with MMSE= intercept (fixed)
+- MODEL 2: Unconditional with MMSE= intercept (random)
+- MODEL 3: Unconditional with MMSE= intercept + time (fixed)
+- MODEL 4: Unconditional with MMSE= intercept + time (random)
+- MODEL 5: Conditional with MMSE= intercept + time + grouping variable
+Here grouping variable is Organic only/SMI only/SMI + O
+OPTION B)
+Run model 1- 4 in each group of the grouping variable. 3 outputs
+"""
 
 
 ##############################################################################################
@@ -21,6 +34,14 @@ def run_model(file_path, baseline_cols, to_predict, regressors):
     df_test = df[df.brcid == 9][['age_at_score', 'score_combined']]
     df_grouped_test = df_grouped[df_grouped.brcid == 9][['age_at_score', 'score_combined']]
 
+
+def multi_level_r(df, regressors, to_predict):
+    from pymer4.utils import get_resource_path
+
+    df = pd.read_csv(os.path.join(get_resource_path(), 'sample_data.csv'))
+    model = Lm('DV ~ IV1 + IV3', data=df)
+    model = Lmer('score_combined ~ age_at_score_upper_bound  + (age_at_score_upper_bound|brcid)', data=df)
+    model.fit()
 
 def model(file_path,
           regressors,

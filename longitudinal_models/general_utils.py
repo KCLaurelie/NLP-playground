@@ -47,7 +47,7 @@ def clean_df(df, to_numeric=True, filter_col=None, filter_value=None, threshold_
     return df
 
 
-def getDuplicateColumns(df):
+def get_duplicate_columns(df):
     '''
     Get a list of duplicate columns.
     It will iterate over all the columns in dataframe and find the columns whose contents are duplicate.
@@ -71,7 +71,7 @@ def getDuplicateColumns(df):
 
 
 def drop_duplicate_columns(df):
-    new_df = df.drop(columns=getDuplicateColumns(df))
+    new_df = df.drop(columns=get_duplicate_columns(df))
     return new_df
 
 
