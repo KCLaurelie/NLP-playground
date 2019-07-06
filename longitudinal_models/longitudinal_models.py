@@ -1,16 +1,19 @@
 import os
+os.environ['R_HOME'] = r'C:\Program Files\R\R-3.6.0'  # where R is (needs to be run before importing pymer and rpy)
+try:  # for use on CRIS computers
+    os.chdir(r'T:\aurelie_mascio\python_scripts')
+except:
+    pass
+
 import pandas as pd
 import numpy as np
 from scipy import stats
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
-import longitudinal_models.longitudinal_dataset as dataprep
+import longitudinal_models.longitudinal_dataset as ds
+from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lm, Lmer
 
-try:  # for use on CRIS computers
-    os.chdir(r'T:\aurelie_mascio\python_scripts')
-except:
-    pass
 
 """
 OPTION A)
@@ -25,22 +28,39 @@ Run model 1- 4 in each group of the grouping variable. 3 outputs
 """
 
 
+def check_r_loc():
+    from rpy2.robjects.packages import importr
+    base = importr('base')
+    return base.R_home()
+
 ##############################################################################################
 # LONGITUDINAL MODELLING
 ##############################################################################################
-def run_model(file_path, baseline_cols, to_predict, regressors):
-    df = dataprep.read_and_clean_data(file_path, baseline_cols)[0]
-    df_grouped = dataprep.prep_data_for_model(df, to_predict=to_predict, regressors=regressors)
-    df_test = df[df.brcid == 9][['age_at_score', 'score_combined']]
-    df_grouped_test = df_grouped[df_grouped.brcid == 9][['age_at_score', 'score_combined']]
+def run_model(dataset=ds.default_dataset, normalize=False, dummyfy=False):
+    data = dataset.load_data()
+    df = data['data_grouped']
+    #df_test = df[df.brcid == 9][['age_at_score', 'score_combined']]
+    if normalize:
+        numeric_cols = [col for col in df[dataset.regressors]._get_numeric_data().columns]
+        cols_to_normalize = [dataset.to_predict] + [col for col in numeric_cols]
+        scaler = MinMaxScaler()
+        x = df[cols_to_normalize].values
+        scaled_values = scaler.fit_transform(x)
+        df[cols_to_normalize] = scaled_values
+    if dummyfy:
+        cols_to_dummyfy = df[dataset.regressors].select_dtypes(include=['object', 'category']).columns
+        dummyfied_df = pd.get_dummies(df[cols_to_dummyfy])
+        df = pd.concat([df.drop(columns=cols_to_dummyfy), dummyfied_df], axis=1)
+
+    return df
 
 
 def multi_level_r(df, regressors, to_predict):
     from pymer4.utils import get_resource_path
-
     df = pd.read_csv(os.path.join(get_resource_path(), 'sample_data.csv'))
     model = Lm('DV ~ IV1 + IV3', data=df)
-    model = Lmer('score_combined ~ age_at_score_upper_bound  + (age_at_score_upper_bound|brcid)', data=df)
+    model = Lmer('DV ~ IV2 + (IV2|Group)', data=df)
+    model = Lmer('score_combined ~ age_at_score_upper_bound  + (age_at_score_upper_bound_baseline|brcid)', data=df)
     model.fit()
 
 def model(file_path,
@@ -49,10 +69,10 @@ def model(file_path,
           intercept_col='score_combined_baseline',
           col_to_bucket='age_at_score', bucket_min=50, bucket_max=90, interval=0.5, min_obs=3, na_values=None,
           ):
-    df = dataprep.read_and_clean_data(file_path)[0]
-    df = dataprep.prep_data_for_model(df, regressors=regressors, to_predict=to_predict, na_values=na_values,
-                                      col_to_bucket=col_to_bucket,
-                                      bucket_min=bucket_min, bucket_max=bucket_max, interval=interval, min_obs=min_obs)
+    df = ds.read_and_clean_data(file_path)[0]
+    df = ds.prep_data_for_model(df, regressors=regressors, to_predict=to_predict, na_values=na_values,
+                                col_to_bucket=col_to_bucket,
+                                bucket_min=bucket_min, bucket_max=bucket_max, interval=interval, min_obs=min_obs)
 
     df['age_bucket_complete'] = 0  # TODO? fill with NAN if no data for specific bucket?
     df['intercept'] = df[intercept_col]  # take score at baseline
