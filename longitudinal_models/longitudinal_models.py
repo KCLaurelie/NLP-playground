@@ -37,7 +37,7 @@ def check_r_loc():
 # LONGITUDINAL MODELLING
 ##############################################################################################
 def run_model(dataset=ds.default_dataset, normalize=False, dummyfy=False):
-    data = dataset.load_data()
+    data = dataset.prep_data()
     df = data['data_grouped']
     #df_test = df[df.brcid == 9][['age_at_score', 'score_combined']]
     if normalize:
