@@ -5,6 +5,7 @@ import longitudinal_models.general_utils as gutils
 import longitudinal_models.plot_utils as pltu
 import datetime
 import time
+import sys
 
 try:
     os.chdir(r'T:\aurelie_mascio\python_scripts')  # for use on CRIS computers
@@ -29,14 +30,18 @@ class Dataset:
         self.bucket_max = bucket_max
         self.interval = interval
         self.min_obs = min_obs
+        self.data = None
 
     def read_and_clean_data(self):
+        print("read data from parent class")
         df = pd.read_csv(self.file_path, header=0, low_memory=False)
         df.columns = df.columns.str.lower()
         df_baseline = pd.DataFrame()
-        return [df, df_baseline]
+        self.data = {'data': df, 'data_baseline': df_baseline}
+        return 0
 
-    def prep_data_for_model(self, df):
+    def prep_data_for_model(self):
+        df = self.data['data']
         cols_to_keep = [self.key] + self.regressors + [self.to_predict]
         # only use data within bucket boundaries
         df = df[(df[self.to_bucket] >= self.bucket_min) & (df[self.to_bucket] <= self.bucket_max)][cols_to_keep]
@@ -68,21 +73,19 @@ class Dataset:
                                    columns=[bucket_col])
         all_buckets['counter'] = np.arange(start=1, stop=len(all_buckets) + 1, step=1)
         df_grouped = df_grouped.merge(all_buckets, on=bucket_col).sort_values([self.key, bucket_col])
-
-        return df_grouped.reset_index(drop=True)
+        df_grouped = df_grouped.reset_index(drop=True)
+        self.data = {'data': df, 'data_baseline': df_baseline, 'data_grouped': df_grouped}
+        return 0
 
     def prep_data(self, load_type='all'):
-        df, df_baseline = self.read_and_clean_data()
+        self.read_and_clean_data()
         if load_type == 'all':
-            df_grouped = self.prep_data_for_model(df)
+            self.prep_data_for_model()
         else:
-            df_grouped = pd.DataFrame()
-        res = {'data': df,
-               'data_baseline': df_baseline,
-               'data_grouped': df_grouped}
-        return res
+            self.data['data_grouped'] = pd.DataFrame()
+        return 0
 
-    def write_report(self, output_file_path, df, df_baseline):
+    def write_report(self, output_file_path): #, df, df_baseline):
         raise NotImplementedError("Please Implement this method")
 
     def check(self):
@@ -99,9 +102,10 @@ class DatasetMMSE(Dataset):
         self.agg_funcs = agg_funcs
 
     def read_and_clean_data(self):
-        # df = pd.read_csv(self.file_path, header=0, low_memory=False)
-        # df.columns = df.columns.str.lower()
-        [df, df_baseline] = Dataset.read_and_clean_data(self)
+        Dataset.read_and_clean_data(self)
+        print("cleaning data for MMSE object")
+        df = self.data['data']
+        df_baseline = self.data['data_baseline']
         static_data_col = [col for col in df.select_dtypes(include=['object']).columns if
                            ('date' not in col) and ('age' not in col) and ('score_bucket' not in col)]
         df[static_data_col] = df[static_data_col].apply(lambda x: x.astype(str).str.lower())
@@ -144,12 +148,18 @@ class DatasetMMSE(Dataset):
             df_baseline = df.sort_values(['brcid', 'age_at_score']).groupby('brcid').first().reset_index()
             df = df.merge(df_baseline[self.baseline_cols], on='brcid', suffixes=('', '_baseline'))
             df = df.sort_values(['brcid', 'age_at_score'])
-        return [df, df_baseline]
 
-    def write_report(self, output_file_path, data=None):
-        if data is None: data = self.prep_data(load_type='not all')
-        df = data['data']
-        df_baseline = data['data_baseline']
+        self.data = {'data': df, 'data_baseline': df_baseline}
+        return 0
+
+    def write_report(self, output_file_path):
+        try:
+            df = self.data['data']
+            df_baseline = self.data['data_baseline']
+        except:
+            self.prep_data(load_type='not all')
+            df = self.data['data']
+            df_baseline = self.data['data_baseline']
         index_baseline = [col for col in df.columns if 'bucket_baseline' in col or 'smoking_status' in col]
         st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S')
         writer = pd.ExcelWriter(output_file_path.replace('.xlsx', '_' + st + '.xlsx'), engine='xlsxwriter')
@@ -172,7 +182,7 @@ class DatasetMMSE(Dataset):
         pv_master.to_excel(writer, sheet_name='summary', startrow=len(header) + 1, header=False)
 
         pv_baseline = df_baseline.pivot_table(values=self.key, index=self.index_to_pivot_baseline,
-                                              columns=self.cols_to_pivot,aggfunc=pd.Series.nunique, margins=True).fillna(0)
+                                              columns=self.cols_to_pivot, aggfunc=pd.Series.nunique, margins=True).fillna(0)
         pv_baseline.to_excel(writer, sheet_name='first_measure', startrow=0)
 
         health_stats0 = df_baseline.groupby(self.cols_to_pivot[0])[self.health_numeric_cols].agg(self.agg_funcs)
@@ -206,7 +216,7 @@ default_dataset = DatasetMMSE(
     index_to_pivot=['age_bucket_report', 'gender', 'ethnicity_group', 'first_language', 'occupation', 'living_status',
                     'marital_status', 'education_bucket_raw'],
     index_to_pivot_baseline='age_bucket_report',
-    agg_funcs=['count', np.mean, np.std]
+    agg_funcs=['count', np.mean, np.std],
 )
 # default_dataset.write_report(r'C:\Users\K1774755\Downloads\testmmsereport.xlsx')
 

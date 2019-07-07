@@ -1,4 +1,5 @@
 import os
+
 os.environ['R_HOME'] = r'C:\Program Files\R\R-3.6.0'  # where R is (needs to be run before importing pymer and rpy)
 try:  # for use on CRIS computers
     os.chdir(r'T:\aurelie_mascio\python_scripts')
@@ -13,7 +14,6 @@ import statsmodels.regression.mixed_linear_model as mlm
 import longitudinal_models.longitudinal_dataset as ds
 from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lm, Lmer
-
 
 """
 OPTION A)
@@ -33,13 +33,15 @@ def check_r_loc():
     base = importr('base')
     return base.R_home()
 
+
 ##############################################################################################
 # LONGITUDINAL MODELLING
 ##############################################################################################
-def run_model(dataset=ds.default_dataset, normalize=False, dummyfy=False):
-    data = dataset.prep_data()
-    df = data['data_grouped']
-    #df_test = df[df.brcid == 9][['age_at_score', 'score_combined']]
+def pre_cleaning(dataset=ds.default_dataset, normalize=False, dummyfy=False):
+    if dataset.data is None:
+        dataset.prep_data()
+    df = dataset.data['data_grouped']
+    # df_test = df[df.brcid == 9][['age_at_score', 'score_combined']]
     if normalize:
         numeric_cols = [col for col in df[dataset.regressors]._get_numeric_data().columns]
         cols_to_normalize = [dataset.to_predict] + [col for col in numeric_cols]
@@ -61,7 +63,21 @@ def multi_level_r(df, regressors, to_predict):
     model = Lm('DV ~ IV1 + IV3', data=df)
     model = Lmer('DV ~ IV2 + (IV2|Group)', data=df)
     model = Lmer('score_combined ~ age_at_score_upper_bound  + (age_at_score_upper_bound_baseline|brcid)', data=df)
-    model.fit()
+    result = model.fit()
+    print(result.summary())
+
+    model2 = smf.mixedlm("score_combined ~ age_at_score_upper_bound + gender", df, groups=df['brcid'])
+    result = model2.fit()
+    print(result.summary())
+
+    df['intercept']=df['age_at_score_upper_bound_baseline']
+    model3 = mlm.MixedLM(endog=df['score_combined'],  # dependent variable (1D))
+                         exog=df[['age_at_score_upper_bound', 'intercept']],  # fixed effect covariates (2D)
+                         exog_re=df['intercept'],  # random effect covariates
+                         groups=df['patient_diagnosis_super_class'])  # data from different groups are independent
+    result = model3.fit()
+    print(result.summary())
+
 
 def model(file_path,
           regressors,
