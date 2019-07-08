@@ -14,18 +14,19 @@ except:
 
 
 class Dataset:
-    def __init__(self, file_path, key='brcid',  # data path and key
+    def __init__(self, file_path, key='brcid', timestamp='age_at_score',  # data path and keys
                  baseline_cols=None, na_values=None,  # identify columns
-                 to_predict='score_combined', regressors=['age_at_score'],  # for regression model
+                 to_predict='score_combined', regressors=('age_at_score',),  # for regression model
                  to_bucket='age_at_score', bucket_min=50, bucket_max=90, interval=0.5, min_obs=3,  # to create groups
                  ):
         self.file_path = file_path
-        self.baseline_cols = baseline_cols
         self.key = key
-        self.to_predict = to_predict
-        self.regressors = [regressors] if isinstance(regressors, str) else regressors
+        self.timestamp = timestamp
+        self.baseline_cols = gutils.to_list(baseline_cols)
         self.na_values = na_values
-        self.to_bucket = to_bucket
+        self.to_predict = gutils.to_list(to_predict)
+        self.regressors = gutils.to_list(regressors)
+        self.to_bucket = str(to_bucket)
         self.bucket_min = bucket_min
         self.bucket_max = bucket_max
         self.interval = interval
@@ -33,7 +34,7 @@ class Dataset:
         self.data = None
 
     def read_and_clean_data(self):
-        print("read data from parent class")
+        print("read data (method from parent class)")
         df = pd.read_csv(self.file_path, header=0, low_memory=False)
         df.columns = df.columns.str.lower()
         df_baseline = pd.DataFrame()
@@ -41,17 +42,20 @@ class Dataset:
         return 0
 
     def prep_data_for_model(self):
+        print("prep data (method from parent class)")
         df = self.data['data']
-        cols_to_keep = [self.key] + self.regressors + [self.to_predict]
+        cols_to_keep = gutils.to_list(self.key) + gutils.to_list(self.regressors) + gutils.to_list(self.to_bucket) + gutils.to_list(self.to_predict)
+        cols_to_keep = list(dict.fromkeys(cols_to_keep)) # removing duplicates
         # only use data within bucket boundaries
-        df = df[(df[self.to_bucket] >= self.bucket_min) & (df[self.to_bucket] <= self.bucket_max)][cols_to_keep]
+        df = df.loc[(df[self.to_bucket] >= self.bucket_min) & (df[self.to_bucket] <= self.bucket_max), cols_to_keep]
         if self.na_values is not None:
             df.fillna(self.na_values, inplace=True)
         # transform bool cols to "yes"/"no" so they are not averaged out in the groupby
-        bool_cols = [col for col in df if df[col].dropna().value_counts().index.isin([0, 1]).all()]
+        bool_cols = [col for col in df.columns if df[col].value_counts().index.isin([0, 1]).all()]
         if len(bool_cols) > 0: df[bool_cols] = df[bool_cols].replace({0: 'no', 1: 'yes'})
         # detect numerical and categorical columns
-        static_data_col = [col for col in df.select_dtypes(include=['object', 'category']).columns if (self.key not in col)]
+        static_data_col = [col for col in df.select_dtypes(include=['object', 'category']).columns if
+                           (self.key not in col)]
         numeric_col = [col for col in df._get_numeric_data().columns if (self.key not in col)]
         # group by buckets
         bucket_col = self.to_bucket + '_upper_bound'
@@ -62,8 +66,6 @@ class Dataset:
         grouping_dict = dict(zip(keys, values))
 
         df_grouped = df.groupby([self.key] + [bucket_col], as_index=False).agg(grouping_dict)
-        df_baseline = df_grouped.sort_values([self.key, self.to_bucket]).groupby(self.key).first()
-        df_grouped = df_grouped.merge(df_baseline, on=self.key, suffixes=('', '_baseline'))
         df_grouped = df_grouped.sort_values([self.key, self.to_bucket])
 
         df_grouped['occur'] = df_grouped.groupby(self.key)[self.key].transform('size')
@@ -93,7 +95,8 @@ class Dataset:
 
 
 class DatasetMMSE(Dataset):
-    def __init__(self, health_numeric_cols=None, cols_to_pivot=None, index_to_pivot=None, index_to_pivot_baseline=None, agg_funcs=None, **kwargs):
+    def __init__(self, health_numeric_cols=None, cols_to_pivot=None, index_to_pivot=None, index_to_pivot_baseline=None,
+                 agg_funcs=None, **kwargs):
         super(DatasetMMSE, self).__init__(**kwargs)
         self.health_numeric_cols = health_numeric_cols
         self.cols_to_pivot = cols_to_pivot
@@ -103,7 +106,7 @@ class DatasetMMSE(Dataset):
 
     def read_and_clean_data(self):
         Dataset.read_and_clean_data(self)
-        print("cleaning data for MMSE object")
+        print("read data (method from mmse class)")
         df = self.data['data']
         df_baseline = self.data['data_baseline']
         static_data_col = [col for col in df.select_dtypes(include=['object']).columns if
@@ -145,9 +148,9 @@ class DatasetMMSE(Dataset):
         df['score_time_period'] = pd.PeriodIndex(pd.to_datetime(df.score_date), freq='Q').astype(str)
         df.score_time_period.replace({'Q1': 'H1', 'Q2': 'H1', 'Q3': 'H2', 'Q4': 'H2'}, regex=True, inplace=True)
         if self.baseline_cols is not None:
-            df_baseline = df.sort_values(['brcid', 'age_at_score']).groupby('brcid').first().reset_index()
+            df_baseline = df.sort_values([self.key, self.timestamp]).groupby(self.key).first().reset_index()
             df = df.merge(df_baseline[self.baseline_cols], on='brcid', suffixes=('', '_baseline'))
-            df = df.sort_values(['brcid', 'age_at_score'])
+            df = df.sort_values([self.key, self.timestamp])
 
         self.data = {'data': df, 'data_baseline': df_baseline}
         return 0
@@ -168,9 +171,10 @@ class DatasetMMSE(Dataset):
         for var in self.index_to_pivot + index_baseline:
             pv_scores = my_pivot(df, values=self.to_predict, index=var, cols_to_pivot=self.cols_to_pivot,
                                  aggfunc=self.agg_funcs)
-            pv_pop = my_pivot(df, values=self.key, index=var, cols_to_pivot=self.cols_to_pivot, aggfunc=pd.Series.nunique)
+            pv_pop = my_pivot(df, values=self.key, index=var, cols_to_pivot=self.cols_to_pivot,
+                              aggfunc=pd.Series.nunique)
             pv_pop.columns = [x + '_' + str(self.key) for x in pv_pop.columns]
-            pv = concat_clean(pv_scores, pv_pop)
+            pv = gutils.concat_clean(pv_scores, pv_pop)
             pv_master = pd.concat([pv_master, pv], axis=0, sort=False)
             pv.to_excel(writer, sheet_name='summary_separate', startrow=cpt_row)
             cpt_row += len(pv_scores) + 4
@@ -182,7 +186,8 @@ class DatasetMMSE(Dataset):
         pv_master.to_excel(writer, sheet_name='summary', startrow=len(header) + 1, header=False)
 
         pv_baseline = df_baseline.pivot_table(values=self.key, index=self.index_to_pivot_baseline,
-                                              columns=self.cols_to_pivot, aggfunc=pd.Series.nunique, margins=True).fillna(0)
+                                              columns=self.cols_to_pivot, aggfunc=pd.Series.nunique,
+                                              margins=True).fillna(0)
         pv_baseline.to_excel(writer, sheet_name='first_measure', startrow=0)
 
         health_stats0 = df_baseline.groupby(self.cols_to_pivot[0])[self.health_numeric_cols].agg(self.agg_funcs)
@@ -199,13 +204,15 @@ default_dataset = DatasetMMSE(
     baseline_cols=['brcid', 'age_at_score', 'score_combined', 'bmi_score', 'plasma_glucose_value', 'diastolic_value',
                    'systolic_value', 'smoking_status', 'bmi_bucket', 'diabetes_bucket', 'bp_bucket'],
     key='brcid',
+    timestamp='age_at_score',
     health_numeric_cols=['bmi_score', 'plasma_glucose_value', 'diastolic_value', 'systolic_value'],
     to_predict='score_combined',
     regressors=['patient_diagnosis_class', 'patient_diagnosis_super_class', 'score_date', 'age_at_score',
-                'gender', 'ethnicity_group', 'first_language', 'occupation', 'living_status', 'marital_status',
-                'education_bucket_raw', 'is_active', 'has_depression_anxiety_diagnosis', 'has_agitation_diagnosis',
-                'smoking_status', 'aggression_status', 'plasma_glucose_value', 'diabetes_bucket', 'diastolic_value',
-                'systolic_value', 'bp_bucket', 'bmi_score', 'bmi_bucket'],
+                'score_combined_baseline', 'gender', 'ethnicity_group', 'first_language', 'occupation',
+                'living_status', 'marital_status', 'education_bucket_raw', 'smoking_status_baseline',
+                'plasma_glucose_value_baseline', 'diastolic_value_baseline', 'systolic_value_baseline',
+                'bmi_score_baseline',
+                'diabetes_bucket_baseline', 'bp_bucket_baseline', 'bmi_bucket_baseline'],
     na_values=None,
     to_bucket='age_at_score',
     bucket_min=50,
@@ -218,6 +225,8 @@ default_dataset = DatasetMMSE(
     index_to_pivot_baseline='age_bucket_report',
     agg_funcs=['count', np.mean, np.std],
 )
+
+
 # default_dataset.write_report(r'C:\Users\K1774755\Downloads\testmmsereport.xlsx')
 
 
@@ -241,15 +250,3 @@ def my_pivot(df, cols_to_pivot, values, index, aggfunc=pd.Series.nunique):
     pv.rename(index={'All': 'All_' + index}, inplace=True)
     pv = pv.loc[:, ~pv.columns.duplicated()]
     return pv.reindex([x for x in pv.index if x != 'not known'] + ['not known'])
-
-
-def print_pv_to_excel(pv, writer, sheet_name, startrow=0, startcol=0):
-    pv.to_excel(writer, sheet_name=sheet_name, startrow=startrow, startcol=startcol)
-    return [startrow + len(pv) + 2, startcol + len(pv.columns) + 2]
-
-
-def concat_clean(df1, df2):
-    df = pd.concat([df1, df2], axis=1, sort=True)
-    df.sort_index(axis=1, inplace=True)
-    df = df.loc[:, ~df.columns.duplicated()]
-    return df.reindex([x for x in df.index if x != 'not known'] + ['not known'])

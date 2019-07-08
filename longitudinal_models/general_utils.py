@@ -30,7 +30,21 @@ patients_data_file = CRIS_data_path + r'\F20_patients_documents_details_from_DB.
 
 ##############################################################################
 # GENERAL UTILS FUNCTIONS
-############################################################################## 
+##############################################################################
+def to_list(x):
+    return [x] if isinstance(x, str) else list(x)
+
+
+def print_pv_to_excel(pv, writer, sheet_name, startrow=0, startcol=0):
+    pv.to_excel(writer, sheet_name=sheet_name, startrow=startrow, startcol=startcol)
+    return [startrow + len(pv) + 2, startcol + len(pv.columns) + 2]
+
+
+def concat_clean(df1, df2):
+    df = pd.concat([df1, df2], axis=1, sort=True)
+    df.sort_index(axis=1, inplace=True)
+    df = df.loc[:, ~df.columns.duplicated()]
+    return df.reindex([x for x in df.index if x != 'not known'] + ['not known'])
 # standardize dataframe data
 def clean_df(df, to_numeric=True, filter_col=None, filter_value=None, threshold_col=None, threshold_value=None):
     df.columns = df.columns.str.lower()

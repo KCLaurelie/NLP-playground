@@ -8,6 +8,7 @@ except:
 
 import pandas as pd
 import numpy as np
+import longitudinal_models.general_utils as gutils
 from scipy import stats
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
@@ -37,7 +38,7 @@ def check_r_loc():
 ##############################################################################################
 # LONGITUDINAL MODELLING
 ##############################################################################################
-def pre_cleaning(dataset=ds.default_dataset, normalize=False, dummyfy=False):
+def pre_cleaning(dataset=ds.default_dataset, normalize=False, dummyfy=False, keep_only_baseline=False):
     if dataset.data is None:
         dataset.prep_data()
     df = dataset.data['data_grouped']
@@ -53,7 +54,11 @@ def pre_cleaning(dataset=ds.default_dataset, normalize=False, dummyfy=False):
         cols_to_dummyfy = df[dataset.regressors].select_dtypes(include=['object', 'category']).columns
         dummyfied_df = pd.get_dummies(df[cols_to_dummyfy])
         df = pd.concat([df.drop(columns=cols_to_dummyfy), dummyfied_df], axis=1)
-
+    if keep_only_baseline:
+        to_drop = [col for col in df.columns if ('_baseline' in col)
+                   and col.replace('_baseline', '') not in gutils.to_list(dataset.to_predict)
+                   and col.replace('_baseline', '') in df.columns]
+        df.drop(columns=to_drop, inplace=True)
     return df
 
 
@@ -70,7 +75,7 @@ def multi_level_r(df, regressors, to_predict):
     result = model2.fit()
     print(result.summary())
 
-    df['intercept']=df['age_at_score_upper_bound_baseline']
+    df['intercept'] = df['age_at_score_upper_bound_baseline']
     model3 = mlm.MixedLM(endog=df['score_combined'],  # dependent variable (1D))
                          exog=df[['age_at_score_upper_bound', 'intercept']],  # fixed effect covariates (2D)
                          exog_re=df['intercept'],  # random effect covariates
