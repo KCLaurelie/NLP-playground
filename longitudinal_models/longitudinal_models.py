@@ -67,19 +67,18 @@ def multi_level_r(df, regressors, to_predict):
     df = pd.read_csv(os.path.join(get_resource_path(), 'sample_data.csv'))
     model = Lm('DV ~ IV1 + IV3', data=df)
     model = Lmer('DV ~ IV2 + (IV2|Group)', data=df)
-    model = Lmer('score_combined ~ age_at_score_upper_bound  + (age_at_score_upper_bound_baseline|brcid)', data=df)
+    model = Lmer('score_combined ~ age_at_score_upper_bound  + (score_combined_baseline|brcid)', data=df)
     result = model.fit()
-    print(result.summary())
 
     model2 = smf.mixedlm("score_combined ~ age_at_score_upper_bound + gender", df, groups=df['brcid'])
     result = model2.fit()
     print(result.summary())
 
-    df['intercept'] = df['age_at_score_upper_bound_baseline']
+    df['intercept'] = df['score_combined_baseline']
     model3 = mlm.MixedLM(endog=df['score_combined'],  # dependent variable (1D))
                          exog=df[['age_at_score_upper_bound', 'intercept']],  # fixed effect covariates (2D)
                          exog_re=df['intercept'],  # random effect covariates
-                         groups=df['patient_diagnosis_super_class'])  # data from different groups are independent
+                         groups=df['brcid'])  # data from different groups are independent
     result = model3.fit()
     print(result.summary())
 

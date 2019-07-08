@@ -71,12 +71,13 @@ class Dataset:
         df_grouped['occur'] = df_grouped.groupby(self.key)[self.key].transform('size')
         df_grouped = df_grouped[(df_grouped['occur'] >= self.min_obs)]
         # df_grouped['counter'] = df.groupby(key).cumcount() + 1
-        all_buckets = pd.DataFrame(data=np.arange(start=self.bucket_min, stop=self.bucket_max, step=self.interval),
+        all_buckets = pd.DataFrame(data=np.arange(start=self.bucket_min, stop=self.bucket_max + self.interval, step=self.interval),
                                    columns=[bucket_col])
         all_buckets['counter'] = np.arange(start=1, stop=len(all_buckets) + 1, step=1)
         df_grouped = df_grouped.merge(all_buckets, on=bucket_col).sort_values([self.key, bucket_col])
         df_grouped = df_grouped.reset_index(drop=True)
         self.data['data_grouped'] = df_grouped
+        # df.loc[df.brcid==326, ['score_combined', 'age_at_score', bucket_col]]
         return 0
 
     def prep_data(self, load_type='all'):
