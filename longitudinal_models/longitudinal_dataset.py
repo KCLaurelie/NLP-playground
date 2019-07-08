@@ -74,7 +74,7 @@ class Dataset:
         all_buckets['counter'] = np.arange(start=1, stop=len(all_buckets) + 1, step=1)
         df_grouped = df_grouped.merge(all_buckets, on=bucket_col).sort_values([self.key, bucket_col])
         df_grouped = df_grouped.reset_index(drop=True)
-        self.data['data_grouped']: df_grouped
+        self.data['data_grouped'] = df_grouped
         return 0
 
     def prep_data(self, load_type='all'):
