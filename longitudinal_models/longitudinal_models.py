@@ -28,6 +28,8 @@ OPTION B)
 Run model 1- 4 in each group of the grouping variable. 3 outputs
 """
 
+# TODO: simple linear regression with age / score at baseline / age at baseline
+# TODO: how is reference group used? (for age: youngest, rest: most prevalent)
 
 def check_r_loc():
     from rpy2.robjects.packages import importr
@@ -67,14 +69,18 @@ def multi_level_r(df, regressors, to_predict):
     df = pd.read_csv(os.path.join(get_resource_path(), 'sample_data.csv'))
     model = Lm('DV ~ IV1 + IV3', data=df)
     model = Lmer('DV ~ IV2 + (IV2|Group)', data=df)
-    model = Lmer('score_combined ~ age_at_score_upper_bound  + (score_combined_baseline|brcid)', data=df)
+
+    df = pre_cleaning(dataset=ds.default_dataset, normalize=False, dummyfy=False, keep_only_baseline=False)
+    df['intercept'] = df['score_combined_baseline']
+    model = Lmer('score_combined ~ intercept + age_at_score_upper_bound  + (1|brcid)', data=df)  # THIS WORKS
+    model = Lmer('score_combined ~ intercept + age_at_score_upper_bound  + (1|brcid) + (1|patient_diagnosis_super_class)', data=df)  # DOES NOT WORK
+    model = Lmer('score_combined ~ intercept  + (1|age_at_score_upper_bound)', data=df)  # THIS WORKS
     result = model.fit()
 
     model2 = smf.mixedlm("score_combined ~ age_at_score_upper_bound + gender", df, groups=df['brcid'])
     result = model2.fit()
     print(result.summary())
 
-    df['intercept'] = df['score_combined_baseline']
     model3 = mlm.MixedLM(endog=df['score_combined'],  # dependent variable (1D))
                          exog=df[['age_at_score_upper_bound', 'intercept']],  # fixed effect covariates (2D)
                          exog_re=df['intercept'],  # random effect covariates

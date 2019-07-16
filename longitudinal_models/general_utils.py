@@ -45,10 +45,12 @@ def concat_clean(df1, df2):
     df.sort_index(axis=1, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
     return df.reindex([x for x in df.index if x != 'not known'] + ['not known'])
+
+
 # standardize dataframe data
 def clean_df(df, to_numeric=True, filter_col=None, filter_value=None, threshold_col=None, threshold_value=None):
     df.columns = df.columns.str.lower()
-    df = df.rename(columns={'brc_id': 'brcid'})
+    df.rename(columns={'brc_id': 'brcid', 'ï»¿brcid': 'brcid'}, inplace=True)
     if 'brcid' in df.columns: df.dropna(subset=['brcid'], inplace=True)
     date_cols = [x for x in df.columns if 'date' in x]
     df[date_cols] = df[date_cols].apply(pd.to_datetime, errors='ignore')
@@ -143,6 +145,7 @@ def super_read_csv(file_path, usecols=None, clean_results=True, filter_col=None,
                                   encoding='ISO-8859-1')
         if clean_results: res = clean_df(res, filter_col=filter_col, filter_value=filter_value,
                                          threshold_col=threshold_col, threshold_value=threshold_value)
+    res.columns = res.columns.str.lower()
     return res
 
 
