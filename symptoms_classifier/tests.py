@@ -35,6 +35,7 @@ def test0():
     sentences = parse_text('C:\\temp\\bla.txt', convert_to_series=True, remove_punctuation=True)
     emb_snt = convert_stn2avgtoken(sentences, w2v_model)
 
+
 def test():
     data = pd.read_csv("https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv")
     data_clean = data[['airline_sentiment', 'text']].rename(columns={'airline_sentiment': 'class'})

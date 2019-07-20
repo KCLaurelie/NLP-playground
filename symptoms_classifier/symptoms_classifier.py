@@ -24,6 +24,7 @@ models = {
     'SVM with poly kernel': svm.SVC(kernel='poly')
 }
 
+
 def test():
     data = pd.read_csv("https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv")
     data_clean = data[['airline_sentiment', 'text']].rename(columns={'airline_sentiment': 'class'})
