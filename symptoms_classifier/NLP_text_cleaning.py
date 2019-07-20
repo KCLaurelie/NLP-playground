@@ -5,41 +5,44 @@ from nltk.corpus import stopwords
 import pandas as pd
 import numpy as np
 import re
-import contractions
 import unicodedata
 import itertools
-
+try: import contractions
+except: pass
 """
 FOR ALL THE FUNCTIONS BELOW:
 my_text can either be a string or a pd.Series of sentences (1 row = 1 sentence)
 """
 
 
-def parse_text(raw_text, convert_to_series=False):
+def parse_text(raw_text, convert_to_series=False, remove_punctuation=False):
     """
 
-    :param raw_text:
-    :param convert_to_series:
+    :param raw_text: string or path of the text file to parse
+    :param convert_to_series: to convert text in a series of sentences
+    :param remove_punctuation: remove punctuation once text converted to sentences
     :return:
     """
     if raw_text.endswith('.txt'):
         with open(raw_text, encoding='utf8') as f:
             raw_text = f.read().strip().replace('\n', '. ')
     if isinstance(raw_text, str) and convert_to_series:  # convert text to sentences if not already done
-        raw_text = text2sentences(raw_text)
+        raw_text = text2sentences(raw_text, remove_punctuation=remove_punctuation)
     return raw_text
 
 
-def text2sentences(raw_text):
+def text2sentences(raw_text, remove_punctuation=False):
     """
     converts text into a series of sentences
     :param raw_text: string or file of the path containing the text
+    :param remove_punctuation: clean punctuation from sentences
     :return: pd.Series of sentences (1 row = 1 sentence)
     """
     # some pre-cleaning before using punkt tokenizer
     raw_text = clean_string(raw_text, remove_punctuation=False)  # we keep punctuation for tokenizing
     sentences = tokenize.sent_tokenize(raw_text)
-    sentences = [re.sub(r'[^\w\s]', '', stn) for stn in sentences]  # now cleanup punctuation
+    if remove_punctuation:
+        sentences = [re.sub(r'[^\w\s]', '', stn) for stn in sentences]  # now cleanup punctuation
     return pd.Series(sentences)
 
 
@@ -144,7 +147,7 @@ def find_with_context(raw_text, keywords, context_length=20, context_type='porti
     return pd.Series(res)
 
 
-def preprocess_text(raw_text, remove_stopwords=False, stemmer=None, lemmatizer=None, keywords=None):
+def preprocess_text(raw_text, remove_stopwords=False, stemmer=None, lemmatizer=None, keywords=None, remove_punctuation=False):
     """
     cleans text and outputs series of pre-processed sentences
     :param raw_text: raw text, can be either string, .txt file containing text or pd.Series of sentences
@@ -152,11 +155,12 @@ def preprocess_text(raw_text, remove_stopwords=False, stemmer=None, lemmatizer=N
     :param stemmer: can be either porter, snowball, lancaster or None
     :param lemmatizer: for verb lemmatization. can be either wordnet or None
     :param keywords: list of keywords to select sentences of interest
+    :param remove_punctuation: remove or keep punctuation symbols
     :return: pd.Series of cleaned sentences
     """
-    raw_text = parse_text(raw_text, convert_to_series=True)
+    raw_text = parse_text(raw_text, convert_to_series=True, remove_punctuation=remove_punctuation)
     # clean the text
-    raw_text = raw_text.apply(lambda x: clean_string(x, remove_punctuation=True))
+    raw_text = raw_text.apply(lambda x: clean_string(x, remove_punctuation=remove_punctuation))
     # keep only sentences with relevant keywords
     if keywords is not None:
         keywords = [x.lower() for x in keywords]
@@ -186,7 +190,8 @@ def clean_string(raw_text, remove_punctuation=False):
     raw_text = raw_text.strip()  # remove leading/trailing characters
     raw_text = unicodedata.normalize('NFKD', raw_text).encode('ascii', 'ignore').decode('utf-8', 'ignore')  # remove non ascii characters
     raw_text = raw_text.replace('i', 'I')  # to allow expansion of i'm, i've...
-    raw_text = contractions.fix(raw_text)  # expand english contractions (didn't -> did not)
+    try: raw_text = contractions.fix(raw_text)  # expand english contractions (didn't -> did not)
+    except: print('contractions not expanded')
     raw_text = raw_text.lower()  # to lower case
     raw_text = raw_text.replace('e.g.', 'exempli gratia')  # replace e.g. (otherwise punkt tokenizer breaks)
     raw_text = raw_text.replace('i.e.', 'id est')  # replace i.e. (otherwise punkt tokenizer breaks)
@@ -198,7 +203,7 @@ def clean_string(raw_text, remove_punctuation=False):
     if remove_punctuation:
         raw_text = re.sub(r'[^\w\s]', ' ', raw_text)
     else:  # keep bare minimum punctuation
-        raw_text = re.sub(r'[^a-zA-Z0-9.,-?!()\s]+', ' ', raw_text)
+        raw_text = re.sub(r'[^a-zA-Z0-9.,\'-?!()\s]+', ' ', raw_text)
     raw_text = ' '.join(raw_text.split())  # substitute multiple spaces with single space
 
     return raw_text
