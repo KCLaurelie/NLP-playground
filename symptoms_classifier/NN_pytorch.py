@@ -34,42 +34,33 @@ y = np.array([1 if v > 20 else 0 for v in x])
 
 # Generate a train/test/dev dataset
 inds = np.random.permutation(len(x))
-inds_train = inds[0:int(0.8*len(x))]
-inds_test = inds[int(0.8*len(x)):int(0.9*len(x))]
-inds_dev = inds[int(0.9*len(x)):]
-# 80% of the dataset
+inds_train = inds[0:int(0.8*len(x))]  # 80% of the dataset
+inds_test = inds[int(0.8*len(x)):int(0.9*len(x))]  # 10% of the dataset
+inds_dev = inds[int(0.9*len(x)):]  # 10% of the dataset
+
 x_train = x[inds_train]
 y_train = y[inds_train]
-# 10% of the dataset
 x_test = x[inds_test]
 y_test = y[inds_test]
-# 10% of the dataset
 x_dev = x[inds_dev]
 y_dev = y[inds_dev]
 
 """#Convert the inputs to PyTorch"""
 x_train = torch.tensor(x_train.reshape(-1, 1), dtype=torch.float32)
 y_train = torch.tensor(y_train.reshape(-1, 1), dtype=torch.float32)
-
 x_dev = torch.tensor(x_dev.reshape(-1, 1), dtype=torch.float32)
 y_dev = torch.tensor(y_dev.reshape(-1, 1), dtype=torch.float32)
-
 x_test = torch.tensor(x_test.reshape(-1, 1), dtype=torch.float32)
 y_test = torch.tensor(y_test.reshape(-1, 1), dtype=torch.float32)
 
+
 """# Build the Neural Network"""
-#L1 - 4 Neurons
-#L2 - 3 Neurons
-#L3 - 1 Neuron
-device = torch.device('cpu')
-
-
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.fc1 = nn.Linear(1, 4)  # 1 layer with 1 input (1 variable: temperature), 4 outputs (4 neurons)
-        self.fc2 = nn.Linear(4, 3)  # 1 layer with 4 inputs, 3 outputs
-        self.fc3 = nn.Linear(3, 1)  # 3 inputs, 1 output (only 1 prediction)
+        self.fc1 = nn.Linear(1, 4)  # layer 1: 1 input (1 variable: temperature), 4 outputs (4 neurons)
+        self.fc2 = nn.Linear(4, 3)  # layer 2: 4 inputs, 3 outputs (3 neurons)
+        self.fc3 = nn.Linear(3, 1)  # layer 3: 3 inputs, 1 output/neuron (only 1 prediction)
 
     def forward(self, x):
         x1 = torch.sigmoid(self.fc1(x))  # linear layer receives as input x
@@ -85,11 +76,6 @@ optimizer = optim.SGD(net.parameters(), lr=0.0001, momentum=0.999)  # to update 
 # here optimizer = sigmoid gradient descent with learning rate or 0.0001
 
 """# Train the NN"""
-net.to(device)  # move the network to device (CPU)
-x_train = x_train.to(device)
-y_train = y_train.to(device)
-x_dev = x_dev.to(device)
-y_dev = y_dev.to(device)
 
 net.train()
 losses = []
@@ -105,13 +91,13 @@ for epoch in range(10000):  # do 10,000 epoch
 
     # Track the changes - This is normally done using tensorboard or similar
     losses.append(loss.item())
-    accs.append(sklearn.metrics.accuracy_score([1 if x > 0.5 else 0 for x in outputs.cpu().detach().numpy()],y_train.cpu().numpy()))
-    ws.append(net.fc1.weight.cpu().detach().numpy()[0][0])
-    bs.append(net.fc1.bias.cpu().detach().numpy()[0])
+    accs.append(sklearn.metrics.accuracy_score([1 if x > 0.5 else 0 for x in outputs.numpy()], y_train.cpu().numpy()))
+    ws.append(net.fc1.weight.numpy()[0][0])
+    bs.append(net.fc1.bias.numpy()[0])
 
     # print statistics
     if epoch % 500 == 0:
-        acc = sklearn.metrics.accuracy_score([1 if x > 0.5 else 0 for x in outputs.cpu().detach().numpy()],y_train.cpu().numpy())
+        acc = sklearn.metrics.accuracy_score([1 if x > 0.5 else 0 for x in outputs.numpy()],y_train.cpu().numpy())
         print("Epoch: {:4} Loss: {:.5} Acc: {:.3}".format(epoch, loss.item(), acc))
 
 print('Finished Training')

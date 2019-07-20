@@ -47,6 +47,8 @@ class Net(nn.Module):
 
 net = Net()
 criterion = nn.CrossEntropyLoss()
+# to fix the imbalance: add weights to the cross entropy (here we tell the model we have 10 times more negatives)
+# criterion = nn.CrossEntropyLoss(weight=torch.tensor([0.1, 0.9]))
 optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.99)  # TODO: mode to Adam?
 
 #######################################################################################################################
@@ -55,7 +57,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.99)  # TODO: mode to 
 net.train()
 for epoch in range(5000):
     optimizer.zero_grad()
-    outputs = net(x_train)
+    outputs = net(x_train)  # forward
     loss = criterion(outputs, y_train)
     loss.backward()
     optimizer.step()
@@ -63,15 +65,21 @@ for epoch in range(5000):
     # print statistics
     if epoch % 500 == 0:
         net.eval()
-        outputs = torch.max(outputs, dim=1).indices  # ? Use max to get the index of max for each row
-        acc = sklearn.metrics.accuracy_score(outputs.cpu().detach().numpy(), y_train.cpu().numpy())
-
+        outputs_idx = torch.max(outputs, dim=1).indices.numpy()  # Use max to get the index of max for each row
         outputs_dev = net(x_test)
-        outputs_dev = torch.max(outputs_dev, dim=1).indices  # ? Same but for outputs_dev
-        acc_dev = sklearn.metrics.accuracy_score(outputs_dev.cpu().detach().numpy(), y_test.cpu().numpy())
+        outputs_dev_idx = torch.max(outputs_dev, dim=1).indices.numpy()  # Get the index of max per row
 
-        print("Epoch: {:4} Loss: {:.5f} Acc: {:.3f} Acc Dev: {:.3f}".format(epoch, loss.item(), acc, acc_dev))
+        # performance metrics
+        acc = sklearn.metrics.accuracy_score(outputs_idx, y_train.numpy())
+        acc_dev = sklearn.metrics.accuracy_score(outputs_dev_idx, y_test.numpy())
+        f1_dev = sklearn.metrics.f1_score(outputs_dev_idx, y_test.numpy())  # Use f1 from sklearn
+        p_dev = sklearn.metrics.precision_score(outputs_dev_idx, y_test.numpy())  # Use precision from sklearn
+        r_dev = sklearn.metrics.recall_score(outputs_dev_idx, y_test.numpy())  # Use recall from sklearn
+
+        print("Epoch: {:4} Loss: {:.5f} Acc: {:.3f} Acc Dev: {:.3f} F1 Dev: {:.3f} p Dev: {:.3f} r Dev: {:.3f}".format(
+            epoch, loss.item(), acc, acc_dev, f1_dev, p_dev, r_dev))
         net.train()
+
 print('Finished Training')
 
-print(outputs)
+print(outputs_idx)
