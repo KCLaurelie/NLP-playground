@@ -6,6 +6,7 @@ spacy_en_path = os.path.join(spacy_lib, r'en_core_web_sm\en_core_web_sm-2.1.0')
 
 import pickle  # to save models
 import nltk
+import re
 from nltk import tokenize
 from nltk.corpus import stopwords
 from gensim.models import Word2Vec
@@ -14,7 +15,7 @@ from sklearn.feature_extraction import text
 import numpy as np
 import spacy
 nltk.download('wordnet')
-
+nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
 """
 FOR ALL THE FUNCTIONS BELOW:
 my_text is a pd.Series of sentences (1 row = 1 sentence)
@@ -28,6 +29,16 @@ def top_features(vectorizer, top_n=2):
     return _top_features
 
 # TODO check http://kavita-ganesan.com/extracting-keywords-from-text-tfidf/#.XPFMnohKiUk
+
+
+def tokenize_sentences(sentences, clean_text=False):
+    tok_snts = []
+    for snt in sentences:
+        if clean_text: snt = re.sub(r'[^a-zA-Z0-9\s]', ' ', snt)
+        tkns = [tkn.lemma_.lower() for tkn in nlp.tokenizer(snt)
+                if (not tkn.is_punct) and (not tkn.is_space) and (tkn.pos_ != "SYM")]
+        if len(tkns) > 0: tok_snts.append(tkns)
+    return tok_snts
 
 
 def convert_stn2avgtoken(sentences, w2v_model):
@@ -44,25 +55,22 @@ def convert_stn2avgtoken(sentences, w2v_model):
     sentences_emb = np.zeros((len(sentences), size))  # to store embedded sentences
 
     # tokenize the text and further cleans it (needed otherwise it would take 1 token = 1 letter)
-    nlp = spacy.load('en_core_web_sm', disable=['ner', 'parser'])
-    tok_snts = []
-    for snt in sentences:
-        tkns = [tkn.lemma_.lower() for tkn in nlp.tokenizer(snt) if not tkn.is_punct]
-        tok_snts.append(tkns)
-    sentences = tok_snts  # save back
+    sentences = tokenize_sentences(sentences)
 
     # convert each sentence into the average sum of the vector representations of its tokens
+    not_in_model = []
     for i_snt, snt in enumerate(sentences):  # Loop over sentences
         cnt = 0
         for i_word, word in enumerate(snt):  # Loop over the words of a sentence
-            print(word)
             if word in w2v_model.wv:
-                print('is in model')
                 sentences_emb[i_snt] += w2v_model.wv.get_vector(word)
                 cnt += 1
+            else:
+                not_in_model.append(word)
         if cnt > 0:
             sentences_emb[i_snt] = sentences_emb[i_snt] / cnt
 
+    print('words not in model:', list(dict.fromkeys(not_in_model)))
     return sentences_emb
 
 

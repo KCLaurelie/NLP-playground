@@ -23,11 +23,12 @@ def parse_text(raw_text, convert_to_series=False, remove_punctuation=False):
     :param remove_punctuation: remove punctuation once text converted to sentences
     :return:
     """
-    if raw_text.endswith('.txt'):
-        with open(raw_text, encoding='utf8') as f:
-            raw_text = f.read().strip().replace('\n', '. ')
-    if isinstance(raw_text, str) and convert_to_series:  # convert text to sentences if not already done
-        raw_text = text2sentences(raw_text, remove_punctuation=remove_punctuation)
+    if isinstance(raw_text, str):
+        if raw_text.endswith('.txt'):
+            with open(raw_text, encoding='utf8') as f:
+                raw_text = f.read().strip().replace('\n', '. ')
+        if convert_to_series:  # convert text to sentences if not already done
+            raw_text = text2sentences(raw_text, remove_punctuation=remove_punctuation)
     return raw_text
 
 
@@ -200,7 +201,7 @@ def clean_string(raw_text, remove_punctuation=False):
 
     # remove special characters
     if remove_punctuation:
-        raw_text = re.sub(r'[^\w\s]', ' ', raw_text)
+        raw_text = re.sub(r'[^a-zA-Z0-9\s]', ' ', raw_text)
     else:  # keep bare minimum punctuation
         raw_text = re.sub(r'[^a-zA-Z0-9.,\'-?!()\s]+', ' ', raw_text)
     raw_text = ' '.join(raw_text.split())  # substitute multiple spaces with single space
