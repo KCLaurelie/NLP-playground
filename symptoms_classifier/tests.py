@@ -1,15 +1,20 @@
+import os
+import sys
+spacy_lib = r'C:\Users\K1774755\AppData\Local\Continuum\anaconda3\envs\spacy\Lib\site-packages'
+sys.path.append(spacy_lib)
+spacy_en_path = os.path.join(spacy_lib, r'en_core_web_sm\en_core_web_sm-2.1.0')
+
 import pandas as pd
 from symptoms_classifier.NLP_text_cleaning import clean_string, text2sentences, preprocess_text, parse_text
 from symptoms_classifier.NLP_embedding import fit_text2vec, transform_text2vec, convert_stn2avgtoken
 from gensim.models import Word2Vec
 import spacy
 
-
 def quick_embedding_ex(
         data_file="https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv",
         text_col='text',
         class_col='airline_sentiment'):
-    nlp = spacy.load('en_core_web_sm', disable=['ner', 'parser'])
+    nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
     data = pd.read_csv(data_file)[[class_col, text_col]]
     sentences = data[text_col]
     y = data[class_col]

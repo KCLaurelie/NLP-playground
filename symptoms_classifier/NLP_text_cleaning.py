@@ -7,8 +7,8 @@ import numpy as np
 import re
 import unicodedata
 import itertools
-try: import contractions
-except: pass
+import contractions
+
 """
 FOR ALL THE FUNCTIONS BELOW:
 my_text can either be a string or a pd.Series of sentences (1 row = 1 sentence)
@@ -190,8 +190,7 @@ def clean_string(raw_text, remove_punctuation=False):
     raw_text = raw_text.strip()  # remove leading/trailing characters
     raw_text = unicodedata.normalize('NFKD', raw_text).encode('ascii', 'ignore').decode('utf-8', 'ignore')  # remove non ascii characters
     raw_text = raw_text.replace('i', 'I')  # to allow expansion of i'm, i've...
-    try: raw_text = contractions.fix(raw_text)  # expand english contractions (didn't -> did not)
-    except: print('contractions not expanded')
+    raw_text = contractions.fix(raw_text)  # expand english contractions (didn't -> did not)
     raw_text = raw_text.lower()  # to lower case
     raw_text = raw_text.replace('e.g.', 'exempli gratia')  # replace e.g. (otherwise punkt tokenizer breaks)
     raw_text = raw_text.replace('i.e.', 'id est')  # replace i.e. (otherwise punkt tokenizer breaks)

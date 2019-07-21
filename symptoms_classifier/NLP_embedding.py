@@ -1,5 +1,10 @@
+import os
+import sys
+spacy_lib = r'C:\Users\K1774755\AppData\Local\Continuum\anaconda3\envs\spacy\Lib\site-packages'
+sys.path.append(spacy_lib)
+spacy_en_path = os.path.join(spacy_lib, r'en_core_web_sm\en_core_web_sm-2.1.0')
+
 import pickle  # to save models
-import spacy
 import nltk
 from nltk import tokenize
 from nltk.corpus import stopwords
@@ -7,6 +12,7 @@ from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction import text
 import numpy as np
+import spacy
 nltk.download('wordnet')
 
 """

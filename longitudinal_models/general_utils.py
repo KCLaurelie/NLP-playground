@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Apr  1 10:46:34 2019
-
-@author: AMascio
-"""
 import os
 import pandas as pd
 import numpy as np
@@ -12,6 +6,7 @@ import sys
 import csv
 from collections import OrderedDict
 import pyximport
+sys.path.append(r'C:\Users\K1774755\AppData\Local\Continuum\anaconda3\envs\spacy\Lib\site-packages')
 
 pyximport.install()
 sys.maxsize
