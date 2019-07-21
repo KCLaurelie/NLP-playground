@@ -5,29 +5,24 @@ sys.path.append(spacy_lib)
 spacy_en_path = os.path.join(spacy_lib, r'en_core_web_sm\en_core_web_sm-2.1.0')
 
 import pandas as pd
-import re
 from symptoms_classifier.NLP_text_cleaning import clean_string, text2sentences, preprocess_text, parse_text
-from symptoms_classifier.NLP_embedding import fit_text2vec, transform_text2vec, convert_stn2avgtoken
+from symptoms_classifier.NLP_embedding import fit_text2vec, transform_text2vec, convert_snt2avgtoken, tokenize_sentences
 from gensim.models import Word2Vec
-import spacy
+
 
 def quick_embedding_ex(
         data_file='https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv',
         text_col='text',
         class_col='airline_sentiment'):
-    nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
     data = pd.read_csv(data_file)[[class_col, text_col]]
     data[class_col] = data[class_col].replace({'positive': 1, 'negative': -1, 'neutral': 0})
 
-    sentences = preprocess_text(data[text_col], remove_punctuation=True)
+    sentences = data[text_col]
     y = data[class_col]
-    tok_snts = []
-    for snt in sentences:
-        tkns = [tkn.lemma_.lower() for tkn in nlp.tokenizer(snt)
-                if (not tkn.is_punct) and (not tkn.is_space) and (tkn.pos_ != "SYM")]
-        if len(tkns) > 0: tok_snts.append(tkns)
-    w2v_model = Word2Vec(tok_snts, size=300, window=6, min_count=4, workers=4)
-    x_emb = convert_stn2avgtoken(sentences, w2v_model)
+
+    tok_snts = tokenize_sentences(sentences, clean_text=True)  # tokenize sentences
+    w2v_model = Word2Vec(tok_snts, size=100, window=5, min_count=4, workers=4)  # train word2vec
+    x_emb = convert_snt2avgtoken(sentences, w2v_model, clean_text=True)  # embed sentences
     return [x_emb, y]
 
 
@@ -41,7 +36,7 @@ def test0():
     vectors = [w2v_model[x] for x in "the patient shows poor concentration".split(' ')]
 
     sentences = parse_text('C:\\temp\\bla.txt', convert_to_series=True, remove_punctuation=True)
-    emb_snt = convert_stn2avgtoken(sentences, w2v_model)
+    emb_snt = convert_snt2avgtoken(sentences, w2v_model)
 
 
 def test():

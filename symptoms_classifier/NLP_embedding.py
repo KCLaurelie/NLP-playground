@@ -41,11 +41,12 @@ def tokenize_sentences(sentences, clean_text=False):
     return tok_snts
 
 
-def convert_stn2avgtoken(sentences, w2v_model):
+def convert_snt2avgtoken(sentences, w2v_model, clean_text=False):
     """
     convert sentences to embedded sentences using pre-trained Word2Vec model
     :param sentences: sentences to vectorize
     :param w2v_model: Word2Vec pre-trained model (either model object or filepath to savec model)
+    :param clean_text: set to true to remove punctuations and special characters (only keeps alphanumerics)
     :return: embedded sentences
     """
     if isinstance(w2v_model, str):  # load model if saved in file
@@ -55,7 +56,7 @@ def convert_stn2avgtoken(sentences, w2v_model):
     sentences_emb = np.zeros((len(sentences), size))  # to store embedded sentences
 
     # tokenize the text and further cleans it (needed otherwise it would take 1 token = 1 letter)
-    sentences = tokenize_sentences(sentences)
+    sentences = tokenize_sentences(sentences, clean_text=clean_text)
 
     # convert each sentence into the average sum of the vector representations of its tokens
     not_in_model = []
@@ -99,7 +100,7 @@ def transform_text2vec(my_text, emb_model, algo='tfidf', word2vec_option='senten
             for idx, snt in enumerate(sentences):
                 vectors[idx] = [emb_model.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
         else:  # Convert each sentence into the average sum of its tokens
-            vectors = convert_stn2avgtoken(sentences, w2v_model=emb_model)
+            vectors = convert_snt2avgtoken(sentences, w2v_model=emb_model)
     else:
         return 'unknown algo'
     return vectors
