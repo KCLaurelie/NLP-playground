@@ -122,7 +122,6 @@ class TextsToClassify:
         # if object default values not overriden
         if binary is None: binary = self.binary
         if classifier_model is None: classifier_model = self.classifier_model
-        embedded_text = self.embedded_text
 
         # convert annotations to binary class if needed
         if binary:
@@ -131,7 +130,7 @@ class TextsToClassify:
             self.make_numeric_class()
         text_class = self.dataset['class_numeric']
 
-        x_emb_train, x_emb_test, y_train, y_test = train_test_split(embedded_text, text_class, test_size=test_size)
+        x_emb_train, x_emb_test, y_train, y_test = train_test_split(self.embedded_text, text_class, test_size=test_size)
 
         # train classifier
         classifier = cutils.load_classifier(classifier_model)
