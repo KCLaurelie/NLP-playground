@@ -18,16 +18,22 @@ nltk.data.path.append(root_path + '\\software')
 
 
 # GENERATE RANDOM SAMPLE OF FILES
-def generate_sample(patients_file=r'T:\aurelie_mascio\F20 corpus\patients_static_data.csv',
+def generate_sample(patients_file=r'T:\aurelie_mascio\F20 corpus\patients_static_data_until_20190701.csv',
+                    documents_file=r'T:\aurelie_mascio\F20 corpus\attention\attention_list_docs_20190701_v2.csv',
                     sample_size=1000,
                     random_state=1,
                     sample_cols=['brcid', 'len_text', 'date_of_birth', 'first_language', 'gender', 'employment',
-                                 'occupation', 'religion', 'marital_status', 'ethnicity', 'secondary_diag']):
+                                 'occupation', 'religion', 'marital_status', 'ethnicity',
+                                 'secondary_diag', 'doc_date', 'doc_type']):
     patients_data = gutils.super_read_csv(patients_file)  # in case file saved in stupid format
     patients_data.fillna('not known', inplace=True)
     summary = patients_data.describe(include='all')
     print(summary)
-    sample = patients_data[sample_cols].sample(n=sample_size, random_state=random_state)
+    if documents_file is not None:
+        documents_data = gutils.super_read_csv(documents_file)
+        patients_data = patients_data.merge(documents_data, on='brcid')
+    sample_ix = patients_data[sample_cols].sample(n=sample_size, random_state=random_state).index
+    sample = patients_data.loc[sample_ix, sample_cols + ['cn_doc_id']]
     return sample
 
 
