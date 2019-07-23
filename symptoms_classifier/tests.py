@@ -15,14 +15,20 @@ def test_final():
         filepath='https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv',
         class_col='airline_sentiment', text_col='text',
         embedding_algo='w2v', embedding_model=None,
-        classifier_type='SVM')
+        binary_main_class='positive',
+        classifier_model='SVM')
     df = tweets.load_data()
-    df['tokens_clean'] = tweets.tokenize_text(manually_clean_text=True, update_obj=True)
-    # df['tokens_spacy'] = tweets.tokenize_text(manually_clean_text=False, update_obj=True)
+    tkns = tweets.tokenize_text(manually_clean_text=True, update_obj=True)
     w2v = tweets.train_embedding_model()
     w2v.wv['you']
-    emb_x = tweets.embed_text(update_obj=True)
+    x_emb = tweets.embed_text(update_obj=True)
+
     res = tweets.run_classifier(test_size=0.2)
+    res2 = tweets.run_classifier(classifier_model='SVM with sigmoid kernel'
+                                 , test_size=0.2
+                                 , binary=True, binary_main_class='negative'
+                                 , save_model=True)
+    y = tweets.dataset['class_numeric']
 
 
 def quick_embedding_ex(
@@ -31,14 +37,13 @@ def quick_embedding_ex(
         class_col='airline_sentiment'):
     data = pd.read_csv(data_file)[[class_col, text_col]]
     data[class_col] = data[class_col].replace({'positive': 1, 'negative': -1, 'neutral': 0})
-
     sentences = data[text_col]
     y = data[class_col]
-
     tok_snts = tokenize_sentences(sentences, manually_clean_text=True)  # tokenize sentences
     w2v_model = Word2Vec(tok_snts, size=100, window=5, min_count=4, workers=4)  # train word2vec
     x_emb = convert_snt2avgtoken(sentences, w2v_model, clean_text=True)  # embed sentences
     return [x_emb, y]
+
 
 def classifier_test():
     data = pd.read_csv(
@@ -51,12 +56,12 @@ def classifier_test():
     x_train, x_test, y_train, y_test = train_test_split(processed_features, data_clean['class'], test_size=0.8,
                                                         random_state=0)
 
-    classifier = classifiers['SVM']
+    classifier = cutils.classifiers['SVM']
     classifier.fit(x_train, y_train)
     preds = classifier.predict(x_train)
-    # test_metrics = gutils.perf_metrics(y_train, preds)
+    # test_metrics = cutils.perf_metrics(y_train, preds)
 
-    from sklearn.metrics  import confusion_matrix, classification_report, accuracy_score
+    from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
     print(confusion_matrix(y_train, preds))
     print(classification_report(y_train, preds))
     print(accuracy_score(y_train, preds))
@@ -98,3 +103,36 @@ def test0():
     w2v = fit_text2vec(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='word2vec', size=100)
     list(w2v.wv.vocab)
     return 0
+
+
+def run_classifier_test(classifier_model, train_data, test_data):
+    train_text = preprocess_text(train_data['text'], remove_stopwords=True, stemmer=None, lemmatizer=None)
+    test_text = test_data[['text']]
+    train_class = train_data[['class']]
+    test_class = test_data[['class']]
+
+    # vectorize text data
+    vectorizer = fit_text2vec(train_text)
+    train_data_features = transform_text2vec(train_text, vectorizer)
+    test_data_features = transform_text2vec(test_text, vectorizer)
+
+    # train classifier
+    classifier = cutils.classifiers[classifier_model]
+    classifier.fit(train_data_features, train_class)
+
+    # test classifier
+    test_preds = classifier.predict(test_data_features)
+    train_preds = cross_val_predict(classifier, train_data_features, train_class, cv=10)
+    test_metrics = cutils.perf_metrics(test_class, test_preds)
+    train_metrics = cutils.perf_metrics(train_class, train_preds)
+    return {'test': test_metrics, 'train': train_metrics}
+
+
+def plot_distribution(class_array, title):
+    plt.figure(title)
+    pd.DataFrame(class_array, columns=['Class']).Class.value_counts().plot(
+        kind='pie',
+        autopct='%.2f %%',
+    )
+    plt.axis('equal')
+    plt.title(title)

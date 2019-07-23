@@ -5,7 +5,7 @@ import nltk
 from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction import text
-from symptoms_classifier.NLP_text_cleaning import preprocess_text, clean_string
+from symptoms_classifier.NLP_text_cleaning import clean_string
 import numpy as np
 from nltk import tokenize
 from nltk.corpus import stopwords
