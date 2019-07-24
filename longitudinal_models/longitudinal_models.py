@@ -1,14 +1,11 @@
 import os
-
+import sys
 os.environ['R_HOME'] = r'C:\Program Files\R\R-3.6.0'  # where R is (needs to be run before importing pymer and rpy)
-try:  # for use on CRIS computers
-    os.chdir(r'T:\aurelie_mascio\python_scripts')
-except:
-    pass
-
+sys.path.append(r'C:\Users\K1774755\AppData\Local\Continuum\anaconda3\Library\mingw-w64\bin')
+# from code_utils.global_variables import *
 import pandas as pd
 import numpy as np
-import longitudinal_models.general_utils as gutils
+import code_utils.general_utils as gutils
 from scipy import stats
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm

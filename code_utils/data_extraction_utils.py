@@ -6,7 +6,7 @@ Created on Sat Mar 30 08:26:08 2019
 """
 import os
 import pandas as pd
-import longitudinal_models.general_utils as gutils
+import code_utils.general_utils as gutils
 import nltk.data
 from nltk import tokenize
 

@@ -1,9 +1,4 @@
-import os
-import sys
-spacy_lib = r'C:\Users\K1774755\AppData\Local\Continuum\anaconda3\envs\spacy\Lib\site-packages'
-sys.path.append(spacy_lib)
-spacy_en_path = os.path.join(spacy_lib, r'en_core_web_sm\en_core_web_sm-2.1.0')
-
+from code_utils.global_variables import *
 from medcat.cat import CAT
 from medcat.utils.vocab import Vocab
 from medcat.prepare_cdb import PrepareCDB

@@ -2,12 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="minor changes">
-      <change afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code_utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code_utils/global_variables.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MedCat/medcat_attention.py" beforeDir="false" afterPath="$PROJECT_DIR$/MedCat/medcat_attention.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/longitudinal_models/general_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/longitudinal_models/general_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/longitudinal_models/data_extraction_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code_utils/data_extraction_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/longitudinal_models/db_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code_utils/db_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/longitudinal_models/general_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code_utils/general_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/longitudinal_models/longitudinal_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/longitudinal_models/longitudinal_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/longitudinal_models/longitudinal_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/longitudinal_models/longitudinal_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/longitudinal_models/plot_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code_utils/plot_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py" beforeDir="false" afterPath="$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py" beforeDir="false" afterPath="$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/symptoms_classifier/classifiers_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/symptoms_classifier/classifiers_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/symptoms_classifier/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/symptoms_classifier/tests.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,72 +39,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="28" selection-start-line="28" selection-end-line="29" selection-end-column="99" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="561">
-              <caret line="33" column="4" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" selection-start-line="5" selection-end-line="5" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/symptoms_classifier/tests.py">
+        <entry file="file://$PROJECT_DIR$/longitudinal_models/longitudinal_models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="18" column="24" selection-start-line="18" selection-start-column="24" selection-end-line="18" selection-end-column="24" />
+            <state relative-caret-position="43">
+              <caret line="32" column="21" selection-start-line="32" selection-start-column="21" selection-end-line="32" selection-end-column="21" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/symptoms_classifier/NN_pytorch_multiclass.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="20" selection-start-line="20" selection-end-line="20" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/longitudinal_models/general_utils.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-129">
-              <folding>
-                <element signature="e#86#95#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -106,8 +54,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MedCat/medcat_attention.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" selection-start-line="5" selection-end-line="5" />
+            <state relative-caret-position="51">
+              <caret line="3" column="10" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/code_utils/general_utils.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="4046">
+              <caret line="245" column="50" selection-start-line="245" selection-start-column="50" selection-end-line="245" selection-end-column="50" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -118,10 +75,19 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/longitudinal_models/longitudinal_dataset.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1921">
-              <caret line="113" column="94" selection-start-line="113" selection-start-column="94" selection-end-line="113" selection-end-column="94" />
+            <state relative-caret-position="51">
+              <caret line="3" column="11" selection-start-line="3" selection-start-column="11" selection-end-line="3" selection-end-column="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/code_utils/global_variables.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="6" column="69" selection-start-line="6" selection-start-column="18" selection-end-line="6" selection-end-column="69" />
               <folding>
-                <element signature="e#0#9#0" expanded="true" />
+                <element signature="e#0#10#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -138,8 +104,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>print</find>
-      <find>args.</find>
       <find>text</find>
       <find>stopwo</find>
       <find>data_dir</find>
@@ -163,10 +127,13 @@
       <find>Dataset.</find>
       <find>age_bucket_report</find>
       <find>drop</find>
-      <find>replace</find>
       <find>contractions</find>
       <find>parse_text</find>
       <find>transform_text2vec</find>
+      <find>replace</find>
+      <find>clea</find>
+      <find>classifier_</find>
+      <find>classifier_typ</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -193,35 +160,39 @@
         <option value="$PROJECT_DIR$/NLP/sentiment_analysis_scikit.py" />
         <option value="$PROJECT_DIR$/NLP/ZK_012_neural_networks_intro_COMPLETE.py" />
         <option value="$PROJECT_DIR$/NLP/ZK_022_sentiment_detection.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/general_utils.py" />
         <option value="$PROJECT_DIR$/symptoms_classifier/NLP_utils.py" />
         <option value="$PROJECT_DIR$/symptoms_classifier/clean_text.py" />
         <option value="$PROJECT_DIR$/symptoms_classifier/NLP_spellcheck.py" />
         <option value="$PROJECT_DIR$/NLP_courses_and_tutorials/ZK_022_sentiment_detection.py" />
         <option value="$PROJECT_DIR$/longitudinal_models/cog_score_trajectories.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/data_extraction_utils.py" />
         <option value="$PROJECT_DIR$/longitudinal_models/db_utils.py" />
         <option value="$PROJECT_DIR$/longitudinal_models/plot_utils.py" />
         <option value="$PROJECT_DIR$/longitudinal_models/longitudinal_data_prep.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/longitudinal_models.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/longitudinal_dataset.py" />
         <option value="$PROJECT_DIR$/symptoms_classifier/attention.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/NN_pytorch_multiclass.py" />
         <option value="$PROJECT_DIR$/symptoms_classifier/NN_pytorch.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/tests.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py" />
-        <option value="$PROJECT_DIR$/MedCat/medcat_attention.py" />
         <option value="$PROJECT_DIR$/longitudinal_models/general_utils.py" />
+        <option value="$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py" />
+        <option value="$PROJECT_DIR$/symptoms_classifier/NN_pytorch_multiclass.py" />
+        <option value="$PROJECT_DIR$/symptoms_classifier/spacy_contractions.py" />
+        <option value="$PROJECT_DIR$/symptoms_classifier/general_utils.py" />
+        <option value="$PROJECT_DIR$/longitudinal_models/data_extraction_utils.py" />
+        <option value="$PROJECT_DIR$/symptoms_classifier/classifiers_utils.py" />
+        <option value="$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py" />
+        <option value="$PROJECT_DIR$/code_utils/global_variables.py" />
+        <option value="$PROJECT_DIR$/longitudinal_models/longitudinal_dataset.py" />
+        <option value="$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py" />
+        <option value="$PROJECT_DIR$/symptoms_classifier/tests.py" />
+        <option value="$PROJECT_DIR$/longitudinal_models/longitudinal_models.py" />
+        <option value="$PROJECT_DIR$/code_utils/general_utils.py" />
+        <option value="$PROJECT_DIR$/MedCat/medcat_attention.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-1928" />
-    <option name="y" value="-8" />
-    <option name="width" value="1936" />
-    <option name="height" value="1056" />
+    <option name="x" value="-18" />
+    <option name="y" value="-18" />
+    <option name="width" value="3876" />
+    <option name="height" value="2196" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -229,12 +200,18 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="toy-models" type="b2602c69:ProjectViewProjectNode" />
               <item name="toy-models" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="toy-models" type="b2602c69:ProjectViewProjectNode" />
+              <item name="toy-models" type="462c0819:PsiDirectoryNode" />
+              <item name="code_utils" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="toy-models" type="b2602c69:ProjectViewProjectNode" />
@@ -246,22 +223,16 @@
               <item name="toy-models" type="462c0819:PsiDirectoryNode" />
               <item name="MedCat" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="toy-models" type="b2602c69:ProjectViewProjectNode" />
-              <item name="toy-models" type="462c0819:PsiDirectoryNode" />
-              <item name="symptoms_classifier" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/Programs/Git/bin/git.exe" />
+    <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/R/python.exe" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -277,6 +248,11 @@
         <option name="myModuleName" value="toy-models" />
       </console-settings>
     </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\code_utils" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -305,56 +281,12 @@
       <workItem from="1563178790807" duration="4271000" />
       <workItem from="1563221555024" duration="2167000" />
       <workItem from="1563224595763" duration="28382000" />
-      <workItem from="1563703409641" duration="5601000" />
-    </task>
-    <task id="LOCAL-00010" summary="added">
-      <created>1552470780423</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1552470780423</updated>
-    </task>
-    <task id="LOCAL-00011" summary="upload">
-      <created>1556819680895</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1556819680895</updated>
-    </task>
-    <task id="LOCAL-00012" summary="added templates">
-      <created>1556819765886</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1556819765886</updated>
-    </task>
-    <task id="LOCAL-00013" summary="updated python version">
-      <created>1556819814507</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1556819814507</updated>
-    </task>
-    <task id="LOCAL-00014" summary="updated">
-      <created>1556819850988</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1556819850988</updated>
-    </task>
-    <task id="LOCAL-00015" summary="cleaned and added functions to save models">
-      <created>1556825151860</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1556825151860</updated>
-    </task>
-    <task id="LOCAL-00016" summary="added tweet data">
-      <created>1556825194199</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1556825194199</updated>
+      <workItem from="1563703409641" duration="16107000" />
+      <workItem from="1563728603916" duration="67000" />
+      <workItem from="1563781976370" duration="29473000" />
+      <workItem from="1563877692329" duration="21202000" />
+      <workItem from="1563990253115" duration="2889000" />
+      <workItem from="1563993414402" duration="1438000" />
     </task>
     <task id="LOCAL-00017" summary="added new functions for text preprocessing and model fitting">
       <created>1556991669672</created>
@@ -650,11 +582,60 @@
       <option name="project" value="LOCAL" />
       <updated>1563644269320</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <task id="LOCAL-00059" summary="added path for spacy env">
+      <created>1563710135238</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1563710135239</updated>
+    </task>
+    <task id="LOCAL-00060" summary="minor changes">
+      <created>1563715692998</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1563715692998</updated>
+    </task>
+    <task id="LOCAL-00061" summary="minor changes">
+      <created>1563728643740</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1563728643740</updated>
+    </task>
+    <task id="LOCAL-00062" summary="modified Texts class structure&#10;added classifier and metrics functions">
+      <created>1563824094649</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1563824094650</updated>
+    </task>
+    <task id="LOCAL-00063" summary="update generate_sample function">
+      <created>1563882082897</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1563882082898</updated>
+    </task>
+    <task id="LOCAL-00064" summary="moved classifier functions to classifiers_utils&#10;refactored several functions&#10;added classifiers&#10;added classification results to self.dataset">
+      <created>1563911713474</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1563911713474</updated>
+    </task>
+    <task id="LOCAL-00065" summary="removed variable to store self.embedded_text">
+      <created>1563912017023</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1563912017023</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="49670000" />
+    <option name="totallyTimeSpent" value="115245000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -666,42 +647,36 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1928" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
+    <frame x="-6" y="-6" width="1292" height="692" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49822694" visible="true" weight="0.10927505" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49822694" visible="true" weight="0.289644" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32719395" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32624114" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32978722" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.22643554" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.38297874" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50146973" side_tool="true" weight="0.22617681" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="10" sideWeight="0.50177306" visible="true" weight="0.25893825" />
+      <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.50177306" weight="0.62234044" />
       <window_info anchor="bottom" id="Docker" order="11" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="12" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="0" width="273" height="492" id="Documentation" order="3" show_stripe_button="false" sideWeight="0.40350878" side_tool="true" weight="0.13006397" />
+      <window_info anchor="right" x="0" y="0" width="273" height="492" id="Documentation" order="3" sideWeight="0.18390805" side_tool="true" visible="true" weight="0.15695792" />
       <window_info anchor="right" id="Database" order="4" weight="0.32928804" />
-      <window_info anchor="right" id="SciView" order="5" sideWeight="0.5964912" visible="true" weight="0.13006397" />
+      <window_info anchor="right" id="SciView" order="5" sideWeight="0.81609195" visible="true" weight="0.15695792" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="deleted" />
-    <MESSAGE value="added spell checking / refactored" />
-    <MESSAGE value="cleanup" />
-    <MESSAGE value="added keyword filter" />
-    <MESSAGE value="added comments" />
     <MESSAGE value="added keyword filtering functions" />
     <MESSAGE value="added find_with_context function" />
     <MESSAGE value="modified find_with_context function" />
@@ -716,46 +691,20 @@
     <MESSAGE value="corrected prep_data_for_model" />
     <MESSAGE value="added timestamp and refactored code" />
     <MESSAGE value="fixed bugs with bucketing (was ignoring last bucket)" />
-    <MESSAGE value="minor changes" />
     <MESSAGE value="refactoring" />
     <MESSAGE value="added" />
     <MESSAGE value="added punctuation removal as option" />
     <MESSAGE value="minor changes / reformatting" />
     <MESSAGE value="reformatting / removed .cpu()" />
-    <option name="LAST_COMMIT_MESSAGE" value="reformatting / removed .cpu()" />
+    <MESSAGE value="added path for spacy env" />
+    <MESSAGE value="minor changes" />
+    <MESSAGE value="modified Texts class structure&#10;added classifier and metrics functions" />
+    <MESSAGE value="update generate_sample function" />
+    <MESSAGE value="moved classifier functions to classifiers_utils&#10;refactored several functions&#10;added classifiers&#10;added classification results to self.dataset" />
+    <MESSAGE value="removed variable to store self.embedded_text" />
+    <option name="LAST_COMMIT_MESSAGE" value="removed variable to store self.embedded_text" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/NLP_courses_and_tutorials/playground_pytorch.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="4" selection-start-line="4" selection-end-line="4" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/NLP_courses_and_tutorials/nltk_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="9" column="17" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/NLP_courses_and_tutorials/NLP_gensim.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HVASS/imdb.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="56" column="41" selection-start-line="56" selection-start-column="41" selection-end-line="56" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../mimic-code/buildmimic/postgres/create_mimic_user.sh" />
     <entry file="file://$PROJECT_DIR$/../mimic-code/buildmimic/postgres/postgres_load_data.sql" />
     <entry file="file://$PROJECT_DIR$/../mimic-code/buildmimic/postgres/postgres_create_tables_pg10.sql" />
     <entry file="file://$PROJECT_DIR$/../mimic-code/buildmimic/postgres/Makefile" />
@@ -883,16 +832,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/general_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-149">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/NLP_courses_and_tutorials/NLP_hvass.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="328">
@@ -910,16 +849,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/longitudinal_models/data_extraction_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="36" lean-forward="true" selection-start-line="16" selection-start-column="36" selection-end-line="16" selection-end-column="36" />
-          <folding>
-            <element signature="e#86#95#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/rpy2-2.9.4-py3.7-win-amd64.egg/rpy2/robjects/pandas2ri.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="578">
@@ -927,14 +856,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/longitudinal_models/db_utils.py">
+    <entry file="file://$PROJECT_DIR$/code_utils/db_utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
           <caret line="21" column="56" selection-start-line="21" selection-start-column="56" selection-end-line="21" selection-end-column="56" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/longitudinal_models/plot_utils.py">
+    <entry file="file://$PROJECT_DIR$/code_utils/plot_utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
           <caret line="4" selection-start-line="4" selection-end-line="4" />
@@ -985,27 +914,54 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/longitudinal_models/longitudinal_models.py">
+    <entry file="file://$PROJECT_DIR$/symptoms_classifier/spacy_contractions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="33" column="18" selection-start-line="33" selection-start-column="18" selection-end-line="33" selection-end-column="18" />
+        <state relative-caret-position="102">
+          <caret line="6" column="12" selection-start-line="6" selection-start-column="12" selection-end-line="6" selection-end-column="12" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/longitudinal_models/longitudinal_dataset.py">
+    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/pandas/core/internals/managers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1921">
-          <caret line="113" column="94" selection-start-line="113" selection-start-column="94" selection-end-line="113" selection-end-column="94" />
+        <state relative-caret-position="116">
+          <caret line="1690" selection-start-line="1690" selection-end-line="1690" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code_utils/data_extraction_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="62" column="18" selection-start-line="62" selection-start-column="18" selection-end-line="62" selection-end-column="18" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#86#95#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/symptoms_classifier/classifiers_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="11" selection-start-line="2" selection-start-column="11" selection-end-line="2" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="28" selection-start-line="12" selection-start-column="28" selection-end-line="12" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/symptoms_classifier/NN_pytorch_multiclass.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
+        <state relative-caret-position="357">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
@@ -1014,57 +970,86 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
+        <state relative-caret-position="241">
+          <caret line="74" column="31" selection-start-line="74" selection-start-column="31" selection-end-line="74" selection-end-column="31" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="33" column="4" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="28" selection-start-line="28" selection-end-line="29" selection-end-column="99" />
+        <state relative-caret-position="114">
+          <caret line="74" column="67" selection-start-line="74" selection-start-column="56" selection-end-line="74" selection-end-column="67" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MedCat/medcat_attention.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/longitudinal_models/general_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-129">
-          <folding>
-            <element signature="e#86#95#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/symptoms_classifier/tests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="24" selection-start-line="18" selection-start-column="24" selection-end-line="18" selection-end-column="24" />
+        <state relative-caret-position="136">
+          <caret line="17" column="50" selection-start-line="17" selection-start-column="50" selection-end-line="17" selection-end-column="50" />
+          <folding>
+            <element signature="e#44#97#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/rpy2-2.9.4-py3.7-win-amd64.egg/rpy2/rinterface/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="173">
+          <caret line="29" selection-start-line="29" selection-end-line="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/ctypes/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-959">
+          <caret line="355" selection-start-line="355" selection-end-line="355" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MedCat/medcat_attention.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="10" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code_utils/general_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4046">
+          <caret line="245" column="50" selection-start-line="245" selection-start-column="50" selection-end-line="245" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code_utils/global_variables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="6" column="69" selection-start-line="6" selection-start-column="18" selection-end-line="6" selection-end-column="69" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/longitudinal_models/longitudinal_dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="11" selection-start-line="3" selection-start-column="11" selection-end-line="3" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/longitudinal_models/longitudinal_models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="43">
+          <caret line="32" column="21" selection-start-line="32" selection-start-column="21" selection-end-line="32" selection-end-column="21" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>

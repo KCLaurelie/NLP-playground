@@ -1,7 +1,6 @@
 import pandas as pd
 import datetime
 import time
-import pickle
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.externals import joblib

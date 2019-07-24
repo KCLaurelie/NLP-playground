@@ -1,5 +1,3 @@
-import os
-import sys
 import pickle  # to save models
 import nltk
 from gensim.models import Word2Vec
@@ -9,15 +7,12 @@ from symptoms_classifier.NLP_text_cleaning import clean_string
 import numpy as np
 from nltk import tokenize
 from nltk.corpus import stopwords
-nltk.download('wordnet')
 
 # spacy stuff
-spacy_lib = r'C:\Users\K1774755\AppData\Local\Continuum\anaconda3\envs\spacy\Lib\site-packages'
-sys.path.append(spacy_lib)
-spacy_en_path = os.path.join(spacy_lib, r'en_core_web_sm\en_core_web_sm-2.1.0')
+from code_utils.global_variables import *
 import spacy
 nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
-
+nltk.download('wordnet')
 
 def top_features_idf(vectorizer, top_n=2):
     # TODO check http://kavita-ganesan.com/extracting-keywords-from-text-tfidf/#.XPFMnohKiUk
@@ -76,7 +71,8 @@ def convert_snt2avgtoken(sentences, w2v_model, clean_text=True):
         if cnt > 0:
             sentences_emb[i_snt] = sentences_emb[i_snt] / cnt
 
-    print('words not in model:', list(dict.fromkeys(not_in_model)))
+    excluded_words = list(dict.fromkeys(not_in_model))
+    print(len(excluded_words), 'words not in model:', excluded_words)
     return sentences_emb
 
 

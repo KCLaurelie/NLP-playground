@@ -1,16 +1,9 @@
-import os
 import pandas as pd
 import numpy as np
-import longitudinal_models.general_utils as gutils
-import longitudinal_models.plot_utils as pltu
+import code_utils.general_utils as gutils
 import datetime
 import time
-import sys
-
-try:
-    os.chdir(r'T:\aurelie_mascio\python_scripts')  # for use on CRIS computers
-except:
-    pass
+from code_utils.global_variables import *
 
 
 class Dataset:

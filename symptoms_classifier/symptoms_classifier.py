@@ -2,14 +2,13 @@ import os
 import numpy as np
 import pandas as pd
 from gensim.models import Word2Vec
-from sklearn.model_selection import cross_val_predict, train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, accuracy_score
-import matplotlib.pyplot as plt
 import matplotlib
 from symptoms_classifier.NLP_embedding import convert_snt2avgtoken, tokenize_sentences
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
-from longitudinal_models.general_utils import super_read_csv
+from code_utils.general_utils import super_read_csv
 import symptoms_classifier.classifiers_utils as cutils
 
 os.chdir(r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier')
@@ -147,7 +146,8 @@ class TextsToClassify:
         self.dataset.loc[y_train.index, 'preds'] = train_preds
         self.dataset.loc[y_test.index, 'preds'] = test_preds
 
-        print('CLASSES\n',
+        print(str(classifier), '\n',
+              'CLASSES\n',
               self.dataset[['class_numeric', self.class_col]].drop_duplicates(),
               '\n\n',
               'TEST SET\n', 'accuracy:',

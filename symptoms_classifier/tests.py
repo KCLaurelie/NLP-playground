@@ -1,13 +1,9 @@
-import sys
+# from code_utils.global_variables import *
 from symptoms_classifier.symptoms_classifier import *
 import pandas as pd
 from symptoms_classifier.NLP_text_cleaning import clean_string, text2sentences, preprocess_text, parse_text
 from symptoms_classifier.NLP_embedding import fit_text2vec, transform_text2vec, convert_snt2avgtoken, tokenize_sentences
 from gensim.models import Word2Vec
-
-spacy_lib = r'C:\Users\K1774755\AppData\Local\Continuum\anaconda3\envs\spacy\Lib\site-packages'
-sys.path.append(spacy_lib)
-spacy_en_path = os.path.join(spacy_lib, r'en_core_web_sm\en_core_web_sm-2.1.0')
 
 
 def test_final():
@@ -19,15 +15,17 @@ def test_final():
         classifier_model='SVM')
     df = tweets.load_data()
     tkns = tweets.tokenize_text(manually_clean_text=True, update_obj=True)
-    w2v = tweets.train_embedding_model()
+    w2v = tweets.train_embedding_model(min_count=3)
     w2v.wv['you']
     x_emb = tweets.embed_text(update_obj=True)
 
     res = tweets.run_classifier(test_size=0.2)
-    res2 = tweets.run_classifier(classifier_model='SVM with sigmoid kernel'
-                                 , test_size=0.2
-                                 , binary=True, binary_main_class='negative'
-                                 , save_model=True)
+    model = 'SVM with sigmoid kernel'
+    for model in cutils.classifiers.keys():
+        tweets.run_classifier(classifier_model=model,  # 'SVM with sigmoid kernel'
+                              test_size=0.2,
+                              binary=True, binary_main_class='negative',
+                              save_model=True)
     y = tweets.dataset['class_numeric']
 
 

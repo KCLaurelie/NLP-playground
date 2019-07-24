@@ -6,21 +6,16 @@ import sys
 import csv
 from collections import OrderedDict
 import pyximport
-sys.path.append(r'C:\Users\K1774755\AppData\Local\Continuum\anaconda3\envs\spacy\Lib\site-packages')
 
 pyximport.install()
 sys.maxsize
 csv.field_size_limit(200000000)
 
-root_path = r'T:\aurelie_mascio'
-CRIS_data_path = root_path + '\\CRIS data'
-SQL_path = root_path + '\\SQL queries'
-try:
-    os.chdir(root_path + r'\python_scripts')  # directory with python library
-except:
-    pass
-headers_dict_file = root_path + r'\python_scripts\CRIS_data_dict.csv'
-patients_data_file = CRIS_data_path + r'\F20_patients_documents_details_from_DB.csv'
+# root_path = r'T:\aurelie_mascio'
+# CRIS_data_path = root_path + '\\CRIS data'
+# SQL_path = root_path + '\\SQL queries'
+# headers_dict_file = root_path + r'\python_scripts\CRIS_data_dict.csv'
+# patients_data_file = CRIS_data_path + r'\F20_patients_documents_details_from_DB.csv'
 
 
 ##############################################################################
@@ -248,7 +243,7 @@ def convert_to_longitudinal_age(df,
                                 end_date_col='actual_end_date',  # for interval only
                                 measure_date_col='rating_date',  # for rating only
                                 measure_col='length_stay_days',  # for rating only
-                                dob_file=patients_data_file,
+                                dob_file=None,  # patients_data_file,
                                 mode='interval'):  # interval: need to measure length (e.g. length of hospital stay), not interval: need to grab measure (e.g. HoNOS) by age
     df = clean_df(df)
     dob_data = pd.read_csv(dob_file, header=0)
