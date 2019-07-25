@@ -1,17 +1,20 @@
 import sys
 import os
 
-if os.path.exists(r'T:\aurelie_mascio'):
+if os.path.exists(r'T:\aurelie_mascio'):  # working on SLaM machine
     root_path = r'T:\aurelie_mascio'
-else:
+    os.environ['R_HOME'] = r'T:\aurelie_mascio\software\R-3.6.0'
+else:  # working on normal machine
     root_path = r'C:\Users\K1774755\AppData\Local\Continuum\anaconda3\envs'
+    os.environ['R_HOME'] = r'C:\Program Files\R\R-3.6.0'
 
-code_path = os.path.join(root_path, 'python_github')
+# for SLaM
+code_path_slam = os.path.join(root_path, 'python_github')
+if os.path.exists(code_path_slam):
+    os.chdir(code_path_slam)
+
+# Spacy environment
 spacy_lib = os.path.join(root_path, r'spacy\Lib\site-packages')
 spacy_en_path = os.path.join(spacy_lib, r'en_core_web_sm\en_core_web_sm-2.1.0')
-
-if os.path.exists(code_path):
-    os.chdir(code_path)
-
 sys.path.append(spacy_lib)
 

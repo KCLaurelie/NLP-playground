@@ -3,7 +3,6 @@ import numpy as np
 import code_utils.general_utils as gutils
 import datetime
 import time
-from code_utils.global_variables import *
 
 
 class Dataset:
@@ -194,7 +193,7 @@ class DatasetMMSE(Dataset):
 
 
 default_dataset = DatasetMMSE(
-    file_path='https://raw.githubusercontent.com/KCLaurelie/toy-models/master/longitudinal_models/mmse_trajectory_synthetic.csv?token=ALKII2U7IKICWCAEWC22H7S5EZQBW',
+    file_path='https://raw.githubusercontent.com/KCLaurelie/toy-models/master/longitudinal_models/mmse_trajectory_synthetic.csv?token=ALKII2WMALZVPQLYTOUOHYC5IK526',
     baseline_cols=['brcid', 'age_at_score', 'score_combined', 'bmi_score', 'plasma_glucose_value', 'diastolic_value',
                    'systolic_value', 'smoking_status', 'bmi_bucket', 'diabetes_bucket', 'bp_bucket'],
     key='brcid',

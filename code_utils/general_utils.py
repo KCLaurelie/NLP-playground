@@ -5,17 +5,11 @@ import datetime
 import sys
 import csv
 from collections import OrderedDict
-import pyximport
+# import pyximport
+# pyximport.install()
 
-pyximport.install()
 sys.maxsize
 csv.field_size_limit(200000000)
-
-# root_path = r'T:\aurelie_mascio'
-# CRIS_data_path = root_path + '\\CRIS data'
-# SQL_path = root_path + '\\SQL queries'
-# headers_dict_file = root_path + r'\python_scripts\CRIS_data_dict.csv'
-# patients_data_file = CRIS_data_path + r'\F20_patients_documents_details_from_DB.csv'
 
 
 ##############################################################################
@@ -60,7 +54,7 @@ def get_duplicate_columns(df):
     :param df: Dataframe object
     :return: List of columns whose contents are duplicates.
     '''
-    duplicateColumnNames = set()
+    duplicate_column_names = set()
     # Iterate over all the columns in dataframe
     for x in range(df.shape[1]):
         # Select column at xth index.
@@ -68,12 +62,12 @@ def get_duplicate_columns(df):
         # Iterate over all the columns in DataFrame from (x+1)th index till end
         for y in range(x + 1, df.shape[1]):
             # Select column at yth index.
-            otherCol = df.iloc[:, y]
+            other_col = df.iloc[:, y]
             # Check if two columns at x 7 y index are equal
-            if col.equals(otherCol):
-                duplicateColumnNames.add(df.columns.values[y])
+            if col.equals(other_col):
+                duplicate_column_names.add(df.columns.values[y])
 
-    return list(duplicateColumnNames)
+    return list(duplicate_column_names)
 
 
 def drop_duplicate_columns(df):
@@ -81,7 +75,7 @@ def drop_duplicate_columns(df):
     return new_df
 
 
-## COUNT NUMBER WORDS IN TEXT FILE
+# COUNT NUMBER WORDS IN TEXT FILE
 def count_words(file_name):
     num_words = 0
     with open(file_name, 'r') as f:
@@ -91,7 +85,7 @@ def count_words(file_name):
     return num_words
 
 
-## read csv file 
+# read csv file
 # file_path=r'T:\aurelie_mascio\multimorbidity\corpus\multimorbidity_attachments_discharge_docs.csv'
 def super_read_csv(file_path, usecols=None, clean_results=True, filter_col=None, filter_value=None, threshold_col=None,
                    threshold_value=None,
@@ -139,7 +133,7 @@ def super_read_csv(file_path, usecols=None, clean_results=True, filter_col=None,
     return res
 
 
-## LOAD SYMPTOMS APP RESULTS (headers specific to CRIS NLP apps)
+# LOAD SYMPTOMS APP RESULTS (headers specific to CRIS NLP apps)
 def load_symptoms_df(symptoms_file,
                      obs_filter=['positive'],
                      confidence_threshold=0.5,
@@ -156,7 +150,7 @@ def load_symptoms_df(symptoms_file,
 
 
 ##############################################################################
-## RANDOM STUFF
+# RANDOM STUFF
 ##############################################################################
 
 def cut_with_na(to_bin, bins, labels, na_category='not known'):
@@ -230,7 +224,6 @@ def monthlist_fast(dates):
 ## GENERATE LONGITUDINAL DATA FROM RAW DATA (HOSPITAL STAYS, MEASURES...)
 ##############################################################################
 # test_file=r'T:\aurelie_mascio\CRIS data\F20_ward_stays_data_fromDB.csv'
-# patients_data=r'T:\aurelie_mascio\CRIS data\F20_patients_details_from_DB.csv'
 # test_df=pd.read_csv(test_file,header=0)
 # df=test_df.head().copy()
 # df['dob']=datetime.datetime(1986, month=8, day=13)
@@ -243,7 +236,7 @@ def convert_to_longitudinal_age(df,
                                 end_date_col='actual_end_date',  # for interval only
                                 measure_date_col='rating_date',  # for rating only
                                 measure_col='length_stay_days',  # for rating only
-                                dob_file=None,  # patients_data_file,
+                                dob_file=r'T:\aurelie_mascio\CRIS data\F20_patients_documents_details_from_DB.csv',
                                 mode='interval'):  # interval: need to measure length (e.g. length of hospital stay), not interval: need to grab measure (e.g. HoNOS) by age
     df = clean_df(df)
     dob_data = pd.read_csv(dob_file, header=0)

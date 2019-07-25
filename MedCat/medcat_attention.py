@@ -4,26 +4,28 @@ from medcat.utils.vocab import Vocab
 from medcat.prepare_cdb import PrepareCDB
 from medcat.cdb import CDB
 import os
+import spacy
 
-root_path = r'C:\Users\K1774755\PycharmProjects\toy-models\MedCat'
+# nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
+medcat_path = r'C:\Users\K1774755\PycharmProjects\toy-models\MedCat'
 vocab = Vocab()
 
 # Load the vocab model you just downloaded
-vocab.load_dict(os.path.join(root_path, 'med_ann_norm_dict.dat'))
+vocab.load_dict(os.path.join(medcat_path, 'med_ann_norm_dict.dat'))
 
 # If you have an existing CDB
 cdb = CDB()
-# cdb.load_dict(os.path.join(root_path, 'simple_cdb.csv'))
+# cdb.load_dict(os.path.join(medcat_path, 'simple_cdb.csv'))
 
 
 # If you need a special CDB you can build one from a .csv file
 preparator = PrepareCDB(vocab=vocab)
-csv_paths = [os.path.join(root_path, 'simple_cdb.csv')]#, '<another one>', ...]
-csv_paths = [os.path.join(root_path, 'attention_cdb.csv')]
+csv_paths = [os.path.join(medcat_path, 'simple_cdb.csv')]#, '<another one>', ...]
+csv_paths = [os.path.join(medcat_path, 'attention_cdb.csv')]
 cdb = preparator.prepare_csvs(csv_paths)
 
 # Save the new CDB for later
-cdb.save_dict(os.path.join(root_path, 'simple_cdb.cdb'))
+cdb.save_dict(os.path.join(medcat_path, 'simple_cdb.cdb'))
 
 # To annotate documents we do
 doc = "My simple document with kidney failure"
