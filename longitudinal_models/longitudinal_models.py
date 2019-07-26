@@ -1,14 +1,32 @@
 from code_utils.global_variables import *
 import pandas as pd
 import numpy as np
-import code_utils.general_utils as gutils
 from scipy import stats
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
 import longitudinal_models.longitudinal_dataset as ds
-from sklearn.preprocessing import MinMaxScaler
 from pymer4.models import Lm, Lmer
 
+
+# TODO: analysis for each super diagnosis class subgroup
+# TODO plots for 200 sample in each subgroup
+# TODO compare age at baseline vs age a diagnosis
+# TODO redo pivot tables with population used
+# https://rpsychologist.com/r-guide-longitudinal-lme-lmer
+# TODO add missing values
+# TODO count patients per occurence (nb patients with 3, 4... scores)
+# TODO: run model by age or by year? do by year? -> better to use by year and use age at baseline as covariate
+# TODO: plot data https://stats.idre.ucla.edu/r/faq/how-can-i-visualize-longitudinal-data-in-ggplot2/
+
+def check_r_loc():
+    from rpy2.robjects.packages import importr
+    base = importr('base')
+    return base.R_home()
+
+
+##############################################################################################
+# LONGITUDINAL MODELLING
+##############################################################################################
 """
 OPTION A)
 - MODEL 1: Unconditional with MMSE= intercept (fixed)
@@ -21,55 +39,28 @@ OPTION B)
 Run model 1- 4 in each group of the grouping variable. 3 outputs
 """
 
-# TODO: simple linear regression with age / score at baseline / age at baseline
-# TODO: how is reference group used? (for age: youngest, rest: most prevalent)
 
-
-def check_r_loc():
-    from rpy2.robjects.packages import importr
-    base = importr('base')
-    return base.R_home()
-
-
-##############################################################################################
-# LONGITUDINAL MODELLING
-##############################################################################################
-def pre_cleaning(dataset=ds.default_dataset, normalize=False, dummyfy=False, keep_only_baseline=False):
-    if dataset.data is None:
-        dataset.prep_data()
-    df = dataset.data['data_grouped']
-    # df_test = df[df.brcid == 9][['age_at_score', 'score_combined']]
-    if normalize:
-        numeric_cols = [col for col in df[dataset.regressors]._get_numeric_data().columns]
-        cols_to_normalize = [dataset.to_predict] + [col for col in numeric_cols]
-        scaler = MinMaxScaler()
-        x = df[cols_to_normalize].values
-        scaled_values = scaler.fit_transform(x)
-        df[cols_to_normalize] = scaled_values
-    if dummyfy:
-        cols_to_dummyfy = df[dataset.regressors].select_dtypes(include=['object', 'category']).columns
-        dummyfied_df = pd.get_dummies(df[cols_to_dummyfy])
-        df = pd.concat([df.drop(columns=cols_to_dummyfy), dummyfied_df], axis=1)
-    if keep_only_baseline:
-        to_drop = [col for col in df.columns if ('_baseline' in col)
-                   and col.replace('_baseline', '') not in gutils.to_list(dataset.to_predict)
-                   and col.replace('_baseline', '') in df.columns]
-        df.drop(columns=to_drop, inplace=True)
-    return df
-
-
-def multi_level_r(df, regressors, to_predict):
-    from pymer4.utils import get_resource_path
-    df = pd.read_csv(os.path.join(get_resource_path(), 'sample_data.csv'))
-    model = Lm('DV ~ IV1 + IV3', data=df)
-    model = Lmer('DV ~ IV2 + (IV2|Group)', data=df)
-
-    df = pre_cleaning(dataset=ds.default_dataset, normalize=False, dummyfy=False, keep_only_baseline=False)
+def multi_level_r(dataset=ds.default_dataset):
+    df = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
     df['intercept'] = df['score_combined_baseline']
-    model = Lmer('score_combined ~ intercept + age_at_score_upper_bound  + (1|brcid)', data=df)  # THIS WORKS
-    model = Lmer('score_combined ~ intercept + age_at_score_upper_bound  + (1|brcid) + (1|patient_diagnosis_super_class)', data=df)  # DOES NOT WORK
-    model = Lmer('score_combined ~ intercept  + (1|age_at_score_upper_bound)', data=df)  # THIS WORKS
-    result = model.fit()
+    # df['halfyear'] = df['counter']
+    df_baseline = df.sort_values(['brcid', 'score_date']).groupby('age_at_score').first().reset_index()
+    df = df.merge(df_baseline, on='brcid', suffixes=('', '_baseline'))
+
+
+    # MODEL 1: basic model (random intercept and fixed slope)
+    model = Lmer('score_combined ~ halfyear + (1|brcid)', data=df)  # MMSE score by year
+    model = Lmer('score_combined ~ halfyear + (1|brcid)', data=df[df.patient_diagnosis_super_class == 'smi only'])  # for subgroup
+    model = Lmer('score_combined ~ halfyear + age_at_score_baseline + (1|brcid)', data=df)  # adding age at baseline as covariate (is this correct??)
+
+    # MODEL 2: random slope and variable
+    model = Lmer('score_combined ~  (halfyear | brcid)', data=df)
+    model = Lmer('score_combined ~  (halfyear + age_at_score_baseline| brcid)', data=df)
+
+    # MODEL 3: basic model but quadratic
+    model = Lmer('score_combined ~ halfyear + I(halfyear^2) + (1|brcid)', data=df)
+
+    print(model.fit())
 
     model2 = smf.mixedlm("score_combined ~ age_at_score_upper_bound + gender", df, groups=df['brcid'])
     result = model2.fit()
