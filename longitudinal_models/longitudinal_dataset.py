@@ -49,11 +49,10 @@ class Dataset:
         self.data = {'data': df, 'data_baseline': df_baseline}
         return 0
 
-    def bucket_data(self):
-        print("prep data (method from parent class)")
+    def bucket_data(self, additional_cols_to_keep=None):
+        print("bucket data (method from parent class)")
         cols_to_keep = list(dict.fromkeys(gutils.to_list(self.key) + gutils.to_list(self.regressors) + gutils.to_list(
-            self.to_bucket) + gutils.to_list(self.to_predict) + gutils.to_list(self.index_to_pivot) + gutils.to_list(
-            self.cols_to_pivot)))
+            self.to_bucket) + gutils.to_list(self.to_predict) + gutils.to_list(additional_cols_to_keep)))
         # only use data within bucket boundaries
         mask_bucket = (self.data['data'][self.to_bucket] >= self.bucket_min) & (
                 self.data['data'][self.to_bucket] <= self.bucket_max)
@@ -81,15 +80,7 @@ class Dataset:
 
         df_grouped['occur'] = df_grouped.groupby(self.key)[self.key].transform('size')
         df_grouped = df_grouped[(df_grouped['occur'] >= self.min_obs)]
-        df_grouped['counter'] = df.groupby(self.key).cumcount() + 1
-        # all_buckets = pd.DataFrame(
-        #     data=np.arange(start=self.bucket_min, stop=self.bucket_max + self.interval, step=self.interval),
-        #     columns=[bucket_col])
-        # all_buckets['counter'] = np.arange(start=1, stop=len(all_buckets) + 1, step=1)
-        # df_grouped = df_grouped.merge(all_buckets, on=bucket_col).sort_values([self.key, bucket_col])
-        # df_grouped = df_grouped.reset_index(drop=True)
-        # df_grouped['age_bucket_report'] = '[' + (np.ceil(df_grouped['age_at_score'] / 5) * 5 - 5).astype(str) \
-        #                                   + '-' + (np.ceil(df_grouped['age_at_score'] / 5) * 5).astype(str) + ']'
+        df_grouped['counter'] = df_grouped.groupby(self.key).cumcount() + 1
         self.data['data_grouped'] = df_grouped
 
         # now update df and df_baseline with patients who made the cut for modelling
@@ -151,9 +142,9 @@ class DatasetMMSE(Dataset):
         """
         super(DatasetMMSE, self).__init__(**kwargs)
         self.health_numeric_cols = health_numeric_cols
-        self.cols_to_pivot = cols_to_pivot
-        self.index_to_pivot = index_to_pivot
-        self.index_to_pivot_baseline = index_to_pivot_baseline
+        self.cols_to_pivot = gutils.to_list(cols_to_pivot)
+        self.index_to_pivot = gutils.to_list(index_to_pivot)
+        self.index_to_pivot_baseline = gutils.to_list(index_to_pivot_baseline)
         self.agg_funcs = agg_funcs
 
     def read_and_clean_data(self):
@@ -208,6 +199,10 @@ class DatasetMMSE(Dataset):
         self.data = {'data': df, 'data_baseline': df_baseline}
         return 0
 
+    def bucket_data(self):
+        print("bucket data (method from mmse class)")
+        Dataset.bucket_data(self, additional_cols_to_keep=gutils.to_list(self.index_to_pivot) + gutils.to_list(self.cols_to_pivot))
+
     def write_report(self, output_file_path, use_grouped=False):
         if self.data is None or self.data['data_grouped'] is None:
             self.prep_data(load_type='all')
@@ -241,8 +236,8 @@ class DatasetMMSE(Dataset):
                                               margins=True).fillna(0)
         pv_baseline.to_excel(writer, sheet_name='first_measure', startrow=0)
 
-        pv_measures = self.data['data_grouped'].pivot_table(values=self.key, index=self.index_to_pivot_baseline,
-                                                            columns=self.occur, aggfunc=pd.Series.nunique,
+        pv_measures = self.data['data_grouped'].pivot_table(values=self.key, index=self.cols_to_pivot[0],
+                                                            columns='occur', aggfunc=pd.Series.nunique,
                                                             margins=True).fillna(0)
         pv_measures.to_excel(writer, sheet_name='nb_measures', startrow=0)
 
@@ -285,9 +280,6 @@ default_dataset = DatasetMMSE(
     index_to_pivot_baseline='age_bucket_report',
     agg_funcs=['count', np.mean, np.std],
 )
-
-
-# default_dataset.write_report(r'C:\Users\K1774755\Downloads\mmse_report.xlsx')
 
 
 ##############################################################################################

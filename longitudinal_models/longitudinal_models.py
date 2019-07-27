@@ -40,6 +40,13 @@ Run model 1- 4 in each group of the grouping variable. 3 outputs
 """
 
 
+def run_report(dataset=ds.default_dataset):
+    dataset.cols_to_pivot = ['patient_diagnosis_super_class']
+    dataset.write_report(r'C:\Users\K1774755\Downloads\mmse_report_1class.xlsx')
+    dataset.cols_to_pivot = ['patient_diagnosis_super_class', 'patient_diagnosis_class']
+    dataset.write_report(r'C:\Users\K1774755\Downloads\mmse_report_2classes.xlsx')
+
+
 def multi_level_r(dataset=ds.default_dataset):
     df = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
     df['intercept'] = df['score_combined_baseline']
