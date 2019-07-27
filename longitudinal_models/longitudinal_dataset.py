@@ -5,6 +5,7 @@ import datetime
 import time
 from sklearn.preprocessing import MinMaxScaler
 
+
 class Dataset:
     def __init__(self, file_path, key='brcid', timestamp='age_at_score',  # data path and keys
                  baseline_cols=None, na_values=None,  # identify columns
@@ -50,11 +51,12 @@ class Dataset:
 
     def bucket_data(self):
         print("prep data (method from parent class)")
-        #df = self.data['data']
-        cols_to_keep = gutils.to_list(self.key) + gutils.to_list(self.regressors) + gutils.to_list(self.to_bucket) + gutils.to_list(self.to_predict)
-        cols_to_keep = list(dict.fromkeys(cols_to_keep)) # removing duplicates
+        cols_to_keep = list(dict.fromkeys(gutils.to_list(self.key) + gutils.to_list(self.regressors) + gutils.to_list(
+            self.to_bucket) + gutils.to_list(self.to_predict) + gutils.to_list(self.index_to_pivot) + gutils.to_list(
+            self.cols_to_pivot)))
         # only use data within bucket boundaries
-        mask_bucket = (self.data['data'][self.to_bucket] >= self.bucket_min) & (self.data['data'][self.to_bucket] <= self.bucket_max)
+        mask_bucket = (self.data['data'][self.to_bucket] >= self.bucket_min) & (
+                self.data['data'][self.to_bucket] <= self.bucket_max)
         df = self.data['data'].loc[mask_bucket, cols_to_keep]
         if self.na_values is not None:
             df.fillna(self.na_values, inplace=True)
@@ -62,9 +64,10 @@ class Dataset:
         bool_cols = [col for col in df.columns if df[col].value_counts().index.isin([0, 1]).all()]
         if len(bool_cols) > 0: df[bool_cols] = df[bool_cols].replace({0: 'no', 1: 'yes'})
         # detect numerical and categorical columns
+        force_static_cols = ['half_year', 'score_time_period']
         static_data_col = [col for col in df.select_dtypes(include=['object', 'category']).columns if
-                           (self.key not in col)]
-        numeric_col = [col for col in df._get_numeric_data().columns if (self.key not in col)]
+                           (self.key not in col)] + force_static_cols
+        numeric_col = [col for col in df._get_numeric_data().columns if (col not in [self.key]+force_static_cols)]
         # group by buckets
         bucket_col = self.to_bucket + '_upper_bound'
         df[bucket_col] = np.ceil(df[self.to_bucket] / self.interval) * self.interval
@@ -78,20 +81,23 @@ class Dataset:
 
         df_grouped['occur'] = df_grouped.groupby(self.key)[self.key].transform('size')
         df_grouped = df_grouped[(df_grouped['occur'] >= self.min_obs)]
-        # df_grouped['counter'] = df.groupby(key).cumcount() + 1
-        all_buckets = pd.DataFrame(data=np.arange(start=self.bucket_min, stop=self.bucket_max + self.interval, step=self.interval),
-                                   columns=[bucket_col])
-        all_buckets['counter'] = np.arange(start=1, stop=len(all_buckets) + 1, step=1)
-        df_grouped = df_grouped.merge(all_buckets, on=bucket_col).sort_values([self.key, bucket_col])
-        df_grouped = df_grouped.reset_index(drop=True)
-        df_grouped['age_bucket_report'] = '[' + (np.ceil(df_grouped['age_at_score'] / 5) * 5 - 5).astype(str) \
-                                          + '-' + (np.ceil(df_grouped['age_at_score'] / 5) * 5).astype(str) + ']'
+        df_grouped['counter'] = df.groupby(self.key).cumcount() + 1
+        # all_buckets = pd.DataFrame(
+        #     data=np.arange(start=self.bucket_min, stop=self.bucket_max + self.interval, step=self.interval),
+        #     columns=[bucket_col])
+        # all_buckets['counter'] = np.arange(start=1, stop=len(all_buckets) + 1, step=1)
+        # df_grouped = df_grouped.merge(all_buckets, on=bucket_col).sort_values([self.key, bucket_col])
+        # df_grouped = df_grouped.reset_index(drop=True)
+        # df_grouped['age_bucket_report'] = '[' + (np.ceil(df_grouped['age_at_score'] / 5) * 5 - 5).astype(str) \
+        #                                   + '-' + (np.ceil(df_grouped['age_at_score'] / 5) * 5).astype(str) + ']'
         self.data['data_grouped'] = df_grouped
 
-        # now update df and df_baseline with patients to keep
-        keys_to_keep = list(df_grouped[self.key].unique())  # we only want to report patients who made the cut for modelling
-        self.data['data']['include'] = np.where(mask_bucket & (self.data['data'][self.key].isin(keys_to_keep)), 'yes', 'no')
-        self.data['data_baseline']['include'] = np.where(self.data['data_baseline'][self.key].isin(keys_to_keep), 'yes', 'no')
+        # now update df and df_baseline with patients who made the cut for modelling
+        keys_to_keep = list(df_grouped[self.key].unique())
+        self.data['data']['include'] = np.where(mask_bucket & (self.data['data'][self.key].isin(keys_to_keep)), 'yes',
+                                                'no')
+        self.data['data_baseline']['include'] = np.where(self.data['data_baseline'][self.key].isin(keys_to_keep), 'yes',
+                                                         'no')
         return 0
 
     def prep_data(self, load_type='all'):
@@ -106,7 +112,6 @@ class Dataset:
         if self.data is None or self.data['data_grouped'] is None:
             self.prep_data(load_type='all')
         df = self.data['data_grouped']
-        # df_test = df[df.brcid == 9][['age_at_score', 'score_combined']]
         if normalize:
             numeric_cols = [col for col in df[self.regressors]._get_numeric_data().columns]
             cols_to_normalize = [self.to_predict] + [col for col in numeric_cols]
@@ -191,9 +196,10 @@ class DatasetMMSE(Dataset):
         df['bmi_bucket'] = gutils.bmi_category(df.bmi_score)
         df['bp_bucket'] = gutils.blood_pressure(df.systolic_value, df.diastolic_value)
         df['diabetes_bucket'] = gutils.diabetes(df.plasma_glucose_value)
+        df['half_year'] = pd.to_datetime(df.score_date).apply(lambda x: x.year + (0.5 if x.month > 6 else 0))
         intv = 1 if (self.interval is None) or (12 % self.interval != 0) else self.interval
-        # df['half_year'] = pd.to_datetime(df.score_date).apply(lambda x: x.year + 0.5 if x.month > 6 else 0)
-        df['score_time_period'] = pd.to_datetime(df.score_date).apply(lambda x: x.year + np.ceil((x.month/12) / intv) *intv)
+        df['score_time_period'] = pd.to_datetime(df.score_date).apply(
+            lambda x: x.year + np.floor((x.month / 12) / intv) * intv)
         if self.baseline_cols is not None:
             df_baseline = df.sort_values([self.key, self.timestamp]).groupby(self.key).first().reset_index()
             df = df.merge(df_baseline[self.baseline_cols], on='brcid', suffixes=('', '_baseline'))
@@ -235,9 +241,15 @@ class DatasetMMSE(Dataset):
                                               margins=True).fillna(0)
         pv_baseline.to_excel(writer, sheet_name='first_measure', startrow=0)
 
+        pv_measures = self.data['data_grouped'].pivot_table(values=self.key, index=self.index_to_pivot_baseline,
+                                                            columns=self.occur, aggfunc=pd.Series.nunique,
+                                                            margins=True).fillna(0)
+        pv_measures.to_excel(writer, sheet_name='nb_measures', startrow=0)
+
         health_stats = df_baseline.groupby(self.cols_to_pivot[0])[self.health_numeric_cols].agg(self.agg_funcs)
         health_stats_total = df_baseline[self.health_numeric_cols].agg(self.agg_funcs).unstack()
-        health_stats = pd.concat([health_stats, pd.DataFrame([health_stats_total]).rename(index={0:'All'})], axis=0, sort=True)
+        health_stats = pd.concat([health_stats, pd.DataFrame([health_stats_total]).rename(index={0: 'All'})], axis=0,
+                                 sort=True)
         if isinstance(self.cols_to_pivot, list) and len(self.cols_to_pivot) > 1:  # several groups to use for pivot
             health_stats1 = df_baseline.groupby(self.cols_to_pivot[1])[self.health_numeric_cols].agg(self.agg_funcs)
             health_stats = pd.concat([health_stats, health_stats1], axis=0, sort=True)
@@ -259,7 +271,7 @@ default_dataset = DatasetMMSE(
                 'score_combined_baseline', 'gender', 'ethnicity_group', 'first_language', 'occupation',
                 'living_status', 'marital_status', 'education_bucket_raw', 'smoking_status_baseline',
                 'plasma_glucose_value_baseline', 'diastolic_value_baseline', 'systolic_value_baseline',
-                'bmi_score_baseline', 'age_at_score_baseline', 'score_time_period',
+                'bmi_score_baseline', 'age_at_score_baseline', 'half_year', 'score_time_period',
                 'diabetes_bucket_baseline', 'bp_bucket_baseline', 'bmi_bucket_baseline'],
     na_values=None,
     to_bucket='age_at_score',
@@ -290,7 +302,8 @@ def my_pivot(df, cols_to_pivot, values, index, aggfunc=pd.Series.nunique):
             pv.drop(['organic only', 'All'], level=1, axis=1, inplace=True)  # if more than 1 agg function
         except:  # to avoid duplicates between super class and class: for single index
             pv.drop(columns=['All'], inplace=True)
-        pv1 = df.pivot_table(values=values, index=index, columns=cols_to_pivot[1], aggfunc=aggfunc, margins=True).fillna(0)
+        pv1 = df.pivot_table(values=values, index=index, columns=cols_to_pivot[1], aggfunc=aggfunc,
+                             margins=True).fillna(0)
         pv = pd.concat([pv1, pv], axis=1, sort=True)
 
     if isinstance(aggfunc, list):

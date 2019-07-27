@@ -45,6 +45,7 @@ def multi_level_r(dataset=ds.default_dataset):
     df['intercept'] = df['score_combined_baseline']
     # df['halfyear'] = df['counter']
     df_baseline = df.sort_values(['brcid', 'score_date']).groupby('age_at_score').first().reset_index()
+    df[['half_year', 'score_time_period', 'score_date', 'counter']].drop_duplicates().sort_values(by='score_date')
     df = df.merge(df_baseline, on='brcid', suffixes=('', '_baseline'))
 
 
