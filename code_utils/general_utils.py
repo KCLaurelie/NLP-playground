@@ -2,19 +2,46 @@ import os
 import pandas as pd
 import numpy as np
 import datetime
-import sys
 import csv
 from collections import OrderedDict
 # import pyximport
 # pyximport.install()
 
-sys.maxsize
 csv.field_size_limit(200000000)
 
 
 ##############################################################################
 # GENERAL UTILS FUNCTIONS
 ##############################################################################
+def round_nearest(x, intv=0.5, direction='down'):
+    """
+    rounds number or series of numbers to nearest value given interval
+    :param x: number or pd>Series of numbers to round
+    :param intv: interval to round to
+    :param direction: up (ceil) or down (floor)
+    :return: rounded number or series of numbers
+    """
+    if direction == 'down':
+        res = np.floor(x / intv) * intv
+    else:
+        res = np.ceil(x / intv) * intv
+    return res
+
+
+def date2year(date):
+    """
+    converts date to year+portion of year (e.g. 1900.5 for 30/6/1900)
+    :param date: date or series of dates
+    :return: date of series of dates converted to year fraction
+    """
+    date = pd.to_datetime(date)
+    if isinstance(date, pd.Series):
+        res = ((date.dt.strftime("%j")).astype(float) - 1) / 366 + (date.dt.strftime("%Y").astype(float))
+    else:
+        res = (float(date.strftime("%j")) - 1) / 366 + float(date.strftime("%Y"))
+    return res
+
+
 def to_list(x):
     if x is None:
         res = []
@@ -93,9 +120,11 @@ def count_words(file_name):
 
 # read csv file
 # file_path=r'T:\aurelie_mascio\multimorbidity\corpus\multimorbidity_attachments_discharge_docs.csv'
+# TextFileReader=pd.read_csv(file_path,usecols=usecols,chunksize=10000,low_memory=False,header=0,encoding='utf8',engine='c',error_bad_lines=False)
+# test=TextFileReader.get_chunk(3)
+# row_count = sum(1 for row in TextFileReader)
 def super_read_csv(file_path, usecols=None, clean_results=True, filter_col=None, filter_value=None, threshold_col=None,
-                   threshold_value=None,
-                   read_from_SQL_export=False):
+                   threshold_value=None, read_from_SQL_export=False):
     # f = open(csv_file, encoding='utf-8-sig')
     # df = pd.read_csv(csv_file, sep='|', header=0, encoding='cp1252', quoting=1, escapechar='\\', engine='python')
 
@@ -107,9 +136,6 @@ def super_read_csv(file_path, usecols=None, clean_results=True, filter_col=None,
         else:
             TextFileReader = pd.read_csv(file_path, usecols=usecols, chunksize=10000, header=0, engine='python',
                                          error_bad_lines=False)
-            # TextFileReader=pd.read_csv(file_path,usecols=usecols,chunksize=10000,low_memory=False,header=0,encoding='utf8',engine='c',error_bad_lines=False)
-        # test=TextFileReader.get_chunk(3)
-        # row_count = sum(1 for row in TextFileReader)
 
         # 2. RE-ASSEMBLE THE FILE CHUNKS IN A DATAFRAME
         try:  # if we're lucky we can load all that in 1 go
