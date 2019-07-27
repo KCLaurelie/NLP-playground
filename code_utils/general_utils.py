@@ -16,7 +16,13 @@ csv.field_size_limit(200000000)
 # GENERAL UTILS FUNCTIONS
 ##############################################################################
 def to_list(x):
-    return [x] if isinstance(x, str) else list(x)
+    if x is None:
+        res = []
+    elif isinstance(x, str):
+        res = [x]
+    else:
+        res = list(x)
+    return res
 
 
 def print_pv_to_excel(pv, writer, sheet_name, startrow=0, startcol=0):
