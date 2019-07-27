@@ -50,27 +50,28 @@ def run_report(dataset=ds.default_dataset):
 def multi_level_r(dataset=ds.default_dataset):
     df = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
     df['intercept'] = df['score_combined_baseline']
-    # df['halfyear'] = df['counter']
     df_baseline = df.sort_values(['brcid', 'score_date']).groupby('age_at_score').first().reset_index()
     df[['half_year', 'score_time_period', 'score_date', 'counter']].drop_duplicates().sort_values(by='score_date')
     df = df.merge(df_baseline, on='brcid', suffixes=('', '_baseline'))
 
+    df2 = dataset.data['data']
+    t = df2.loc[df2.score_time_period != df2.half_year, ['half_year', 'score_time_period', 'score_date']]
 
     # MODEL 1: basic model (random intercept and fixed slope)
-    model = Lmer('score_combined ~ halfyear + (1|brcid)', data=df)  # MMSE score by year
-    model = Lmer('score_combined ~ halfyear + (1|brcid)', data=df[df.patient_diagnosis_super_class == 'smi only'])  # for subgroup
-    model = Lmer('score_combined ~ halfyear + age_at_score_baseline + (1|brcid)', data=df)  # adding age at baseline as covariate (is this correct??)
+    model = Lmer('score_combined ~ score_date_upbound + (1|brcid)', data=df)  # MMSE score by year
+    model = Lmer('score_combined ~ score_date_upbound + (1|brcid)', data=df[df.patient_diagnosis_super_class == 'smi only'])  # for subgroup
+    model = Lmer('score_combined ~ score_date_upbound + age_at_score_baseline + (1|brcid)', data=df)  # adding age at baseline as covariate (is this correct??)
 
     # MODEL 2: random slope and variable
-    model = Lmer('score_combined ~  (halfyear | brcid)', data=df)
-    model = Lmer('score_combined ~  (halfyear + age_at_score_baseline| brcid)', data=df)
+    model = Lmer('score_combined ~  (score_date_upbound | brcid)', data=df)
+    model = Lmer('score_combined ~  (score_date_upbound + age_at_score_baseline| brcid)', data=df)
 
     # MODEL 3: basic model but quadratic
-    model = Lmer('score_combined ~ halfyear + I(halfyear^2) + (1|brcid)', data=df)
+    model = Lmer('score_combined ~ score_date_upbound + I(score_date_upbound^2) + (1|brcid)', data=df)
 
     print(model.fit())
 
-    model2 = smf.mixedlm("score_combined ~ age_at_score_upper_bound + gender", df, groups=df['brcid'])
+    model2 = smf.mixedlm("score_combined ~ age_at_score_upbound + gender", df, groups=df['brcid'])
     result = model2.fit()
     print(result.summary())
 

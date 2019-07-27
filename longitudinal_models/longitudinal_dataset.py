@@ -49,7 +49,7 @@ class Dataset:
         self.data = {'data': df, 'data_baseline': df_baseline}
         return 0
 
-    def bucket_data(self, additional_cols_to_keep=None):
+    def bucket_data(self, additional_cols_to_keep=None, timestamp_cols=None):
         print("bucket data (method from parent class)")
         cols_to_keep = list(dict.fromkeys(gutils.to_list(self.key) + gutils.to_list(self.regressors) + gutils.to_list(
             self.to_bucket) + gutils.to_list(self.to_predict) + gutils.to_list(additional_cols_to_keep)))
@@ -63,16 +63,14 @@ class Dataset:
         bool_cols = [col for col in df.columns if df[col].value_counts().index.isin([0, 1]).all()]
         if len(bool_cols) > 0: df[bool_cols] = df[bool_cols].replace({0: 'no', 1: 'yes'})
         # detect numerical and categorical columns
-        force_static_cols = ['half_year', 'score_time_period']
-        static_data_col = [col for col in df.select_dtypes(include=['object', 'category']).columns if
-                           (self.key not in col)] + force_static_cols
-        numeric_col = [col for col in df._get_numeric_data().columns if (col not in [self.key]+force_static_cols)]
+        categoric_col = [col for col in df.select_dtypes(include=['object', 'category']).columns if (self.key not in col)]
+        numeric_col = [col for col in df._get_numeric_data().columns if (col not in [self.key])]
         # group by buckets
-        bucket_col = self.to_bucket + '_upper_bound'
-        df[bucket_col] = np.ceil(df[self.to_bucket] / self.interval) * self.interval
+        bucket_col = self.to_bucket + '_upbound'
+        df[bucket_col] = gutils.round_nearest(df[self.to_bucket], self.interval, 'up')
         # we aggregate by average for numeric variables and baseline value for categorical variables
-        keys = static_data_col + numeric_col
-        values = ['first'] * len(static_data_col) + ['mean'] * len(numeric_col)
+        keys = categoric_col + numeric_col
+        values = ['first'] * len(categoric_col) + ['mean'] * len(numeric_col)
         grouping_dict = dict(zip(keys, values))
 
         df_grouped = df.groupby([self.key] + [bucket_col], as_index=False).agg(grouping_dict)
@@ -81,6 +79,7 @@ class Dataset:
         df_grouped['occur'] = df_grouped.groupby(self.key)[self.key].transform('size')
         df_grouped = df_grouped[(df_grouped['occur'] >= self.min_obs)]
         df_grouped['counter'] = df_grouped.groupby(self.key).cumcount() + 1
+        df_grouped[[x+'_upbound' for x in timestamp_cols]] = gutils.round_nearest(df_grouped[timestamp_cols], self.interval, 'up')
         self.data['data_grouped'] = df_grouped
 
         # now update df and df_baseline with patients who made the cut for modelling
@@ -130,7 +129,7 @@ class Dataset:
 
 class DatasetMMSE(Dataset):
     def __init__(self, health_numeric_cols=None, cols_to_pivot=None, index_to_pivot=None, index_to_pivot_baseline=None,
-                 agg_funcs=None, **kwargs):
+                 agg_funcs=None, timestamp_cols=None, **kwargs):
         """
 
         :param health_numeric_cols: columns containing health numeric data (for report generation)
@@ -138,6 +137,7 @@ class DatasetMMSE(Dataset):
         :param index_to_pivot: variables to generate stats for
         :param index_to_pivot_baseline: baseline variables to generate stats for
         :param agg_funcs: functions to use for reporting. supports list of functions
+        :param timestamp_cols: columns containing timestamp data (e.g. date of measure)
         :param kwargs: parameters from parent class
         """
         super(DatasetMMSE, self).__init__(**kwargs)
@@ -146,6 +146,7 @@ class DatasetMMSE(Dataset):
         self.index_to_pivot = gutils.to_list(index_to_pivot)
         self.index_to_pivot_baseline = gutils.to_list(index_to_pivot_baseline)
         self.agg_funcs = agg_funcs
+        self.timestamp_cols = timestamp_cols
 
     def read_and_clean_data(self):
         Dataset.read_and_clean_data(self)
@@ -155,9 +156,8 @@ class DatasetMMSE(Dataset):
         static_data_col = [col for col in df.select_dtypes(include=['object']).columns if
                            ('date' not in col) and ('age' not in col) and ('score_bucket' not in col)]
         df[static_data_col] = df[static_data_col].apply(lambda x: x.astype(str).str.lower())
-        df['age_bucket_report'] = '[' + (np.ceil(df['age_at_score'] / 5) * 5 - 5).astype(str) + '-' \
-                                  + (np.ceil(df['age_at_score'] / 5) * 5).astype(str) + ']'
-        # df.loc[df['first_language'].str.contains('other', case=False, na=False), 'first_language'] = 'other language'
+        df['age_bucket_report'] = '[' + (gutils.round_nearest(df.age_at_score, 5, 'up') - 5).astype(str) + '-' \
+                                  + gutils.round_nearest(df.age_at_score, 5, 'up').astype(str) + ']'
         df.loc[df['ethnicity'].str.contains('other', case=False, na=False), 'ethnicity'] = 'other ethnicity'
         df[static_data_col] = df[static_data_col].replace(
             ['null', 'unknown', np.nan, 'nan', 'other', 'not specified', 'not disclosed', 'not stated (z)'],
@@ -187,10 +187,8 @@ class DatasetMMSE(Dataset):
         df['bmi_bucket'] = gutils.bmi_category(df.bmi_score)
         df['bp_bucket'] = gutils.blood_pressure(df.systolic_value, df.diastolic_value)
         df['diabetes_bucket'] = gutils.diabetes(df.plasma_glucose_value)
-        df['half_year'] = pd.to_datetime(df.score_date).apply(lambda x: x.year + (0.5 if x.month > 6 else 0))
-        intv = 1 if (self.interval is None) or (12 % self.interval != 0) else self.interval
-        df['score_time_period'] = pd.to_datetime(df.score_date).apply(
-            lambda x: x.year + np.floor((x.month / 12) / intv) * intv)
+        for col in self.timestamp_cols:
+            df[col] = gutils.date2year(df[col])
         if self.baseline_cols is not None:
             df_baseline = df.sort_values([self.key, self.timestamp]).groupby(self.key).first().reset_index()
             df = df.merge(df_baseline[self.baseline_cols], on='brcid', suffixes=('', '_baseline'))
@@ -201,7 +199,9 @@ class DatasetMMSE(Dataset):
 
     def bucket_data(self):
         print("bucket data (method from mmse class)")
-        Dataset.bucket_data(self, additional_cols_to_keep=gutils.to_list(self.index_to_pivot) + gutils.to_list(self.cols_to_pivot))
+        Dataset.bucket_data(self,
+                            additional_cols_to_keep=gutils.to_list(self.index_to_pivot) + gutils.to_list(self.cols_to_pivot),
+                            timestamp_cols=['score_date'])
 
     def write_report(self, output_file_path, use_grouped=False):
         if self.data is None or self.data['data_grouped'] is None:
@@ -256,18 +256,17 @@ class DatasetMMSE(Dataset):
 
 default_dataset = DatasetMMSE(
     file_path='https://raw.githubusercontent.com/KCLaurelie/toy-models/master/longitudinal_models/mmse_trajectory_synthetic.csv?token=ALKII2WMALZVPQLYTOUOHYC5IK526',
-    baseline_cols=['brcid', 'age_at_score', 'score_combined', 'bmi_score', 'plasma_glucose_value', 'diastolic_value',
+    baseline_cols=['brcid', 'age_at_score', 'score_date', 'score_combined', 'bmi_score', 'plasma_glucose_value', 'diastolic_value',
                    'systolic_value', 'smoking_status', 'bmi_bucket', 'diabetes_bucket', 'bp_bucket'],
     key='brcid',
     timestamp='age_at_score',
     health_numeric_cols=['bmi_score', 'plasma_glucose_value', 'diastolic_value', 'systolic_value'],
     to_predict='score_combined',
-    regressors=['patient_diagnosis_class', 'patient_diagnosis_super_class', 'score_date', 'age_at_score',
-                'score_combined_baseline', 'gender', 'ethnicity_group', 'first_language', 'occupation',
-                'living_status', 'marital_status', 'education_bucket_raw', 'smoking_status_baseline',
-                'plasma_glucose_value_baseline', 'diastolic_value_baseline', 'systolic_value_baseline',
-                'bmi_score_baseline', 'age_at_score_baseline', 'half_year', 'score_time_period',
-                'diabetes_bucket_baseline', 'bp_bucket_baseline', 'bmi_bucket_baseline'],
+    regressors=['patient_diagnosis_class', 'patient_diagnosis_super_class', 'score_date', 'score_date_baseline',
+                'age_at_score', 'age_at_score_baseline', 'score_combined_baseline', 'gender', 'ethnicity_group',
+                'first_language', 'occupation', 'living_status', 'marital_status', 'education_bucket_raw',
+                'smoking_status_baseline', 'plasma_glucose_value_baseline', 'diastolic_value_baseline', 'systolic_value_baseline',
+                'bmi_score_baseline', 'diabetes_bucket_baseline', 'bp_bucket_baseline', 'bmi_bucket_baseline'],
     na_values=None,
     to_bucket='age_at_score',
     bucket_min=50,
@@ -279,6 +278,7 @@ default_dataset = DatasetMMSE(
                     'marital_status', 'education_bucket_raw'],
     index_to_pivot_baseline='age_bucket_report',
     agg_funcs=['count', np.mean, np.std],
+    timestamp_cols=['score_date']
 )
 
 
