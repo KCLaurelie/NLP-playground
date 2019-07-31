@@ -126,6 +126,15 @@ class Dataset:
     def check(self):
         print("Dataset object created from", self.file_path)
 
+    def expand_all_timestamps(self, timestamp_col='counter', merge_with_df=False):
+        pv = self.pivot(index=timestamp_col, columns=self.key, values=self.to_predict)
+        res = pv.unstack().reset_index()
+        res.rename(columns={0: self.to_predict}, inplace=True)
+        if merge_with_df:
+            df = self.dataset['df_grouped'][[self.key] + [x for x in self.dataset['df_grouped'].columns if 'baseline' in x]]
+            res = df.merge(res, on=self.key)
+        return res
+
 
 class DatasetMMSE(Dataset):
     def __init__(self, health_numeric_cols=None, cols_to_pivot=None, index_to_pivot=None, index_to_pivot_baseline=None,
@@ -191,7 +200,7 @@ class DatasetMMSE(Dataset):
             df[col] = gutils.date2year(df[col])
         if self.baseline_cols is not None:
             df_baseline = df.sort_values([self.key, self.timestamp]).groupby(self.key).first().reset_index()
-            df = df.merge(df_baseline[self.baseline_cols], on='brcid', suffixes=('', '_baseline'))
+            df = df.merge(df_baseline[self.baseline_cols], on=self.key, suffixes=('', '_baseline'))
             df = df.sort_values([self.key, self.timestamp])
 
         self.data = {'data': df, 'data_baseline': df_baseline}

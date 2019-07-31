@@ -1,11 +1,15 @@
 from code_utils.global_variables import *
 import pandas as pd
 import numpy as np
-from scipy import stats
-import statsmodels.formula.api as smf
-import statsmodels.regression.mixed_linear_model as mlm
 import longitudinal_models.longitudinal_dataset as ds
 from pymer4.models import Lm, Lmer
+
+# for python models
+from scipy import stats
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import statsmodels.regression.mixed_linear_model as mlm
+
 
 
 # TODO: analysis for each super diagnosis class subgroup
@@ -47,23 +51,22 @@ def run_report(dataset=ds.default_dataset):
     dataset.write_report(r'C:\Users\K1774755\Downloads\mmse_report_2classes.xlsx')
 
 
-def multi_level_r(dataset=ds.default_dataset):
+def multi_level_r(dataset=ds.default_dataset, intercept='score_combined_baseline', timestamp='score_date_upbound'):
     df = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
-    df['intercept'] = df['score_combined_baseline']
-    df_baseline = df.sort_values(['brcid', 'score_date']).groupby('age_at_score').first().reset_index()
-    df[['half_year', 'score_time_period', 'score_date', 'counter']].drop_duplicates().sort_values(by='score_date')
-    df = df.merge(df_baseline, on='brcid', suffixes=('', '_baseline'))
-
-    df2 = dataset.data['data']
-    t = df2.loc[df2.score_time_period != df2.half_year, ['half_year', 'score_time_period', 'score_date']]
+    df['intercept'] = df[intercept]
+    df['timestamp'] = df[timestamp]
+    df_smi = df[df.patient_diagnosis_super_class == 'smi only']
+    df_orga = df[df.patient_diagnosis_super_class == 'organic only']
+    df_smi_orga = df[df.patient_diagnosis_super_class == 'smi+organic']
 
     # MODEL 1: basic model (random intercept and fixed slope)
     model = Lmer('score_combined ~ score_date_upbound + (1|brcid)', data=df)  # MMSE score by year
-    model = Lmer('score_combined ~ score_date_upbound + (1|brcid)', data=df[df.patient_diagnosis_super_class == 'smi only'])  # for subgroup
+    model = Lmer('score_combined ~ score_date_upbound + (1|brcid)', data=df_smi)  # for subgroup
     model = Lmer('score_combined ~ score_date_upbound + age_at_score_baseline + (1|brcid)', data=df)  # adding age at baseline as covariate (is this correct??)
 
-    # MODEL 2: random slope and variable
-    model = Lmer('score_combined ~  (score_date_upbound | brcid)', data=df)
+    # MODEL 2: random intercept and random slope
+    model = Lmer('score_combined ~  (score_date_upbound | brcid)', data=df)  # fails to converge
+    model = Lmer('score_combined ~  1 + score_date_upbound + (1|brcid) + (0 + score_date_upbound | brcid)', data=df)  # this converges but is it correct?
     model = Lmer('score_combined ~  (score_date_upbound + age_at_score_baseline| brcid)', data=df)
 
     # MODEL 3: basic model but quadratic
@@ -71,12 +74,31 @@ def multi_level_r(dataset=ds.default_dataset):
 
     print(model.fit())
 
-    model2 = smf.mixedlm("score_combined ~ age_at_score_upbound + gender", df, groups=df['brcid'])
-    result = model2.fit()
+    # MODEL 1: python equivalent
+    model_py = smf.mixedlm("score_combined ~ score_date_upbound", df, groups=df['brcid'])
+    result = model_py.fit()
     print(result.summary())
 
+    # random slope and intercept
+    model = sm.MixedLM.from_formula("score_combined ~ score_date_upbound"
+                                    , df
+                                    , re_formula="score_date_upbound"
+                                    , groups=df['brcid'])
+    # random slope only
+    model = sm.MixedLM.from_formula("score_combined ~ score_date_upbound"
+                                    , df
+                                    , re_formula="0 + score_date_upbound"
+                                    , groups=df['brcid'])
+
+    # MODEL 2: python equivalent (??)
+    vcf = {"score_date_upbound": "0 + C(score_date_upbound)", "brcid": "0 + C(brcid)"}
+    model_py = sm.MixedLM.from_formula("score_combined ~ score_date_upbound", groups=df['brcid'],
+                                       vc_formula=vcf, re_formula="0", data=df)
+    print(model_py.fit().summary())
+
+
     model3 = mlm.MixedLM(endog=df['score_combined'],  # dependent variable (1D))
-                         exog=df[['age_at_score_upper_bound', 'intercept']],  # fixed effect covariates (2D)
+                         exog=df[['score_date_upbound', 'intercept']],  # fixed effect covariates (2D)
                          exog_re=df['intercept'],  # random effect covariates
                          groups=df['brcid'])  # data from different groups are independent
     result = model3.fit()
