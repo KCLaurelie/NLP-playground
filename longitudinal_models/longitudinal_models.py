@@ -1,31 +1,20 @@
 from code_utils.global_variables import *
-import pandas as pd
-import numpy as np
 import datetime
 import time
 import longitudinal_models.longitudinal_dataset as ds
+from longitudinal_models.lmer_utils import *
 from pymer4.models import Lmer  # , Lm
-
 # for python models
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
 
 
-# TODO: analysis for each super diagnosis class subgroup
-# TODO plots for 200 sample in each subgroup
 # TODO compare age at baseline vs age a diagnosis
-# TODO redo pivot tables with population used
 # https://rpsychologist.com/r-guide-longitudinal-lme-lmer
-# TODO add missing values
-# TODO count patients per occurence (nb patients with 3, 4... scores)
-# TODO: run model by age or by year? do by year? -> better to use by year and use age at baseline as covariate
+# TODO add missing values (??)
+# TODO plots for 200 sample in each subgroup
 # TODO: plot data https://stats.idre.ucla.edu/r/faq/how-can-i-visualize-longitudinal-data-in-ggplot2/
-
-def check_r_loc():
-    from rpy2.robjects.packages import importr
-    base = importr('base')
-    return base.R_home()
 
 
 ##############################################################################################
@@ -41,6 +30,9 @@ OPTION A)
 Here grouping variable is Organic only/SMI only/SMI + O
 OPTION B)
 Run model 1- 4 in each group of the grouping variable. 3 outputs
+
+Model 2: adjusted for socio-demographic covariates (age at first measurement, education, ethnicity, occupation, living status, marital status). 
+Model 3: adjusted for health factors at baseline (BMI, systolic BP, smoking, glucose)
 """
 
 
@@ -52,69 +44,37 @@ def run_report(dataset=ds.default_dataset):
     dataset.write_report(r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_report_2classes.xlsx')
 
 
-def print_r_model_output(model):
-    stat = pd.DataFrame({'type': 'stats', 'Estimate (SE)': [np.round(model.logLike, 3), np.round(model.AIC, 3)]},
-                        index=['-2LL', 'AIC'])
-    rnd_eff = model.ranef_var.Var.round(3).astype(str) + ' (' + model.ranef_var.Std.round(3).astype(str) + ')'
-    rnd_eff = pd.DataFrame({'type': 'variances', 'Estimate (SE)': rnd_eff}).set_index(
-        (model.ranef_var.index + ' ' + model.ranef_var.Name).values)
-    various = pd.DataFrame({'type': 'misc', 'Estimate (SE)': [model.grps, len(model.data), model.warnings]},
-                           index=['groups', 'obs', 'warnings'])
-    coefs = pd.DataFrame(model.coefs)
-    coefs['type'] = 'coefs'
-    coefs['CI'] = '[' + coefs['2.5_ci'].round(3).astype(str) + ',' + coefs['97.5_ci'].round(3).astype(str) + ']'
-    coefs['Estimate (SE)'] = coefs.Estimate.round(3).astype(str) + ' (' + coefs.SE.round(3).astype(str) + ')'
-    coefs = coefs[['type', 'Estimate (SE)', 'CI', 'P-val']]
-
-    # res = pd.concat([coefs, rnd_eff, stat, various], sort=True)[['type', 'Estimate (SE)','CI', 'Var (Std)', 'P-val']]
-    res = pd.concat([coefs, rnd_eff, stat, various], sort=True)[['type', 'Estimate (SE)', 'CI', 'P-val']]
-    return res.set_index(['type', res.index])
+dataset=ds.default_dataset
+timestamps=['score_date_centered', 'age_at_score_upbound']
+models=['linear_rdn_int', 'linear_rdn_int_slope', 'quadratic_rdn_int']
+input_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_trajectory_data_final6.csv'
+output_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\regression_results.xlsx'
 
 
 def all_models(dataset=ds.default_dataset,
+               timestamps=['score_date_centered', 'age_at_score_upbound'],
+               models=['linear_rdn_int', 'linear_rdn_int_slope', 'quadratic_rdn_int'],
                input_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_trajectory_data_final6.csv',
                output_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\regression_results.xlsx'):
     dataset.file_path = input_file_path
     df = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
-    df['healfyear_centered'] = df.score_date_upbound - df.score_date_upbound.min()
-    timestamps = ['score_date_upbound', 'healfyear_centered', 'counter', 'age_at_score_upbound']
-    df_smi = df[df.patient_diagnosis_super_class == 'smi only']
-    df_orga = df[df.patient_diagnosis_super_class == 'organic only']
-    df_smi_orga = df[df.patient_diagnosis_super_class == 'smi+organic']
-    dfs = [df, df_smi, df_orga, df_smi_orga]
     st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%Hh%M')
     writer = pd.ExcelWriter(output_file_path.replace('.xlsx', '_' + st + '.xlsx'), engine='xlsxwriter')
     col_num = 0
-    for df_tmp in dfs:  # for ts in timestamps:
+    for patient_group in df.patient_diagnosis_super_class.unique():  # for ts in timestamps:
+        df_tmp = df[df.patient_diagnosis_super_class == patient_group]
         row_num = 0
-        for ts in timestamps:  # for df_tmp in dfs:
-            df_tmp['timestamp'] = df_tmp[ts]
-            model = Lmer('score_combined ~ timestamp + (1|brcid)', data=df_tmp)
-            model.fit()
-            pd.DataFrame([str(df_tmp.patient_diagnosis_super_class.unique())],
-                         columns=['MODEL 1: ' + str(model.formula)], index=[ts]).to_excel(writer, startrow=row_num,
-                                                                                          startcol=col_num)
-            to_print = print_r_model_output(model)
-            to_print.to_excel(writer, startrow=row_num + 2, startcol=col_num)
-            row_num += 5 + len(to_print)
-
-            model = Lmer('score_combined ~ (timestamp | brcid)', data=df_tmp)
-            model.fit()
-            pd.DataFrame([str(df_tmp.patient_diagnosis_super_class.unique())],
-                         columns=['MODEL 2: ' + str(model.formula)], index=[ts]).to_excel(writer, startrow=row_num,
-                                                                                          startcol=col_num)
-            to_print = print_r_model_output(model)
-            to_print.to_excel(writer, startrow=row_num + 2, startcol=col_num)
-            row_num += 5 + len(to_print)
-
-            model = Lmer('score_combined ~ timestamp + I(timestamp^2) + (1|brcid)', data=df_tmp)
-            model.fit()
-            pd.DataFrame([str(df_tmp.patient_diagnosis_super_class.unique())],
-                         columns=['MODEL 3: ' + str(model.formula)], index=[ts]).to_excel(writer, startrow=row_num,
-                                                                                          startcol=col_num)
-            to_print = print_r_model_output(model)
-            to_print.to_excel(writer, startrow=row_num + 2, startcol=col_num)
-            row_num += 5 + len(to_print)
+        for ts in timestamps:
+            for m in models:
+                formula = lmer_formula(model_type=m, regressor=dataset.to_bucket, timestamp='age_score_upbound',
+                                       covariates=None, group=dataset.key)
+                model = Lmer(formula, data=df_tmp)
+                model.fit()
+                title = pd.DataFrame([str(patient_group)], columns=['MODEL: ' + str(model.formula)], index=[ts])
+                title.to_excel(writer, startrow=row_num, startcol=col_num)
+                to_print = print_r_model_output(model)
+                to_print.to_excel(writer, startrow=row_num + 2, startcol=col_num)
+                row_num += 5 + len(to_print)
         col_num += to_print.shape[1] + 3
     writer.save()
 

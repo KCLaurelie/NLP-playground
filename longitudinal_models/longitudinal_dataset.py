@@ -79,7 +79,9 @@ class Dataset:
         df_grouped['occur'] = df_grouped.groupby(self.key)[self.key].transform('size')
         df_grouped = df_grouped[(df_grouped['occur'] >= self.min_obs)]
         df_grouped['counter'] = df_grouped.groupby(self.key).cumcount() + 1
-        df_grouped[[x+'_upbound' for x in timestamp_cols]] = gutils.round_nearest(df_grouped[timestamp_cols], self.interval, 'up')
+        for x in timestamp_cols:
+            df_grouped[x+'_upbound'] = gutils.round_nearest(df_grouped[x], self.interval, 'up')
+            df_grouped[x+'_centered'] = df_grouped[x+'_upbound'] - df_grouped[x+'_upbound'].min()
         self.data['data_grouped'] = df_grouped
 
         # now update df and df_baseline with patients who made the cut for modelling
