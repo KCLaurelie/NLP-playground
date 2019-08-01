@@ -1,15 +1,15 @@
 from code_utils.global_variables import *
 import pandas as pd
 import numpy as np
+import datetime
+import time
 import longitudinal_models.longitudinal_dataset as ds
-from pymer4.models import Lm, Lmer
+from pymer4.models import Lmer  # , Lm
 
 # for python models
-from scipy import stats
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
-
 
 
 # TODO: analysis for each super diagnosis class subgroup
@@ -45,13 +45,81 @@ Run model 1- 4 in each group of the grouping variable. 3 outputs
 
 
 def run_report(dataset=ds.default_dataset):
+    dataset.file_path = r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_trajectory_data_final6.csv'
     dataset.cols_to_pivot = ['patient_diagnosis_super_class']
-    dataset.write_report(r'C:\Users\K1774755\Downloads\mmse_report_1class.xlsx')
+    dataset.write_report(r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_report_1class.xlsx')
     dataset.cols_to_pivot = ['patient_diagnosis_super_class', 'patient_diagnosis_class']
-    dataset.write_report(r'C:\Users\K1774755\Downloads\mmse_report_2classes.xlsx')
+    dataset.write_report(r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_report_2classes.xlsx')
 
 
-def multi_level_r(dataset=ds.default_dataset, intercept='score_combined_baseline', timestamp='score_date_upbound'):
+def print_r_model_output(model):
+    stat = pd.DataFrame({'type': 'stats', 'Estimate (SE)': [np.round(model.logLike, 3), np.round(model.AIC, 3)]},
+                        index=['-2LL', 'AIC'])
+    rnd_eff = model.ranef_var.Var.round(3).astype(str) + ' (' + model.ranef_var.Std.round(3).astype(str) + ')'
+    rnd_eff = pd.DataFrame({'type': 'variances', 'Estimate (SE)': rnd_eff}).set_index(
+        (model.ranef_var.index + ' ' + model.ranef_var.Name).values)
+    various = pd.DataFrame({'type': 'misc', 'Estimate (SE)': [model.grps, len(model.data), model.warnings]},
+                           index=['groups', 'obs', 'warnings'])
+    coefs = pd.DataFrame(model.coefs)
+    coefs['type'] = 'coefs'
+    coefs['CI'] = '[' + coefs['2.5_ci'].round(3).astype(str) + ',' + coefs['97.5_ci'].round(3).astype(str) + ']'
+    coefs['Estimate (SE)'] = coefs.Estimate.round(3).astype(str) + ' (' + coefs.SE.round(3).astype(str) + ')'
+    coefs = coefs[['type', 'Estimate (SE)', 'CI', 'P-val']]
+
+    # res = pd.concat([coefs, rnd_eff, stat, various], sort=True)[['type', 'Estimate (SE)','CI', 'Var (Std)', 'P-val']]
+    res = pd.concat([coefs, rnd_eff, stat, various], sort=True)[['type', 'Estimate (SE)', 'CI', 'P-val']]
+    return res.set_index(['type', res.index])
+
+
+def all_models(dataset=ds.default_dataset,
+               input_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_trajectory_data_final6.csv',
+               output_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\regression_results.xlsx'):
+    dataset.file_path = input_file_path
+    df = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
+    df['healfyear_centered'] = df.score_date_upbound - df.score_date_upbound.min()
+    timestamps = ['score_date_upbound', 'healfyear_centered', 'counter', 'age_at_score_upbound']
+    df_smi = df[df.patient_diagnosis_super_class == 'smi only']
+    df_orga = df[df.patient_diagnosis_super_class == 'organic only']
+    df_smi_orga = df[df.patient_diagnosis_super_class == 'smi+organic']
+    dfs = [df, df_smi, df_orga, df_smi_orga]
+    st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%Hh%M')
+    writer = pd.ExcelWriter(output_file_path.replace('.xlsx', '_' + st + '.xlsx'), engine='xlsxwriter')
+    col_num = 0
+    for df_tmp in dfs:  # for ts in timestamps:
+        row_num = 0
+        for ts in timestamps:  # for df_tmp in dfs:
+            df_tmp['timestamp'] = df_tmp[ts]
+            model = Lmer('score_combined ~ timestamp + (1|brcid)', data=df_tmp)
+            model.fit()
+            pd.DataFrame([str(df_tmp.patient_diagnosis_super_class.unique())],
+                         columns=['MODEL 1: ' + str(model.formula)], index=[ts]).to_excel(writer, startrow=row_num,
+                                                                                          startcol=col_num)
+            to_print = print_r_model_output(model)
+            to_print.to_excel(writer, startrow=row_num + 2, startcol=col_num)
+            row_num += 5 + len(to_print)
+
+            model = Lmer('score_combined ~ (timestamp | brcid)', data=df_tmp)
+            model.fit()
+            pd.DataFrame([str(df_tmp.patient_diagnosis_super_class.unique())],
+                         columns=['MODEL 2: ' + str(model.formula)], index=[ts]).to_excel(writer, startrow=row_num,
+                                                                                          startcol=col_num)
+            to_print = print_r_model_output(model)
+            to_print.to_excel(writer, startrow=row_num + 2, startcol=col_num)
+            row_num += 5 + len(to_print)
+
+            model = Lmer('score_combined ~ timestamp + I(timestamp^2) + (1|brcid)', data=df_tmp)
+            model.fit()
+            pd.DataFrame([str(df_tmp.patient_diagnosis_super_class.unique())],
+                         columns=['MODEL 3: ' + str(model.formula)], index=[ts]).to_excel(writer, startrow=row_num,
+                                                                                          startcol=col_num)
+            to_print = print_r_model_output(model)
+            to_print.to_excel(writer, startrow=row_num + 2, startcol=col_num)
+            row_num += 5 + len(to_print)
+        col_num += to_print.shape[1] + 3
+    writer.save()
+
+
+def model_playground(dataset=ds.default_dataset, intercept='score_combined_baseline', timestamp='score_date_upbound'):
     df = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
     df['intercept'] = df[intercept]
     df['timestamp'] = df[timestamp]
@@ -62,17 +130,22 @@ def multi_level_r(dataset=ds.default_dataset, intercept='score_combined_baseline
     # MODEL 1: basic model (random intercept and fixed slope)
     model = Lmer('score_combined ~ score_date_upbound + (1|brcid)', data=df)  # MMSE score by year
     model = Lmer('score_combined ~ score_date_upbound + (1|brcid)', data=df_smi)  # for subgroup
-    model = Lmer('score_combined ~ score_date_upbound + age_at_score_baseline + (1|brcid)', data=df)  # adding age at baseline as covariate (is this correct??)
+    model = Lmer('score_combined ~ score_date_upbound + age_at_score_baseline + (1|brcid)',
+                 data=df)  # adding age at baseline as covariate (is this correct??)
 
     # MODEL 2: random intercept and random slope
     model = Lmer('score_combined ~  (score_date_upbound | brcid)', data=df)  # fails to converge
-    model = Lmer('score_combined ~  1 + score_date_upbound + (1|brcid) + (0 + score_date_upbound | brcid)', data=df)  # this converges but is it correct?
+    model = Lmer('score_combined ~  1 + score_date_upbound + (1|brcid) + (0 + score_date_upbound | brcid)',
+                 data=df)  # this converges but is it correct?
     model = Lmer('score_combined ~  (score_date_upbound + age_at_score_baseline| brcid)', data=df)
 
     # MODEL 3: basic model but quadratic
     model = Lmer('score_combined ~ score_date_upbound + I(score_date_upbound^2) + (1|brcid)', data=df)
 
     print(model.fit())
+
+    #######################################################################################
+    #  PYTHON STUFF
 
     # MODEL 1: python equivalent
     model_py = smf.mixedlm("score_combined ~ score_date_upbound", df, groups=df['brcid'])
@@ -96,61 +169,9 @@ def multi_level_r(dataset=ds.default_dataset, intercept='score_combined_baseline
                                        vc_formula=vcf, re_formula="0", data=df)
     print(model_py.fit().summary())
 
-
     model3 = mlm.MixedLM(endog=df['score_combined'],  # dependent variable (1D))
                          exog=df[['score_date_upbound', 'intercept']],  # fixed effect covariates (2D)
                          exog_re=df['intercept'],  # random effect covariates
                          groups=df['brcid'])  # data from different groups are independent
     result = model3.fit()
-    print(result.summary())
-
-
-def model(file_path,
-          regressors,
-          to_predict='score_combined',
-          intercept_col='score_combined_baseline',
-          col_to_bucket='age_at_score', bucket_min=50, bucket_max=90, interval=0.5, min_obs=3, na_values=None,
-          ):
-    df = ds.read_and_clean_data(file_path)[0]
-    df = ds.prep_data_for_model(df, regressors=regressors, to_predict=to_predict, na_values=na_values,
-                                col_to_bucket=col_to_bucket,
-                                bucket_min=bucket_min, bucket_max=bucket_max, interval=interval, min_obs=min_obs)
-
-    df['age_bucket_complete'] = 0  # TODO? fill with NAN if no data for specific bucket?
-    df['intercept'] = df[intercept_col]  # take score at baseline
-
-    temporal_data_col = [col for col in df._get_numeric_data().columns if 'num_obs' not in col]
-    static_data_col = [col for col in df.select_dtypes(include=['object', 'category']).columns if 'date' not in col]
-    cols_for_stats = static_data_col + temporal_data_col
-    df_agg_patient_class = df[cols_for_stats].groupby('patient_diagnosis_class').agg(
-        [len, np.size, np.mean, np.std, np.min, np.max, stats.mode])
-    df_agg_patient_super_class = df[cols_for_stats].groupby('patient_diagnosis_super_class').agg(
-        [len, np.size, np.mean, np.std, np.min, np.max, stats.mode])
-    df_agg_patient_age = df[cols_for_stats].groupby(['patient_diagnosis_super_class', 'age_at_mmse_upper_bound']).agg(
-        [len, np.size, np.mean, np.std, np.min, np.max, stats.mode])
-    df[cols_for_stats].describe()
-
-    df_stats = df[cols_for_stats].describe(include='all')
-
-    # TRANSFORM CATEGORICAL VARIABLES TO DUMMY
-    # https://blog.myyellowroad.com/using-categorical-data-in-machine-learning-with-python-from-dummy-variables-to-deep-category-66041f734512
-    # from sklearn.preprocessing import OneHotEncoder
-    # enc = OneHotEncoder(handle_unknown='ignore')
-    # enc.fit(X_train_ordinal)
-
-    test = pd.get_dummies(df, prefix=['col1', 'col2'])
-
-    model = smf.mixedlm("score_combined ~ age_at_score_upper_bound + gender",
-                        df,
-                        groups=df["patient_diagnosis_super_class"])
-    results = model.fit()
-    print(results.summary())
-
-    df['intercept'] = 1
-
-    model = mlm.MixedLM(endog=df['score_combined'],  # dependent variable (1D))
-                        exog=df[['age_at_score_upper_bound', 'intercept']],  # fixed effect covariates (2D)
-                        exog_re=df['intercept'],  # random effect covariates
-                        groups=df['patient_diagnosis_super_class'])  # data from different groups are independent
-    result = model.fit()
     print(result.summary())
