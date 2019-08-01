@@ -169,8 +169,8 @@ class DatasetMMSE(Dataset):
                                   + gutils.round_nearest(df.age_at_score, 5, 'up').astype(str) + ']'
         df.loc[df['ethnicity'].str.contains('other', case=False, na=False), 'ethnicity'] = 'other ethnicity'
         df[static_data_col] = df[static_data_col].replace(
-            ['null', 'unknown', np.nan, 'nan', 'other', 'not specified', 'not disclosed', 'not stated (z)'],
-            'not known')
+            ['null', 'unknown', np.nan, 'nan', 'other', 'not specified', 'not disclosed', 'not stated (z)', 'Not Known']
+            , 'not known')
         df.replace({'patient_diagnosis_class': {'smi+organic': 'schizo+bipolar+organic'}}, inplace=True)
         df['ethnicity_group'] = 'other ethnicity'
         df.loc[df['ethnicity'].str.contains('not known', case=False, na=False), 'ethnicity_group'] = 'not known'
