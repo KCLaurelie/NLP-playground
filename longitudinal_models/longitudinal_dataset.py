@@ -42,7 +42,7 @@ class Dataset:
         self.data = None
 
     def read_and_clean_data(self):
-        print("read data (method from parent class)")
+        print("reading data (method from parent class)")
         df = pd.read_csv(self.file_path, header=0, low_memory=False)
         df.columns = df.columns.str.lower()
         df_baseline = pd.DataFrame()
@@ -50,7 +50,7 @@ class Dataset:
         return 0
 
     def bucket_data(self, additional_cols_to_keep=None, timestamp_cols=None):
-        print("bucket data (method from parent class)")
+        print("bucketting data (method from parent class)")
         cols_to_keep = list(dict.fromkeys(gutils.to_list(self.key) + gutils.to_list(self.regressors) + gutils.to_list(
             self.to_bucket) + gutils.to_list(self.to_predict) + gutils.to_list(additional_cols_to_keep)))
         # only use data within bucket boundaries
@@ -161,7 +161,7 @@ class DatasetMMSE(Dataset):
 
     def read_and_clean_data(self):
         Dataset.read_and_clean_data(self)
-        print("read data (method from mmse class)")
+        print("reading data (method from mmse class)")
         df = self.data['data']
         df_baseline = self.data['data_baseline']
         static_data_col = [col for col in df.select_dtypes(include=['object']).columns if
@@ -209,7 +209,7 @@ class DatasetMMSE(Dataset):
         return 0
 
     def bucket_data(self):
-        print("bucket data (method from mmse class)")
+        print("bucketting data (method from mmse class)")
         Dataset.bucket_data(self,
                             additional_cols_to_keep=gutils.to_list(self.index_to_pivot) + gutils.to_list(self.cols_to_pivot),
                             timestamp_cols=['score_date'])
@@ -266,7 +266,7 @@ class DatasetMMSE(Dataset):
 
 
 default_dataset = DatasetMMSE(
-    file_path='https://raw.githubusercontent.com/KCLaurelie/toy-models/master/longitudinal_models/mmse_trajectory_synthetic.csv?token=ALKII2WMALZVPQLYTOUOHYC5IK526',
+    file_path='https://raw.githubusercontent.com/KCLaurelie/toy-models/master/longitudinal_models/mmse_trajectory_synthetic.csv?token=ALKII2WYE6LIQJM6RFQCEQK5JSILS',
     baseline_cols=['brcid', 'age_at_score', 'score_date', 'score_combined', 'bmi_score', 'plasma_glucose_value', 'diastolic_value',
                    'systolic_value', 'smoking_status', 'bmi_bucket', 'diabetes_bucket', 'bp_bucket'],
     key='brcid',

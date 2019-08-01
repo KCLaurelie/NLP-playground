@@ -10,26 +10,22 @@ import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
 
 
-# TODO compare age at baseline vs age a diagnosis
-# https://rpsychologist.com/r-guide-longitudinal-lme-lmer
-# TODO add missing values (??)
-# TODO plots for 200 sample in each subgroup
-# TODO: plot data https://stats.idre.ucla.edu/r/faq/how-can-i-visualize-longitudinal-data-in-ggplot2/
-
-
 ##############################################################################################
 # LONGITUDINAL MODELLING
 ##############################################################################################
+# TODO compare age at baseline vs age a diagnosis
+# https://rpsychologist.com/r-guide-longitudinal-lme-lmer
+# TODO add missing values (??)
+# TODO plots for 200 sample in each subgroup: https://stats.idre.ucla.edu/r/faq/how-can-i-visualize-longitudinal-data-in-ggplot2/
 """
-OPTION A)
+OPTION A) Here grouping variable is Organic only/SMI only/SMI + O
 - MODEL 1: Unconditional with MMSE= intercept (fixed)
 - MODEL 2: Unconditional with MMSE= intercept (random)
 - MODEL 3: Unconditional with MMSE= intercept + time (fixed)
 - MODEL 4: Unconditional with MMSE= intercept + time (random)
 - MODEL 5: Conditional with MMSE= intercept + time + grouping variable
-Here grouping variable is Organic only/SMI only/SMI + O
-OPTION B)
-Run model 1- 4 in each group of the grouping variable. 3 outputs
+
+OPTION B) Run model 1- 4 in each group of the grouping variable. 3 outputs
 
 Model 2: adjusted for socio-demographic covariates (age at first measurement, education, ethnicity, occupation, living status, marital status). 
 Model 3: adjusted for health factors at baseline (BMI, systolic BP, smoking, glucose)
@@ -44,33 +40,27 @@ def run_report(dataset=ds.default_dataset):
     dataset.write_report(r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_report_2classes.xlsx')
 
 
-dataset=ds.default_dataset
-timestamps=['score_date_centered', 'age_at_score_upbound']
-models=['linear_rdn_int', 'linear_rdn_int_slope', 'quadratic_rdn_int']
-input_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_trajectory_data_final6.csv'
-output_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\regression_results.xlsx'
-
-
 def all_models(dataset=ds.default_dataset,
                timestamps=['score_date_centered', 'age_at_score_upbound'],
+               covariates=None,
                models=['linear_rdn_int', 'linear_rdn_int_slope', 'quadratic_rdn_int'],
                input_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_trajectory_data_final6.csv',
                output_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\regression_results.xlsx'):
-    dataset.file_path = input_file_path
+    if input_file_path is not None: dataset.file_path = input_file_path
     df = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
     st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%Hh%M')
     writer = pd.ExcelWriter(output_file_path.replace('.xlsx', '_' + st + '.xlsx'), engine='xlsxwriter')
     col_num = 0
-    for patient_group in df.patient_diagnosis_super_class.unique():  # for ts in timestamps:
-        df_tmp = df[df.patient_diagnosis_super_class == patient_group]
+    for patient_group in ['all'] + list(df.patient_diagnosis_super_class.unique()):
+        df_tmp = df[df.patient_diagnosis_super_class == patient_group] if patient_group != 'all' else df
         row_num = 0
         for ts in timestamps:
             for m in models:
-                formula = lmer_formula(model_type=m, regressor=dataset.to_bucket, timestamp='age_score_upbound',
-                                       covariates=None, group=dataset.key)
+                formula = lmer_formula(model_type=m, regressor=dataset.to_bucket, timestamp=ts,
+                                       covariates=covariates, group=dataset.key)
                 model = Lmer(formula, data=df_tmp)
                 model.fit()
-                title = pd.DataFrame([str(patient_group)], columns=['MODEL: ' + str(model.formula)], index=[ts])
+                title = pd.DataFrame([str(patient_group)], columns=['MODEL ' + m + ': ' + str(model.formula)], index=[ts])
                 title.to_excel(writer, startrow=row_num, startcol=col_num)
                 to_print = print_r_model_output(model)
                 to_print.to_excel(writer, startrow=row_num + 2, startcol=col_num)
