@@ -56,7 +56,7 @@ def all_models(dataset=ds.default_dataset,
         row_num = 0
         for ts in timestamps:
             for m in models:
-                formula = lmer_formula(model_type=m, regressor=dataset.to_bucket, timestamp=ts,
+                formula = lmer_formula(model_type=m, regressor=dataset.to_predict[0], timestamp=ts,
                                        covariates=covariates, group=dataset.key)
                 model = Lmer(formula, data=df_tmp)
                 model.fit()
