@@ -32,7 +32,7 @@
 ########################################################################
 
 import os
-import HVASS.download as download
+import courses_tutorials.HVASS.download as download
 import glob
 
 ########################################################################
