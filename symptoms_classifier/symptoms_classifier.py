@@ -68,7 +68,6 @@ class TextsToClassify:
         tokenized_text = tokenize_sentences(sentences, manually_clean_text=manually_clean_text)
         if update_obj:
             self.dataset['tokenized_text'] = tokenized_text
-            # self.__setattr__('tokenized_text', tokenized_text)
             print('object updated with tokenized text, to view use self.dataset.tokenized_text')
         return tokenized_text
 

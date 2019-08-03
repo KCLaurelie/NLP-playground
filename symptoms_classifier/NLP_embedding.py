@@ -7,12 +7,32 @@ from symptoms_classifier.NLP_text_cleaning import clean_string
 import numpy as np
 from nltk import tokenize
 from nltk.corpus import stopwords
+import code_utils.general_utils as gutils
 
 # spacy stuff
 from code_utils.global_variables import *
 import spacy
+
 nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
 nltk.download('wordnet')
+
+
+def get_wa(sentence, keywords, context=10):
+    sentence = ['this', 'kwd1', 'is', 'a', 'test', 'a', 'b', 'kwd2', 'truc', 'hello']
+    # weights = list(np.arange(0, 1 + 1 / context, 1 / context)) + list(np.arange(0, 1, 1 / context))[::-1]
+    # res = [1 if x in keywords else 0 for x in sentence]
+    keywords = gutils.to_list(keywords)
+    kw_idx = [sentence.index(x) for x in keywords if x in sentence]
+    lst=[]
+    for idx, val in enumerate(kw_idx):
+        len = kw_idx[idx] - (kw_idx[idx-1] if idx > 0 else 0)
+        lst += list(np.arange(1 / context, 1 + 1 / context, 1 / context))[-len:]
+
+    # this works only if 1 keyword
+    weights = list(np.arange(1 / context, 1 + 1 / context, 1 / context))[-(1+kw_idx[0]):] +\
+              list(np.arange(1 / context, 1, 1 / context))[::-1]
+    return weights
+
 
 def top_features_idf(vectorizer, top_n=2):
     # TODO check http://kavita-ganesan.com/extracting-keywords-from-text-tfidf/#.XPFMnohKiUk
@@ -35,7 +55,7 @@ def tokenize_sentences(sentences, manually_clean_text=True):
             snt = clean_string(snt, remove_punctuation=True)
         # else:
         #     snt = re.sub(r'[^a-zA-Z0-9\'\s]', ' ', snt)
-        tkns = [tkn.lemma_.lower() for tkn in nlp.tokenizer(snt.replace('…','. '))
+        tkns = [tkn.lemma_.lower() for tkn in nlp.tokenizer(snt.replace('…', '. '))
                 if (not tkn.is_punct) and (not tkn.is_space) and tkn.is_ascii]
         if len(tkns) > 0: tok_snts.append(tkns)
     return tok_snts
@@ -108,7 +128,7 @@ def transform_text2vec(sentences, emb_model, algo='tfidf', word2vec_option='sent
     return vectors
 
 
-def fit_text2vec(sentences, embedding_algo='w2v', save_model=False,
+def fit_text2vec(sentences, embedding_algo='w2v', save_model=False, stop_words=None,
                  size=100, window=5, min_count=4, workers=4, min_df=0.00125, max_df=0.7):
     """
     train embedding model using series of texts
@@ -119,20 +139,24 @@ def fit_text2vec(sentences, embedding_algo='w2v', save_model=False,
     :param window: w2v parameter
     :param workers: w2v parameter
     :param embedding_algo: embedding model type (can be either tfidf, counter or word2vec)
-    :param size: desired vector size
+    :param stop_words: tokens that will be removed from the resulting tokens. If 'english' will load nltk list
+    :param size: desired size for each embedding vector
     :param save_model: option to save trained model
     :return: word embeddings
     """
 
     embedding_algo = str(embedding_algo).lower()
-    stop_words = stopwords.words('english')
+    if stop_words == 'english':
+        stop_words = stopwords.words('english')
+        # we want to keep negations
+        stop_words = [x for x in stop_words if ('no' not in x) and ('n\'t' not in x)]
     if 'idf' in embedding_algo:
         _vectorizer = text.TfidfVectorizer(
             min_df=min_df,
             max_df=max_df,
             sublinear_tf=True,
             use_idf=True,
-            analyzer='word',
+            analyzer='word',  # analyzer=clean_text
             ngram_range=(1, 5),
             stop_words=stop_words
         )
@@ -150,5 +174,3 @@ def fit_text2vec(sentences, embedding_algo='w2v', save_model=False,
     else:
         return 'unknown embedding_algo'
     return w2v
-
-

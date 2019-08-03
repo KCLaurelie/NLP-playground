@@ -48,8 +48,9 @@ def classifier_test():
         "https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv")
     data_clean = data[['airline_sentiment', 'text']].rename(columns={'airline_sentiment': 'class'})
     data_clean['text'] = preprocess_text(data_clean['text'])
-    vectorizer = fit_text2vec(data_clean['text'], embedding_algo='word2vec', size=100)
-    processed_features = transform_text2vec(data_clean['text'], vectorizer, algo='word2vec')
+    emb_algo = 'tfidf'  # 'word2vec'
+    vectorizer = fit_text2vec(data_clean['text'], embedding_algo=emb_algo, size=100)
+    processed_features = transform_text2vec(data_clean['text'], vectorizer, algo=emb_algo)
     from sklearn.model_selection import train_test_split
     x_train, x_test, y_train, y_test = train_test_split(processed_features, data_clean['class'], test_size=0.8,
                                                         random_state=0)
