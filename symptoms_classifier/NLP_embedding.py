@@ -17,23 +17,6 @@ nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
 nltk.download('wordnet')
 
 
-def get_wa(sentence, keywords, context=10):
-    sentence = ['this', 'kwd1', 'is', 'a', 'test', 'a', 'b', 'kwd2', 'truc', 'hello']
-    # weights = list(np.arange(0, 1 + 1 / context, 1 / context)) + list(np.arange(0, 1, 1 / context))[::-1]
-    # res = [1 if x in keywords else 0 for x in sentence]
-    keywords = gutils.to_list(keywords)
-    kw_idx = [sentence.index(x) for x in keywords if x in sentence]
-    lst=[]
-    for idx, val in enumerate(kw_idx):
-        len = kw_idx[idx] - (kw_idx[idx-1] if idx > 0 else 0)
-        lst += list(np.arange(1 / context, 1 + 1 / context, 1 / context))[-len:]
-
-    # this works only if 1 keyword
-    weights = list(np.arange(1 / context, 1 + 1 / context, 1 / context))[-(1+kw_idx[0]):] +\
-              list(np.arange(1 / context, 1, 1 / context))[::-1]
-    return weights
-
-
 def top_features_idf(vectorizer, top_n=2):
     # TODO check http://kavita-ganesan.com/extracting-keywords-from-text-tfidf/#.XPFMnohKiUk
     indices = np.argsort(vectorizer.idf_)[::-1]

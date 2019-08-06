@@ -13,6 +13,27 @@ csv.field_size_limit(200000000)
 ##############################################################################
 # GENERAL UTILS FUNCTIONS
 ##############################################################################
+def get_wa(sentence, keywords, context=10):
+    """
+    generate vector of weighted averages given specific keywords in a tokenized sentence.
+    the words closest to the keyword will get maximum weight etc...
+    :param sentence: tokenized sentence
+    :param keywords: keywords to look for in the sentence (can be either a list or string)
+    :param context: number of words before/after keyword to use
+    :return: array of weights
+    """
+    sentence = to_list(sentence)
+    keywords = to_list(keywords)
+    kw_idx = [sentence.index(x) for x in keywords if x in sentence]
+    weights = [0]*len(sentence)
+    for i in kw_idx:
+        left = (list(np.arange(0, 1 + 1 / context, 1 / context))[-i:] if i > 0 else [])
+        right = list(np.arange(0, 1 + 1 / context, 1 / context))[::-1][:len(sentence) - i - 1]
+        lst = [0] * (i - context - 1) + left + [1] + right + [0] * (len(sentence) - i - context - 2)
+        weights = np.maximum(weights, lst)
+    return weights
+
+
 def round_nearest(x, intv=0.5, direction='down'):
     """
     rounds number or series of numbers to nearest value given interval
