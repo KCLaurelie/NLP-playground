@@ -102,12 +102,12 @@ def clean_df(df, to_numeric=True, filter_col=None, filter_value=None, threshold_
 
 
 def get_duplicate_columns(df):
-    '''
+    """
     Get a list of duplicate columns.
     It will iterate over all the columns in dataframe and find the columns whose contents are duplicate.
     :param df: Dataframe object
     :return: List of columns whose contents are duplicates.
-    '''
+    """
     duplicate_column_names = set()
     # Iterate over all the columns in dataframe
     for x in range(df.shape[1]):
@@ -253,7 +253,7 @@ def convert_num_to_bucket(nb, bucket_size=0.5, convert_to_str=True):
 
 
 ##############################################################################
-## DATE FUNCTIONS FOR LONGITUDINAL MODELLING
+# DATE FUNCTIONS FOR LONGITUDINAL MODELLING
 ############################################################################## 
 # dates = ["2014-10-10", "2016-01-07"]
 
@@ -274,14 +274,14 @@ def monthlist_fast(dates):
 
 
 ##############################################################################
-## GENERATE LONGITUDINAL DATA FROM RAW DATA (HOSPITAL STAYS, MEASURES...)
+# GENERATE LONGITUDINAL DATA FROM RAW DATA (HOSPITAL STAYS, MEASURES...)
 ##############################################################################
 # test_file=r'T:\aurelie_mascio\CRIS data\F20_ward_stays_data_fromDB.csv'
 # test_df=pd.read_csv(test_file,header=0)
 # df=test_df.head().copy()
 # df['dob']=datetime.datetime(1986, month=8, day=13)
 
-## FUNCTION TO GENERATE LONGITUDINAL DATA BY AGE
+# FUNCTION TO GENERATE LONGITUDINAL DATA BY AGE
 def convert_to_longitudinal_age(df,
                                 key_col='brcid',
                                 dob_col='dob',
@@ -294,7 +294,7 @@ def convert_to_longitudinal_age(df,
     df = clean_df(df)
     dob_data = pd.read_csv(dob_file, header=0)
     #######################################
-    ### TODO: JOIN WITH DOB DATA
+    # TODO: JOIN WITH DOB DATA
     #######################################
     if mode != 'interval':  # we just want to aggregate 1 measure by age, taking the average
         df['rating_age'] = round((df[measure_date_col] - df[dob_col]).dt.days / 365, 0)
@@ -315,7 +315,7 @@ def convert_to_longitudinal_age(df,
     return res
 
 
-## FUNCTION TO GENERATE LONGITUDINAL DATA BY YEAR
+# FUNCTION TO GENERATE LONGITUDINAL DATA BY YEAR
 def convert_to_longitudinal_dates(df,
                                   key_col='brcid',
                                   start_date_col='actual_start_date',
