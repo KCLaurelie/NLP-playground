@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="moved courses to separate folder">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/toy-models.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/toy-models.iml" afterDir="false" />
+    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code_utils/general_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code_utils/general_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py" beforeDir="false" afterPath="$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py" beforeDir="false" afterPath="$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,8 +30,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1343">
-              <caret line="90" column="33" selection-start-line="90" selection-start-column="33" selection-end-line="90" selection-end-column="33" />
+            <state relative-caret-position="234">
+              <caret line="65" column="8" selection-start-line="65" selection-start-column="8" selection-end-line="65" selection-end-column="8" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -45,8 +42,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="646">
-              <caret line="42" column="21" selection-start-line="42" selection-start-column="21" selection-end-line="42" selection-end-column="21" />
+            <state relative-caret-position="289">
+              <caret line="17" column="28" lean-forward="true" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
               <folding>
                 <element signature="e#44#97#0" expanded="true" />
               </folding>
@@ -57,7 +54,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
+            <state relative-caret-position="-1717">
               <caret line="17" selection-start-line="17" selection-end-line="17" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
@@ -66,11 +63,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/code_utils/general_utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="33" column="18" lean-forward="true" selection-start-line="33" selection-start-column="18" selection-end-line="33" selection-end-column="18" />
+            <state relative-caret-position="425">
+              <caret line="40" column="37" lean-forward="true" selection-start-line="40" selection-start-column="37" selection-end-line="40" selection-end-column="37" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -78,13 +75,13 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1122">
-              <caret line="71" column="20" selection-start-line="71" selection-start-column="20" selection-end-line="71" selection-end-column="20" />
+            <state relative-caret-position="170">
+              <caret line="10" selection-start-line="10" selection-end-line="10" />
               <folding>
-                <element signature="e#84#102#0" expanded="true" />
+                <element signature="e#84#103#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -196,12 +193,13 @@
         <option value="$PROJECT_DIR$/symptoms_classifier/tests.py" />
         <option value="$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py" />
         <option value="$PROJECT_DIR$/code_utils/general_utils.py" />
+        <option value="$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-1751" />
-    <option name="y" value="129" />
+    <option name="x" value="-1501" />
+    <option name="y" value="244" />
     <option name="width" value="1292" />
     <option name="height" value="692" />
   </component>
@@ -211,6 +209,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -237,7 +236,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -337,21 +335,8 @@
       <workItem from="1564693831985" duration="1692000" />
       <workItem from="1564734052725" duration="17745000" />
       <workItem from="1564922627911" duration="4725000" />
-      <workItem from="1565079596489" duration="12891000" />
-    </task>
-    <task id="LOCAL-00035" summary="added words distance functions and refactored code">
-      <created>1560160590986</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1560160590986</updated>
-    </task>
-    <task id="LOCAL-00036" summary="added">
-      <created>1561749903393</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1561749903393</updated>
+      <workItem from="1565079596489" duration="16421000" />
+      <workItem from="1565598249735" duration="1245000" />
     </task>
     <task id="LOCAL-00037" summary="minor changes">
       <created>1561749944433</created>
@@ -682,11 +667,25 @@
       <option name="project" value="LOCAL" />
       <updated>1564856463399</updated>
     </task>
-    <option name="localTasksCounter" value="84" />
+    <task id="LOCAL-00084" summary="corrected wa function and moved to utils">
+      <created>1565100446566</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1565100446566</updated>
+    </task>
+    <task id="LOCAL-00085" summary="minor fixes/reformatting">
+      <created>1565102743948</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1565102743948</updated>
+    </task>
+    <option name="localTasksCounter" value="86" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="240782000" />
+    <option name="totallyTimeSpent" value="245557000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -701,7 +700,7 @@
     <frame x="-1928" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49822694" visible="true" weight="0.10074627" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49822694" visible="true" weight="0.102345414" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -714,23 +713,21 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.5248227" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50146973" side_tool="true" weight="0.22617681" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="10" sideWeight="0.50177306" visible="true" weight="0.31744313" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="10" sideWeight="0.50177306" visible="true" weight="0.18634886" />
       <window_info anchor="bottom" id="Docker" order="11" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="12" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="0" width="273" height="492" id="Documentation" order="3" sideWeight="0.20793651" side_tool="true" visible="true" weight="0.09968017" />
+      <window_info anchor="right" x="0" y="0" width="273" height="492" id="Documentation" order="3" sideWeight="0.21038616" side_tool="true" visible="true" weight="0.1684435" />
       <window_info anchor="right" id="Database" order="4" weight="0.32928804" />
-      <window_info anchor="right" id="SciView" order="5" sideWeight="0.7920635" visible="true" weight="0.09968017" />
+      <window_info anchor="right" id="SciView" order="5" sideWeight="0.78961384" visible="true" weight="0.1684435" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="minor changes / reformatting" />
-    <MESSAGE value="reformatting / removed .cpu()" />
     <MESSAGE value="added path for spacy env" />
     <MESSAGE value="minor changes" />
     <MESSAGE value="modified Texts class structure&#10;added classifier and metrics functions" />
@@ -754,7 +751,9 @@
     <MESSAGE value="fixed default regressor to use" />
     <MESSAGE value="moved courses to separate folder" />
     <MESSAGE value="1st attempt at weighted avg function" />
-    <option name="LAST_COMMIT_MESSAGE" value="1st attempt at weighted avg function" />
+    <MESSAGE value="corrected wa function and moved to utils" />
+    <MESSAGE value="minor fixes/reformatting" />
+    <option name="LAST_COMMIT_MESSAGE" value="minor fixes/reformatting" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/../mimic-code/buildmimic/postgres/postgres_create_tables.sql" />
@@ -1105,46 +1104,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1343">
-          <caret line="90" column="33" selection-start-line="90" selection-start-column="33" selection-end-line="90" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/tests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="42" column="21" selection-start-line="42" selection-start-column="21" selection-end-line="42" selection-end-column="21" />
-          <folding>
-            <element signature="e#44#97#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1122">
-          <caret line="71" column="20" selection-start-line="71" selection-start-column="20" selection-end-line="71" selection-end-column="20" />
-          <folding>
-            <element signature="e#84#102#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2941">
@@ -1157,10 +1116,50 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/code_utils/general_utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="33" column="18" lean-forward="true" selection-start-line="33" selection-start-column="18" selection-end-line="33" selection-end-column="18" />
+        <state relative-caret-position="425">
+          <caret line="40" column="37" lean-forward="true" selection-start-line="40" selection-start-column="37" selection-end-line="40" selection-end-column="37" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/symptoms_classifier/tests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" column="28" lean-forward="true" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
+          <folding>
+            <element signature="e#44#97#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1717">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="65" column="8" selection-start-line="65" selection-start-column="8" selection-end-line="65" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+          <folding>
+            <element signature="e#84#103#0" expanded="true" />
           </folding>
         </state>
       </provider>

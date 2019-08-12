@@ -1,13 +1,15 @@
 # from https://stackabuse.com/python-for-nlp-sentiment-analysis-with-scikit-learn/
 
-import numpy as np
 import pandas as pd
 import re
-import nltk
-import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('Qt5Agg')  # need to use active backend to visualize plots (to get it run matplotlib.get_backend())
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
+matplotlib.use('Qt5Agg')  # need to use active backend to visualize plots (to get it run matplotlib.get_backend())
 data_source_url = "https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv"
 airline_tweets = pd.read_csv(data_source_url)
 
@@ -65,22 +67,17 @@ Vocab = ["I", "like", "to", "play", "football", "it", "is", "a", "good", "game",
 # TF  = (Frequency of a word in the document)/(Total words in the document)
 # IDF = Log((Total number of docs)/(Number of docs containing the word))
 
-from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import CountVectorizer
-
 vectorizer = CountVectorizer(max_features=2500, min_df=7, max_df=0.8, stop_words=stopwords.words('english'))
 processed_features = vectorizer.fit_transform(processed_features).toarray()
 
 ######################################################
 # DIVIDE TRAINING / TEST SETS
 ######################################################
-from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(processed_features, labels, test_size=0.2, random_state=0)
 
 ######################################################
 # RANDOM FOREST CLASSIFIER
 ######################################################
-from sklearn.ensemble import RandomForestClassifier
 
 # train model
 text_classifier = RandomForestClassifier(n_estimators=200, random_state=0)
@@ -88,7 +85,6 @@ text_classifier.fit(X_train, y_train)
 
 # make predictions and evaluate model
 predictions = text_classifier.predict(X_test)
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 print(confusion_matrix(y_test,predictions))
 print(classification_report(y_test,predictions))
 print(accuracy_score(y_test, predictions))
