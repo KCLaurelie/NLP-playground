@@ -68,6 +68,7 @@ class TextsToClassify:
         tokenized_text = tokenize_sentences(sentences, manually_clean_text=manually_clean_text)
         if update_obj:
             self.dataset['tokenized_text'] = tokenized_text
+            self.__setattr__('clean_text', manually_clean_text)
             print('object updated with tokenized text, to view use self.dataset.tokenized_text')
         return tokenized_text
 
@@ -85,12 +86,11 @@ class TextsToClassify:
         # TODO: add other embedding models?
         return w2v
 
-    def embed_text(self, embedding_model=None, update_obj=True):
+    def embed_text(self, embedding_model=None, update_obj=True, use_weights=False, keywords=None, context=10):
         if embedding_model is None:
             embedding_model = self.embedding_model
-        embedded_text = convert_snt2avgtoken(sentences=self.dataset[self.text_col],
-                                             w2v_model=embedding_model,
-                                             clean_text=True)
+        embedded_text = convert_snt2avgtoken(sentences=self.dataset[self.text_col], w2v_model=embedding_model,
+                                             clean_text=True, use_weights=use_weights, keywords=keywords, context=context)
         if update_obj:
             self.__setattr__('embedded_text', embedded_text)
             print('object updated with embedded text, to view use self.embedded_text')
