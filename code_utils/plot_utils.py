@@ -2,7 +2,18 @@ from matplotlib import pyplot as plt
 import matplotlib
 import seaborn as sns
 import numpy as np
+import pandas as pd
 # matplotlib.use('Qt5Agg')
+
+
+def plot_distribution(class_array, title):
+    plt.figure(title)
+    pd.DataFrame(class_array, columns=['Class']).Class.value_counts().plot(
+        kind='pie',
+        autopct='%.2f %%',
+    )
+    plt.axis('equal')
+    plt.title(title)
 
 
 def plot_multiple_ts(df,
