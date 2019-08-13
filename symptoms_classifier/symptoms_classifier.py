@@ -86,11 +86,14 @@ class TextsToClassify:
         # TODO: add other embedding models?
         return w2v
 
-    def embed_text(self, embedding_model=None, update_obj=True, use_weights=False, keywords=None, context=10):
+    def embed_text(self, embedding_model=None, clean_text=False, use_weights=False, keywords=None, context=10, update_obj=True):
         if embedding_model is None:
             embedding_model = self.embedding_model
-        embedded_text = convert_snt2avgtoken(sentences=self.dataset[self.text_col], w2v_model=embedding_model,
-                                             clean_text=True, use_weights=use_weights, keywords=keywords, context=context)
+        if 'tokenized_text' not in self.dataset.columns:
+            self.tokenize_text(manually_clean_text=clean_text, update_obj=True)
+        embedded_text = convert_snt2avgtoken(sentences=self.dataset.tokenized_text, w2v_model=embedding_model,
+                                             clean_text=True, use_weights=use_weights, keywords=keywords
+                                             , context=context, already_tokenized=True)
         if update_obj:
             self.__setattr__('embedded_text', embedded_text)
             print('object updated with embedded text, to view use self.embedded_text')

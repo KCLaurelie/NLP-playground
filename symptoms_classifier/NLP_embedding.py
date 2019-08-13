@@ -64,7 +64,7 @@ def tokenize_sentences(sentences, manually_clean_text=True):
     return tok_snts
 
 
-def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=False, keywords=None, context=10):
+def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=False, keywords=None, context=10, already_tokenized=False):
     """
     convert sentences to embedded sentences using pre-trained Word2Vec model
     :param sentences: pd.Series of sentences to vectorize
@@ -73,6 +73,7 @@ def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=Fals
     :param use_weights: use weight average instead f simple average, based on distance from specific keyword(s)
     :param keywords: string or list of strings to compute distance from for weighted average option
     :param context: number of tokens to use around the keywords for weighted average option
+    :param already_tokenized: set to True if sentences already in token format
     :return: embedded sentences
     """
     if isinstance(w2v_model, str):  # load model if saved in file
@@ -82,7 +83,8 @@ def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=Fals
     sentences_emb = np.zeros((len(sentences), size))  # to store embedded sentences
 
     # tokenize the text and further cleans it (needed otherwise it would take 1 token = 1 letter)
-    sentences = tokenize_sentences(sentences, manually_clean_text=clean_text)
+    if not already_tokenized:
+        sentences = tokenize_sentences(sentences, manually_clean_text=clean_text)
 
     # convert each sentence into the average sum of the vector representations of its tokens
     not_in_model = []
