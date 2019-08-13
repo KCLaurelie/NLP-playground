@@ -2,9 +2,9 @@
 from symptoms_classifier.symptoms_classifier import *
 import pandas as pd
 from symptoms_classifier.NLP_text_cleaning import clean_string, text2sentences, preprocess_text, parse_text
-from symptoms_classifier.NLP_embedding import fit_text2vec, transform_text2vec, convert_snt2avgtoken, tokenize_sentences
+from symptoms_classifier.NLP_embedding import *
 from gensim.models import Word2Vec
-
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def test_final():
     tweets = TextsToClassify(
@@ -15,9 +15,13 @@ def test_final():
         classifier_model='SVM')
     df = tweets.load_data()
     tkns = tweets.tokenize_text(manually_clean_text=True, update_obj=True)
+    tfidf = TfidfVectorizer(min_df=2, max_features=200, preprocessor=' '.join)
+    tfidf_vect_fit = tfidf.fit_transform(tweets.dataset.tokenized_text)
+    x_emb = pd.DataFrame(tfidf_vect_fit.toarray(), columns=tfidf.get_feature_names())
     w2v = tweets.train_embedding_model(min_count=3)
     w2v.wv['you']
     x_emb = tweets.embed_text(update_obj=True)
+    x_emb = tweets.embed_text(update_obj=False, use_weights=True, keywords=lemmatize_words(['virgin', 'awesome']))
 
     res = tweets.run_classifier(test_size=0.2)
     model = 'SVM with sigmoid kernel'
@@ -49,8 +53,8 @@ def classifier_test():
     data_clean = data[['airline_sentiment', 'text']].rename(columns={'airline_sentiment': 'class'})
     data_clean['text'] = preprocess_text(data_clean['text'])
     emb_algo = 'tfidf'  # 'word2vec'
-    vectorizer = fit_text2vec(data_clean['text'], embedding_algo=emb_algo, size=100)
-    processed_features = transform_text2vec(data_clean['text'], vectorizer, algo=emb_algo)
+    vectorizer = fit_embedding_model(data_clean['text'], embedding_algo=emb_algo, size=100)
+    processed_features = embed_sentences(data_clean['text'], vectorizer, algo=emb_algo)
     from sklearn.model_selection import train_test_split
     x_train, x_test, y_train, y_test = train_test_split(processed_features, data_clean['class'], test_size=0.8,
                                                         random_state=0)
@@ -95,25 +99,26 @@ def test0():
     clean_text = preprocess_text(txt)
     preprocess_text(txt, remove_stopwords=True, stemmer='snowball', lemmatizer=None)
     # vocab = [["cat", "say", "meow"], ["dog", "say", "woof"]]
-    w2v = fit_text2vec(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='tfidf', size=100)
+    w2v = fit_embedding_model(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='tfidf', size=100)
     list(w2v.vocabulary_.keys())[:10]
-    processed_features = transform_text2vec(clean_text, w2v, algo='tfidf')
+    processed_features = embed_sentences(clean_text, w2v, algo='tfidf')
 
-    w2v = fit_text2vec(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='word2vec', size=100)
+    w2v = fit_embedding_model(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='word2vec', size=100)
     list(w2v.wv.vocab)
     return 0
 
 
 def run_classifier_test(classifier_model, train_data, test_data):
+    from sklearn.model_selection import cross_val_predict
     train_text = preprocess_text(train_data['text'], remove_stopwords=True, stemmer=None, lemmatizer=None)
     test_text = test_data[['text']]
     train_class = train_data[['class']]
     test_class = test_data[['class']]
 
     # vectorize text data
-    vectorizer = fit_text2vec(train_text)
-    train_data_features = transform_text2vec(train_text, vectorizer)
-    test_data_features = transform_text2vec(test_text, vectorizer)
+    vectorizer = fit_embedding_model(train_text)
+    train_data_features = embed_sentences(train_text, vectorizer)
+    test_data_features = embed_sentences(test_text, vectorizer)
 
     # train classifier
     classifier = cutils.classifiers[classifier_model]
