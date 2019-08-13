@@ -24,7 +24,8 @@ def get_wa(sentence, keywords, context=10):
     """
     sentence = to_list(sentence)
     keywords = to_list(keywords)
-    kw_idx = [sentence.index(x) for x in keywords if x in sentence]
+    # kw_idx = [sentence.index(x) for x in keywords if x in sentence]
+    kw_idx = [sentence.index(s) for s in sentence if any(xs in s for xs in keywords)]
     weights = [0]*len(sentence)
     for i in kw_idx:
         left = (list(np.arange(0, 1 + 1 / context, 1 / context))[-i:] if i > 0 else [])
