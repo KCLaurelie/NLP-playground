@@ -1,10 +1,9 @@
 # from code_utils.global_variables import *
 from symptoms_classifier.symptoms_classifier import *
-import pandas as pd
-from symptoms_classifier.NLP_text_cleaning import clean_string, text2sentences, preprocess_text, parse_text
 from symptoms_classifier.NLP_embedding import *
 from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import TfidfVectorizer
+
 
 def test_final():
     tweets = TextsToClassify(
@@ -15,9 +14,6 @@ def test_final():
         classifier_model='SVM')
     df = tweets.load_data()
     tkns = tweets.tokenize_text(manually_clean_text=True, update_obj=True)
-    tfidf = TfidfVectorizer(min_df=2, max_features=200, preprocessor=' '.join)
-    tfidf_vect_fit = tfidf.fit_transform(tweets.dataset.tokenized_text)
-    x_emb = pd.DataFrame(tfidf_vect_fit.toarray(), columns=tfidf.get_feature_names())
     w2v = tweets.train_embedding_model(min_count=3)
     w2v.wv['you']
     x_emb = tweets.embed_text(update_obj=True)
@@ -31,6 +27,14 @@ def test_final():
                               binary=True, binary_main_class='negative',
                               save_model=True)
     y = tweets.dataset['class_numeric']
+
+    # tfidf testing
+    tfidf = TfidfVectorizer(min_df=2, max_features=200, preprocessor=' '.join)
+    tfidf_vect_fit = tfidf.fit_transform(tweets.dataset.tokenized_text)
+    x_emb = pd.DataFrame(tfidf_vect_fit.toarray(), columns=tfidf.get_feature_names())
+
+    text_series = pd.read_csv('list_docs_w2v.csv')
+    test = tokenize_text_series(text_series, manually_clean_text=True)
 
 
 def quick_embedding_ex(
@@ -130,13 +134,3 @@ def run_classifier_test(classifier_model, train_data, test_data):
     test_metrics = cutils.perf_metrics(test_class, test_preds)
     train_metrics = cutils.perf_metrics(train_class, train_preds)
     return {'test': test_metrics, 'train': train_metrics}
-
-
-def plot_distribution(class_array, title):
-    plt.figure(title)
-    pd.DataFrame(class_array, columns=['Class']).Class.value_counts().plot(
-        kind='pie',
-        autopct='%.2f %%',
-    )
-    plt.axis('equal')
-    plt.title(title)
