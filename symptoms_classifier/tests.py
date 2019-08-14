@@ -33,7 +33,7 @@ def test_final():
     tfidf_vect_fit = tfidf.fit_transform(tweets.dataset.tokenized_text)
     x_emb = pd.DataFrame(tfidf_vect_fit.toarray(), columns=tfidf.get_feature_names())
 
-    text_series = pd.read_csv('list_docs_w2v.csv')
+    text_series = pd.read_csv('files/list_docs_w2v.csv')
     test = tokenize_text_series(text_series, manually_clean_text=True)
 
 

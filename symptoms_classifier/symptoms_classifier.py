@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, accuracy_score
 import matplotlib
-from symptoms_classifier.NLP_embedding import convert_snt2avgtoken, tokenize_sentences
+from symptoms_classifier.NLP_embedding import convert_snt2avgtoken, tokenize_sentences, tokenize_text_series
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
 from code_utils.general_utils import super_read_csv
 import symptoms_classifier.classifiers_utils as cutils
@@ -79,7 +79,7 @@ class TextsToClassify:
         # train word2vec on tokenized text
         w2v = Word2Vec(self.dataset['tokenized_text'], size=size, window=window, min_count=min_count, workers=workers)
         if save_model:
-            w2v.save('word2vec.model')
+            w2v.save('files/word2vec.model')
         if update_obj:
             self.__setattr__('embedding_model', w2v)
             print('object updated with embedding model, to view use self.embedding_model')
