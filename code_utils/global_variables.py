@@ -13,6 +13,8 @@ code_path_slam = os.path.join(root_path, 'python_github')
 if os.path.exists(code_path_slam):
     os.chdir(code_path_slam)
     sys.path.append(os.path.join(code_path_slam, 'python_pkg'))
+    import nltk.data
+    nltk.data.path.append(r'T:\aurelie_mascio\software')
 
 # Spacy environment
 spacy_lib = os.path.join(root_path, r'spacy\Lib\site-packages')
