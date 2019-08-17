@@ -1,18 +1,18 @@
-import os
+#import os
 import numpy as np
 import pandas as pd
 from gensim.models import Word2Vec
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, accuracy_score
-import matplotlib
-from symptoms_classifier.NLP_embedding import convert_snt2avgtoken, tokenize_sentences, tokenize_text_series
+#import matplotlib
+from symptoms_classifier.NLP_embedding import *
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
 from code_utils.general_utils import super_read_csv
 import symptoms_classifier.classifiers_utils as cutils
 
-os.chdir(r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier')
-matplotlib.use('Qt5Agg')
+#os.chdir(r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier')
+#matplotlib.use('Qt5Agg')
 
 
 class TextsToClassify:
@@ -72,32 +72,50 @@ class TextsToClassify:
             print('object updated with tokenized text, to view use self.dataset.tokenized_text')
         return tokenized_text
 
-    def train_embedding_model(self, size=100, window=5, min_count=4, workers=4, clean_text=False
-                              , save_model=True, update_obj=True):
+    def train_embedding_model(self, embedding_algo='w2v', clean_text=False, save_model=True, update_obj=True,
+                              size=100, window=5, min_count=4,  # w2v parameters
+                              min_df=0.00125, max_df=0.99, ngram_range=(1, 5)  # tfidf params
+                              ):
         if 'tokenized_text' not in self.dataset.columns:
             self.tokenize_text(manually_clean_text=clean_text, update_obj=True)
+        if embedding_algo is None:
+            embedding_algo = self.embedding_algo
         # train word2vec on tokenized text
-        w2v = Word2Vec(self.dataset['tokenized_text'], size=size, window=window, min_count=min_count, workers=workers)
-        if save_model:
-            w2v.save('files/word2vec.model')
+        # w2v = Word2Vec(self.dataset['tokenized_text'], size=size, window=window, min_count=min_count, workers=workers)
+        # if save_model:
+        #     w2v.save('files/word2vec.model')
+
+        # TODO: to test
+        saved_model_path = os.getcwd() + '\\symptoms_classifier\\files\\' + os.path.basename(self.filepath) + '_' + embedding_algo if save_model else None
+        w2v = fit_embedding_model(sentences=self.dataset['tokenized_text'], embedding_algo=embedding_algo,
+                                  saved_model_path=saved_model_path,
+                                  size=size, window=window, min_count=min_count,
+                                  ngram_range=ngram_range, min_df=min_df, max_df=max_df)
         if update_obj:
             self.__setattr__('embedding_model', w2v)
+            self.__setattr__('embedding_algo', embedding_algo)
             print('object updated with embedding model, to view use self.embedding_model')
-        # TODO: add other embedding models?
+
         return w2v
 
-    def embed_text(self, embedding_model=None, clean_text=False, use_weights=False, keywords=None, context=10, update_obj=True):
+    def embed_text(self, embedding_algo=None, embedding_model=None, clean_text=False, use_weights=False, keywords=None, context=10, update_obj=True):
         if embedding_model is None:
             embedding_model = self.embedding_model
+        if embedding_algo is None:
+            embedding_algo = self.embedding_algo
         if 'tokenized_text' not in self.dataset.columns:
             self.tokenize_text(manually_clean_text=clean_text, update_obj=True)
-        embedded_text = convert_snt2avgtoken(sentences=self.dataset.tokenized_text, w2v_model=embedding_model,
-                                             clean_text=True, use_weights=use_weights, keywords=keywords
-                                             , context=context, already_tokenized=True)
+
+        # TODO: extend to other models?
+        embedded_text = embed_sentences(tkn_sentences=self.dataset.tokenized_text,
+                                        embedding_model=embedding_model, embedding_algo=embedding_algo,
+                                        emb_option='sentence', use_weights=use_weights, keywords=keywords, context=context)
+        # embedded_text = convert_snt2avgtoken(sentences=self.dataset.tokenized_text, w2v_model=embedding_model,
+        #                                      use_weights=use_weights, keywords=keywords, context=context)
         if update_obj:
             self.__setattr__('embedded_text', embedded_text)
             print('object updated with embedded text, to view use self.embedded_text')
-        # TODO: extend to other models?
+
         return embedded_text
 
     def make_binary_class(self, binary_main_class=None):

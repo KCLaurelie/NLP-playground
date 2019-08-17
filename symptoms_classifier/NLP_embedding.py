@@ -64,7 +64,7 @@ def tokenize_sentences(sentences, manually_clean_text=True):
     return tok_snts
 
 
-def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=False, keywords=None, context=10, already_tokenized=False):
+def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=False, keywords=None, context=10):
     """
     convert sentences to embedded sentences using pre-trained Word2Vec model
     :param sentences: pd.Series of sentences to vectorize
@@ -73,7 +73,6 @@ def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=Fals
     :param use_weights: use weight average instead f simple average, based on distance from specific keyword(s)
     :param keywords: string or list of strings to compute distance from for weighted average option
     :param context: number of tokens to use around the keywords for weighted average option
-    :param already_tokenized: set to True if sentences already in token format
     :return: embedded sentences
     """
     if isinstance(w2v_model, str):  # load model if saved in file
@@ -83,7 +82,7 @@ def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=Fals
     sentences_emb = np.zeros((len(sentences), size))  # to store embedded sentences
 
     # tokenize the text and further cleans it (needed otherwise it would take 1 token = 1 letter)
-    if not already_tokenized:
+    if not isinstance(sentences[0], list):
         sentences = tokenize_sentences(sentences, manually_clean_text=clean_text)
 
     # convert each sentence into the average sum of the vector representations of its tokens
@@ -108,40 +107,39 @@ def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=Fals
     return sentences_emb
 
 
-def embed_sentences(sentences, emb_model, algo='w2v', emb_option='sentence', clean_text=True,
+def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', emb_option='sentence',
                     use_weights=False, keywords=None, context=10):
     """
     embed text using pre-trained embedding model
-    :param sentences: pd.Series of texts (1 row = 1 sentence)
-    :param emb_model: pre-trained embedding model to use (model object or filepath to model)
-    :param algo: embedding model type (can be either tfidf or word2vec)
+    :param tkn_sentences: pd.Series of tokenized sentences (1 row = 1 list of tokens)
+    :param embedding_model: pre-trained embedding model to use (model object or filepath to model)
+    :param embedding_algo: embedding model type (can be either tfidf or word2vec)
     :param emb_option: represent each word separately ('word') or do an average sum by sentence (default) (only for w2v)
-    :param clean_text: set to true to remove punctuations and special characters (only keeps alphanumerics)
-    :param use_weights: see convert_snt2avgtoken documentation
-    :param keywords: see convert_snt2avgtoken documentation
-    :param context: see convert_snt2avgtoken documentation
+    :param use_weights: use weight average instead f simple average, based on distance from specific keyword(s)
+    :param keywords: string or list of strings to compute distance from for weighted average option
+    :param context: number of tokens to use around the keywords for weighted average option
     :return: embedded sentences
     """
-    algo = str(algo).lower()
+    embedding_algo = str(embedding_algo).lower()
 
-    if 'idf' in algo:
-        if isinstance(emb_model, str):  # load model if stored in file
-            emb_model = pickle.load(open(emb_model), "rb")
-        snt_emb = emb_model.transform(sentences).toarray()
-    elif 'word2vec' in algo or 'w2v' in algo:
-        if isinstance(emb_model, str):  # load model if stored in file
-            emb_model = Word2Vec.load(emb_model)
-        sentences = sentences.to_list()
+    if 'idf' in embedding_algo:
+        if isinstance(embedding_model, str):  # load model if stored in file
+            embedding_model = pickle.load(open(embedding_model), "rb")
+        snt_emb = embedding_model.transform(tkn_sentences).toarray()
+    elif 'word2vec' in embedding_algo or 'w2v' in embedding_algo:
+        if isinstance(embedding_model, str):  # load model if stored in file
+            embedding_model = Word2Vec.load(embedding_model)
 
         if emb_option == 'word':  # TODO: IS THIS WORKING ????
-            snt_emb = np.zeros((len(sentences), emb_model.wv.vector_size))
-            for idx, snt in enumerate(sentences):
-                snt_emb[idx] = [emb_model.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
+            snt_emb = np.zeros((len(tkn_sentences), embedding_model.wv.vector_size))
+            for idx, snt in enumerate(tkn_sentences):
+                snt_emb[idx] = [embedding_model.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
         else:  # Convert each sentence into the average sum of its tokens
-            snt_emb = convert_snt2avgtoken(sentences, w2v_model=emb_model, clean_text=clean_text,
-                                           use_weights=use_weights, keywords=keywords, context=context)
+            snt_emb = convert_snt2avgtoken(tkn_sentences, w2v_model=embedding_model, use_weights=use_weights
+                                           , keywords=keywords, context=context)
+
     else:
-        return 'unknown algo'
+        return 'unknown embedding_algo'
     return snt_emb
 
 
@@ -149,7 +147,7 @@ def fit_embedding_model(sentences, embedding_algo='w2v', saved_model_path=None, 
                         ngram_range=(1, 5), size=100, window=5, min_count=4, workers=4, min_df=0.00125, max_df=0.7):
     """
     train embedding model using series of texts (at the moment only allows tfidf and word2vec)
-    :param sentences: pd.Series of texts (1 row = 1 sentence)
+    :param sentences: pd.Series of texts or tokens (1 row = 1 sentence or 1 list of tokens)
     :param min_df: ignore words below that frequency (tfidf parameter)
     :param max_df: ignore words above that frequency (tfidf parameter)
     :param sublinear_tf: replace tf with 1 + log(tf) (tfidf parameter)
@@ -165,7 +163,8 @@ def fit_embedding_model(sentences, embedding_algo='w2v', saved_model_path=None, 
     """
 
     embedding_algo = str(embedding_algo).lower()
-    tok_snts = tokenize_sentences(sentences, manually_clean_text=True)  # tokenize sentences
+    if not isinstance(sentences[0], list):  # sentences have not been tokenized
+        sentences = tokenize_sentences(sentences, manually_clean_text=True)  # tokenize sentences
     if stop_words == 'english':
         stop_words = stopwords.words('english')
         stop_words = [x for x in stop_words if ('no' not in x) and ('n\'t' not in x)]  # we want to keep negations
@@ -173,14 +172,14 @@ def fit_embedding_model(sentences, embedding_algo='w2v', saved_model_path=None, 
         _vectorizer = TfidfVectorizer(min_df=min_df, max_df=max_df, ngram_range=ngram_range, stop_words=stop_words,
                                       sublinear_tf=sublinear_tf, use_idf=True, preprocessor=' '.join)
 
-        w2v = _vectorizer.fit(tok_snts)
+        w2v = _vectorizer.fit(sentences)
         if saved_model_path is not None:
-            with open(saved_model_path + '.pickle', 'wb') as fin:
+            with open(saved_model_path + '_mindf_' + str(min_df) + '_maxdf_' + str(max_df) + '_ngram_' + str(ngram_range) + '.pickle', 'wb') as fin:
                 pickle.dump(w2v, fin)
     elif 'word2vec' in embedding_algo or 'w2v' in embedding_algo:
-        w2v = Word2Vec(tok_snts, size=size, window=window, min_count=min_count, workers=workers)  # train word2vec
+        w2v = Word2Vec(sentences, size=size, window=window, min_count=min_count, workers=workers)  # train word2vec
         if saved_model_path is not None:
-            w2v.save(saved_model_path + '.model')
+            w2v.save(saved_model_path + '_size_' + str(size) + '_win_' + str(window) + '_mincount_' + str(min_count) + '.model')
     else:
         return 'unknown embedding_algo'
     return w2v

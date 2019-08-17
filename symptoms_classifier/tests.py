@@ -14,10 +14,10 @@ def test_final():
         classifier_model='SVM')
     df = tweets.load_data()
     tkns = tweets.tokenize_text(manually_clean_text=True, update_obj=True)
-    w2v = tweets.train_embedding_model(min_count=3)
+    w2v = tweets.train_embedding_model(embedding_algo='w2v')
     w2v.wv['you']
-    x_emb = tweets.embed_text(update_obj=True)
-    x_emb = tweets.embed_text(update_obj=False, use_weights=True, keywords=lemmatize_words(['virgin', 'awesome']))
+    x_emb = tweets.embed_text(update_obj=True, embedding_algo='w2v')
+    x_emb = tweets.embed_text(update_obj=False, embedding_algo='w2v', use_weights=True, keywords=lemmatize_words(['virgin', 'awesome']))
 
     res = tweets.run_classifier(test_size=0.2)
     model = 'SVM with sigmoid kernel'
@@ -37,18 +37,17 @@ def test_final():
     test = tokenize_text_series(text_series, manually_clean_text=True)
 
 
-def quick_embedding_ex(
-        data_file='https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv',
-        text_col='text',
-        class_col='airline_sentiment'):
-    data = pd.read_csv(data_file)[[class_col, text_col]]
-    data[class_col] = data[class_col].replace({'positive': 1, 'negative': -1, 'neutral': 0})
-    sentences = data[text_col]
-    y = data[class_col]
-    tok_snts = tokenize_sentences(sentences, manually_clean_text=True)  # tokenize sentences
+def trainw2v(
+        file_path='https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv',
+        text_col='text'):
+    data = pd.read_csv(file_path)
+    tok_snts = tokenize_sentences(data[text_col], manually_clean_text=True)  # tokenize sentences
+    print('text tokenized')
     w2v_model = Word2Vec(tok_snts, size=100, window=5, min_count=4, workers=4)  # train word2vec
-    x_emb = convert_snt2avgtoken(sentences, w2v_model, clean_text=True)  # embed sentences
-    return [x_emb, y]
+    w2v_model.save(os.path.basename(file_path).replace('.csv', '_w2v.model'))
+    print('w2v model saved')
+    # x_emb = convert_snt2avgtoken(data[text_col], w2v_model, clean_text=True)  # embed sentences
+    return 0
 
 
 def classifier_test():
@@ -58,7 +57,7 @@ def classifier_test():
     data_clean['text'] = preprocess_text(data_clean['text'])
     emb_algo = 'tfidf'  # 'word2vec'
     vectorizer = fit_embedding_model(data_clean['text'], embedding_algo=emb_algo, size=100)
-    processed_features = embed_sentences(data_clean['text'], vectorizer, algo=emb_algo)
+    processed_features = embed_sentences(data_clean['text'], vectorizer, embedding_algo=emb_algo)
     from sklearn.model_selection import train_test_split
     x_train, x_test, y_train, y_test = train_test_split(processed_features, data_clean['class'], test_size=0.8,
                                                         random_state=0)
@@ -105,7 +104,7 @@ def test0():
     # vocab = [["cat", "say", "meow"], ["dog", "say", "woof"]]
     w2v = fit_embedding_model(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='tfidf', size=100)
     list(w2v.vocabulary_.keys())[:10]
-    processed_features = embed_sentences(clean_text, w2v, algo='tfidf')
+    processed_features = embed_sentences(clean_text, w2v, embedding_algo='tfidf')
 
     w2v = fit_embedding_model(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='word2vec', size=100)
     list(w2v.wv.vocab)
