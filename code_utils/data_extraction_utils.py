@@ -1,20 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Mar 30 08:26:08 2019
-
-@author: AMascio
-"""
+from code_utils.global_variables import *
 import os
 import pandas as pd
 import code_utils.general_utils as gutils
-import nltk.data
 from nltk import tokenize
 
-root_path = r'T:\aurelie_mascio'
-CRIS_data_path = root_path + '\\CRIS data'
-os.chdir(root_path + r'\python_scripts')  # directory with python library
 headers_dict_file = root_path + r'\python_scripts\CRIS_data_dict.csv'
-nltk.data.path.append(root_path + '\\software')
 
 
 # GENERATE RANDOM SAMPLE OF FILES
