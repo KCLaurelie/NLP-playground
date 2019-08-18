@@ -21,7 +21,7 @@ def test_final():
     tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
     x_embidf = tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
 
-    res = tweets.run_classifier(test_size=0.2)
+    res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative')
     model = 'SVM with sigmoid kernel'
     for model in cutils.classifiers.keys():
         tweets.run_classifier(classifier_model=model,  # 'SVM with sigmoid kernel'
