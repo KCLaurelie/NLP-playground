@@ -16,8 +16,10 @@ def test_final():
     tkns = tweets.tokenize_text(manually_clean_text=True, update_obj=True)
     w2v = tweets.train_embedding_model(embedding_algo='w2v')
     w2v.wv['you']
-    x_emb = tweets.embed_text(update_obj=True, embedding_algo='w2v')
-    x_emb = tweets.embed_text(update_obj=False, embedding_algo='w2v', use_weights=True, keywords=lemmatize_words(['virgin', 'awesome']))
+    x_embw2v = tweets.embed_text(update_obj=True, embedding_algo='w2v')
+    x_embw2v2 = tweets.embed_text(update_obj=True, embedding_algo='w2v', use_weights=True, keywords=['virgin', 'awesome'])
+    tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
+    x_embidf = tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
 
     res = tweets.run_classifier(test_size=0.2)
     model = 'SVM with sigmoid kernel'

@@ -144,13 +144,14 @@ def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', emb_op
 
 
 def fit_embedding_model(sentences, embedding_algo='w2v', saved_model_path=None, stop_words=None, sublinear_tf=True,
-                        ngram_range=(1, 5), size=100, window=5, min_count=4, workers=4, min_df=0.00125, max_df=0.7):
+                        ngram_range=(1, 5), size=100, window=5, min_count=4, workers=4, min_df=0.00125, max_df=0.7, max_features=None):
     """
     train embedding model using series of texts (at the moment only allows tfidf and word2vec)
     :param sentences: pd.Series of texts or tokens (1 row = 1 sentence or 1 list of tokens)
     :param min_df: ignore words below that frequency (tfidf parameter)
     :param max_df: ignore words above that frequency (tfidf parameter)
     :param sublinear_tf: replace tf with 1 + log(tf) (tfidf parameter)
+    :param max_features: only consider the top max_features ordered by term frequency across the corpus (tfidf parameter)
     :param ngram_range: lower and upper boundary of the range of n-values for n-grams to be extracted (tfidf parameter)
     :param min_count: Ignores all words with total frequency lower than this (Word2Vec parameter)
     :param window: Maximum distance between the current and predicted word within a sentence (Word2Vec parameter)
@@ -170,7 +171,7 @@ def fit_embedding_model(sentences, embedding_algo='w2v', saved_model_path=None, 
         stop_words = [x for x in stop_words if ('no' not in x) and ('n\'t' not in x)]  # we want to keep negations
     if 'idf' in embedding_algo:
         _vectorizer = TfidfVectorizer(min_df=min_df, max_df=max_df, ngram_range=ngram_range, stop_words=stop_words,
-                                      sublinear_tf=sublinear_tf, use_idf=True, preprocessor=' '.join)
+                                      sublinear_tf=sublinear_tf, use_idf=True, preprocessor=' '.join, max_features=max_features)
 
         w2v = _vectorizer.fit(sentences)
         if saved_model_path is not None:

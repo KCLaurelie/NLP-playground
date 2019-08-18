@@ -74,7 +74,7 @@ class TextsToClassify:
 
     def train_embedding_model(self, embedding_algo='w2v', clean_text=False, save_model=True, update_obj=True,
                               size=100, window=5, min_count=4,  # w2v parameters
-                              min_df=0.00125, max_df=0.99, ngram_range=(1, 5)  # tfidf params
+                              min_df=0.00125, max_df=0.99, ngram_range=(1, 5), max_features=None  # tfidf params
                               ):
         if 'tokenized_text' not in self.dataset.columns:
             self.tokenize_text(manually_clean_text=clean_text, update_obj=True)
@@ -90,7 +90,7 @@ class TextsToClassify:
         w2v = fit_embedding_model(sentences=self.dataset['tokenized_text'], embedding_algo=embedding_algo,
                                   saved_model_path=saved_model_path,
                                   size=size, window=window, min_count=min_count,
-                                  ngram_range=ngram_range, min_df=min_df, max_df=max_df)
+                                  ngram_range=ngram_range, min_df=min_df, max_df=max_df, max_features=max_features)
         if update_obj:
             self.__setattr__('embedding_model', w2v)
             self.__setattr__('embedding_algo', embedding_algo)
