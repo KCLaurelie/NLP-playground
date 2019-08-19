@@ -1,5 +1,8 @@
 import sys
 import os
+import csv
+
+csv.field_size_limit(200000000)
 
 if os.path.exists(r'T:\aurelie_mascio'):  # working on SLaM machine
     root_path = r'T:\aurelie_mascio'
