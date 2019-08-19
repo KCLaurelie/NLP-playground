@@ -1,4 +1,3 @@
-# from code_utils.global_variables import *
 from symptoms_classifier.symptoms_classifier import *
 from symptoms_classifier.NLP_embedding import *
 from gensim.models import Word2Vec
@@ -17,7 +16,7 @@ def test_final():
     w2v = tweets.train_embedding_model(embedding_algo='w2v')
     w2v.wv['you']
     x_embw2v = tweets.embed_text(update_obj=True, embedding_algo='w2v')
-    x_embw2v2 = tweets.embed_text(update_obj=True, embedding_algo='w2v', use_weights=True, keywords=['virgin', 'awesome'])
+    x_embw2v2 = tweets.embed_text(update_obj=False, embedding_algo='w2v', use_weights=True, keywords=['virgin', 'awesome'])
     tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
     x_embidf = tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
 
@@ -42,11 +41,11 @@ def test_final():
 def trainw2v(
         file_path='https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv',
         text_col='text'):
-    data = pd.read_csv(file_path)
+    data = pd.read_csv(file_path, low_memory=False, header=0, encoding='utf8', engine='c', error_bad_lines=False)
     tok_snts = tokenize_sentences(data[text_col], manually_clean_text=True)  # tokenize sentences
     print('text tokenized')
     w2v_model = Word2Vec(tok_snts, size=100, window=5, min_count=4, workers=4)  # train word2vec
-    w2v_model.save(os.path.basename(file_path).replace('.csv', '_w2v.model'))
+    w2v_model.save(file_path.replace('.csv', '_w2v.model'))
     print('w2v model saved')
     # x_emb = convert_snt2avgtoken(data[text_col], w2v_model, clean_text=True)  # embed sentences
     return 0

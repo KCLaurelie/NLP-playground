@@ -1,17 +1,15 @@
+from code_utils.global_variables import *
 import pickle  # to save models
-import nltk
 from gensim.models import Word2Vec
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.feature_extraction import text
+from sklearn.feature_extraction.text import TfidfVectorizer
 from symptoms_classifier.NLP_text_cleaning import *
 import numpy as np
 from nltk import tokenize
 from nltk.corpus import stopwords
 import code_utils.general_utils as gutils
-
 # spacy stuff
-from code_utils.global_variables import *
 import spacy
+import nltk
 nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
 nltk.download('wordnet')
 
@@ -30,37 +28,49 @@ def top_features_idf(vectorizer, top_n=2):
     return _top_features
 
 
-def tokenize_text_series(text_series, manually_clean_text=True):
+def tokenize_text_series(text_series, manually_clean_text=True, output_file_path=None):
     """
     tokenizes series of texts using spacy (first splits in sentences then tokens)
     :param text_series: pd.Series of texts
     :param manually_clean_text: set to True to expand contractions etc
+    :param output_file_path: to save tokenized sentences in a file
     :return:
     """
     snt = pd.Series()
     for rawtext in text_series:
         snt_tmp = text2sentences(rawtext, remove_punctuation=False)
         snt = snt.append(snt_tmp, ignore_index=True)
-    res = tokenize_sentences(snt, manually_clean_text=manually_clean_text)
+    res = tokenize_sentences(snt, manually_clean_text=manually_clean_text, output_file_path=output_file_path)
     return res
 
 
-def tokenize_sentences(sentences, manually_clean_text=True):
+def tokenize_sentences(sentences, manually_clean_text=True, output_file_path=None):
     """
     tokenize text using spacy
     :param sentences: pd.Series of sentences
     :param manually_clean_text: set to True to expand contractions etc
+    :param output_file_path: to save tokenized sentences in a file
     :return: list of tokenized sentences
     """
     tok_snts = []
-    for snt in sentences:
-        if manually_clean_text:
-            snt = clean_string(snt, remove_punctuation=True)
-        # else:
-        #     snt = re.sub(r'[^a-zA-Z0-9\'\s]', ' ', snt)
-        tkns = [tkn.lemma_.lower() for tkn in nlp.tokenizer(snt.replace('…', '. '))
-                if (not tkn.is_punct) and (not tkn.is_space) and tkn.is_ascii]
-        if len(tkns) > 0: tok_snts.append(tkns)
+    if output_file_path is not None:
+        with open(output_file_path, 'w') as myfile:
+            wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+            for snt in sentences:
+                if manually_clean_text:
+                    snt = clean_string(snt, remove_punctuation=True)
+                tkns = [tkn.lemma_.lower() for tkn in nlp.tokenizer(snt.replace('…', '. '))
+                        if (not tkn.is_punct) and (not tkn.is_space) and tkn.is_ascii]
+                if len(tkns) > 0:
+                    tok_snts.append(tkns)
+                    wr.writerow([tkns])
+    else:
+        for snt in sentences:
+            if manually_clean_text:
+                snt = clean_string(snt, remove_punctuation=True)
+            tkns = [tkn.lemma_.lower() for tkn in nlp.tokenizer(snt.replace('…', '. '))
+                    if (not tkn.is_punct) and (not tkn.is_space) and tkn.is_ascii]
+            if len(tkns) > 0: tok_snts.append(tkns)
     return tok_snts
 
 

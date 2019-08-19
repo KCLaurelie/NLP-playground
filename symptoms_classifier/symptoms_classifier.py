@@ -63,9 +63,9 @@ class TextsToClassify:
         print('data loaded')
         return data
 
-    def tokenize_text(self, manually_clean_text=True, update_obj=True):
+    def tokenize_text(self, manually_clean_text=True, update_obj=True, output_file_path=None):
         sentences = self.dataset[self.text_col]
-        tokenized_text = tokenize_sentences(sentences, manually_clean_text=manually_clean_text)
+        tokenized_text = tokenize_sentences(sentences, manually_clean_text=manually_clean_text, output_file_path=output_file_path)
         if update_obj:
             self.dataset['tokenized_text'] = tokenized_text
             self.__setattr__('clean_text', manually_clean_text)
@@ -155,7 +155,9 @@ class TextsToClassify:
         classifier = cutils.load_classifier(classifier_model)
         classifier.fit(x_emb_train, y_train)
         if save_model:
-            cutils.save_classifier_to_file(classifier, filename=str(classifier_model), timestamp=True)
+            saved_model_path = os.getcwd() + '\\symptoms_classifier\\files\\' + os.path.basename(
+                self.filepath) + '_' + str(classifier_model)
+            cutils.save_classifier_to_file(classifier, filename=saved_model_path, timestamp=True)
 
         # test classifier
         test_preds = classifier.predict(x_emb_test)
