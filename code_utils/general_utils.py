@@ -1,13 +1,11 @@
+from code_utils.global_variables import *
 import os
 import pandas as pd
 import numpy as np
 import datetime
-import csv
 from collections import OrderedDict
 # import pyximport
 # pyximport.install()
-
-csv.field_size_limit(200000000)
 
 
 ##############################################################################
