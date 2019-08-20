@@ -14,7 +14,7 @@ classifiers = {
     'Random Forest': ensemble.RandomForestClassifier(criterion='entropy', n_jobs=10, class_weight='balanced'),
     'Logistic Regression': linear_model.LogisticRegression(C=1e5, solver='lbfgs', multi_class='multinomial'
                                                            , class_weight='balanced', max_iter=1000),
-    'Logistic Regression CV': linear_model.LogisticRegressionCV(class_weight='balanced'),
+    'Logistic Regression CV': linear_model.LogisticRegressionCV(class_weight='balanced', solver='liblinear'),
     'Linear SVM': svm.LinearSVC(multi_class='crammer_singer', class_weight='balanced'),
     'SVM': svm.SVC(gamma='scale', class_weight='balanced'),
     'SVM with linear kernel': svm.SVC(kernel='linear', class_weight='balanced'),

@@ -137,7 +137,7 @@ class TextsToClassify:
             self.dataset['class_numeric'] = lb_make.fit_transform(self.dataset[self.class_col])
             return 0
 
-    def run_classifier(self, classifier_model=None, binary=None, binary_main_class=None, test_size=0.2, save_model=True):
+    def run_classifier(self, classifier_model=None, binary=None, binary_main_class=None, test_size=0.2, random_state=0, save_model=True):
         # if object default values not overriden
         if binary is None: binary = self.binary
         if classifier_model is None: classifier_model = self.classifier_model
@@ -149,7 +149,7 @@ class TextsToClassify:
             self.make_numeric_class()
         text_class = self.dataset['class_numeric']
 
-        x_emb_train, x_emb_test, y_train, y_test = train_test_split(self.embedded_text, text_class, test_size=test_size)
+        x_emb_train, x_emb_test, y_train, y_test = train_test_split(self.embedded_text, text_class, test_size=test_size, random_state=random_state)
 
         # train classifier
         classifier = cutils.load_classifier(classifier_model)
