@@ -47,7 +47,7 @@ class TextsToClassify:
                 try:
                     data = pd.read_csv(self.filepath, header=0)
                 except:
-                    data = super_read_csv(self.filepath)
+                    data = pd.read_csv(self.filepath, header=0, engine='python', encoding='ISO-8859-1')
             elif self.filepath.endswith('.txt'):
                 data = preprocess_text(self.filepath, remove_stopwords=False, stemmer=None, lemmatizer=None,
                                        keywords=None, remove_punctuation=True)
@@ -153,7 +153,11 @@ class TextsToClassify:
 
         # train classifier
         classifier = cutils.load_classifier(classifier_model)
-        classifier.fit(x_emb_train, y_train)
+        try:
+            classifier.fit(x_emb_train, y_train)
+        except:
+            return 'classification algo failed'
+
         if save_model:
             saved_model_path = os.getcwd() + '\\symptoms_classifier\\files\\' + os.path.basename(
                 self.filepath) + '_' + str(classifier_model)
@@ -168,18 +172,24 @@ class TextsToClassify:
         self.dataset.loc[y_train.index, 'preds'] = train_preds
         self.dataset.loc[y_test.index, 'preds'] = test_preds
 
+        title = str(classifier)
+        classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
+        test_report = classification_report(y_test, test_preds, output_dict=True)
+        df_test = pd.DataFrame(test_report).transpose()
+        df_test['accuracy'] = accuracy_score(y_test, test_preds)
+        df_test.index.names = ['TEST']
+
+        train_report = classification_report(y_train, train_preds, output_dict=True)
+        df_train = pd.DataFrame(train_report).transpose()
+        df_train['accuracy'] = accuracy_score(y_train, train_preds)
+        df_train.index.names = ['TRAIN']
+
         print(str(classifier), '\n',
-              'CLASSES\n',
-              self.dataset[['class_numeric', self.class_col]].drop_duplicates(),
-              '\n\n',
-              'TEST SET\n', 'accuracy:',
-              accuracy_score(y_test, test_preds), '\n',
-              classification_report(y_test, test_preds), '\n',
-              'TRAIN SET\n', 'accuracy:',
-              accuracy_score(y_train, train_preds), '\n',
-              classification_report(y_train, train_preds)
+              'CLASSES\n', classes, '\n\n',
+              'TEST SET\n', df_test,
+              'TRAIN SET\n', df_train
               )
-        return 0
+        return [title, classes, df_test, df_train]
 
     def run_all(self, manually_clean_text=True, embedding_model=None, classifier_model=None, binary=None,
                 binary_main_class=None, test_size=0.2):
