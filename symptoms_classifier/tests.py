@@ -1,7 +1,7 @@
 from symptoms_classifier.symptoms_classifier import *
 from symptoms_classifier.NLP_embedding import *
 from gensim.models import Word2Vec
-from sklearn.feature_extraction.text import TfidfVectorizer
+from code_utils.general_utils import list_to_excel
 
 
 def test_final():
@@ -16,23 +16,22 @@ def test_final():
     w2v = tweets.train_embedding_model(embedding_algo='w2v')
     w2v.wv['you']
     x_embw2v = tweets.embed_text(update_obj=True, embedding_algo='w2v')
-    x_embw2v2 = tweets.embed_text(update_obj=False, embedding_algo='w2v', use_weights=True, keywords=['virgin', 'awesome'])
+    x_embw2v2 = tweets.embed_text(update_obj=False, embedding_algo='w2v', use_weights=True,
+                                  keywords=['virgin', 'awesome'])
     tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
     x_embidf = tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
 
     res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative')
-    model = 'SVM with sigmoid kernel'
-    for model in cutils.classifiers.keys():
-        tweets.run_classifier(classifier_model=model,  # 'SVM with sigmoid kernel'
-                              test_size=0.2,
-                              binary=True, binary_main_class='negative',
-                              save_model=True)
-    y = tweets.dataset['class_numeric']
+    row = list_to_excel(res, 'test.xlsx', sheet_name='test2', startrow=0, startcol=0)
 
-    # tfidf testing
-    tfidf = TfidfVectorizer(min_df=2, max_features=200, preprocessor=' '.join)
-    tfidf_vect_fit = tfidf.fit_transform(tweets.dataset.tokenized_text)
-    x_emb = pd.DataFrame(tfidf_vect_fit.toarray(), columns=tfidf.get_feature_names())
+    for model in cutils.classifiers.keys():
+        row = 0
+        res = tweets.run_classifier(classifier_model=model,  # 'SVM with sigmoid kernel'
+                                    test_size=0.2,
+                                    binary=True, binary_main_class='negative',
+                                    save_model=False)
+        row += list_to_excel(res, 'test3.xlsx', startrow=0, startcol=0)
+
 
     text_series = pd.read_csv('files/list_docs_w2v.csv')
     test = tokenize_text_series(text_series, manually_clean_text=True)
