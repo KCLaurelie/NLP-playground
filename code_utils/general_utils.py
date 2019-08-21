@@ -11,6 +11,21 @@ from collections import OrderedDict
 ##############################################################################
 # GENERAL UTILS FUNCTIONS
 ##############################################################################
+def list_to_excel(lst_to_print, filepath='out.xlsx', sheet_name='Sheet1', startrow=0, startcol=0):
+    mode = 'a'if os.path.isfile(filepath) else 'w'
+    writer = pd.ExcelWriter(filepath, engine='openpyxl', mode=mode)
+    cpt_row = startrow
+
+    lst_to_print = to_list(lst_to_print)
+    for i in lst_to_print:
+        to_print = i if isinstance(i, pd.core.frame.DataFrame) else pd.DataFrame([i])
+        print(to_print)
+        to_print.to_excel(writer, sheet_name=sheet_name, startrow=cpt_row, startcol=startcol)
+        cpt_row += len(to_print) + 2
+    writer.save()
+    return cpt_row
+
+
 def get_wa(sentence, keywords, context=10):
     """
     generate vector of weighted averages given specific keywords in a tokenized sentence.
@@ -67,6 +82,8 @@ def to_list(x):
         res = []
     elif isinstance(x, str):
         res = [x]
+    elif isinstance(x, list):
+        res = x
     else:
         res = list(x)
     return res
