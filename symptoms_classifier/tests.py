@@ -32,7 +32,6 @@ def test_final():
                                     save_model=False)
         row += list_to_excel(res, 'test3.xlsx', startrow=0, startcol=0)
 
-
     text_series = pd.read_csv('files/list_docs_w2v.csv')
     test = tokenize_text_series(text_series, manually_clean_text=True)
 
