@@ -7,19 +7,19 @@ from sklearn.externals import joblib
 
 
 classifiers = {
-    'Multinomial NB': naive_bayes.MultinomialNB(),
-    'Gaussian NB': naive_bayes.GaussianNB(),
-    'KNN': neighbors.KNeighborsClassifier(n_neighbors=5, n_jobs=-1, weights='distance'),
-    'Decision Tree': tree.DecisionTreeClassifier(random_state=0, class_weight='balanced'),
-    'Random Forest': ensemble.RandomForestClassifier(criterion='entropy', n_jobs=10, class_weight='balanced'),
-    'Logistic Regression': linear_model.LogisticRegression(C=1e5, solver='lbfgs', multi_class='multinomial'
-                                                           , class_weight='balanced', max_iter=1000),
-    'Logistic Regression CV': linear_model.LogisticRegressionCV(class_weight='balanced', solver='liblinear'),
-    'Linear SVM': svm.LinearSVC(multi_class='crammer_singer', class_weight='balanced'),
-    'SVM': svm.SVC(gamma='scale', class_weight='balanced'),
-    'SVM with linear kernel': svm.SVC(kernel='linear', class_weight='balanced'),
-    'SVM with sigmoid kernel': svm.SVC(kernel='sigmoid', class_weight='balanced'),
-    'SVM with poly kernel': svm.SVC(kernel='poly', class_weight='balanced')
+    'Multinomial NB': naive_bayes.MultinomialNB(random_state=0),
+    'Gaussian NB': naive_bayes.GaussianNB(random_state=0),
+    'KNN': neighbors.KNeighborsClassifier(n_neighbors=5, n_jobs=-1, weights='distance', random_state=0),
+    'Decision Tree': tree.DecisionTreeClassifier(class_weight='balanced', random_state=0),
+    'Random Forest': ensemble.RandomForestClassifier(criterion='entropy', n_jobs=10, class_weight='balanced', random_state=0),
+    'Logistic Reg': linear_model.LogisticRegression(C=1e5, solver='lbfgs', multi_class='multinomial'
+                                                           , class_weight='balanced', max_iter=1000, random_state=0),
+    'Logistic Reg CV': linear_model.LogisticRegressionCV(class_weight='balanced', solver='liblinear', random_state=0),
+    'Linear SVM': svm.LinearSVC(multi_class='crammer_singer', class_weight='balanced', random_state=0),
+    'SVM': svm.SVC(gamma='scale', class_weight='balanced', random_state=0),
+    'SVM linear kernel': svm.SVC(kernel='linear', class_weight='balanced', random_state=0),
+    'SVM sigmoid kernel': svm.SVC(kernel='sigmoid', class_weight='balanced', random_state=0),
+    'SVM poly kernel': svm.SVC(kernel='poly', class_weight='balanced', random_state=0)
 }
 
 
