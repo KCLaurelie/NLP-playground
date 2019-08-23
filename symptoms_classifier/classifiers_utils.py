@@ -7,9 +7,9 @@ from sklearn.externals import joblib
 
 
 classifiers = {
-    'Multinomial NB': naive_bayes.MultinomialNB(random_state=0),
-    'Gaussian NB': naive_bayes.GaussianNB(random_state=0),
-    'KNN': neighbors.KNeighborsClassifier(n_neighbors=5, n_jobs=-1, weights='distance', random_state=0),
+    'Multinomial NB': naive_bayes.MultinomialNB(),
+    'Gaussian NB': naive_bayes.GaussianNB(),
+    'KNN': neighbors.KNeighborsClassifier(n_neighbors=5, n_jobs=-1, weights='distance'),
     'Decision Tree': tree.DecisionTreeClassifier(class_weight='balanced', random_state=0),
     'Random Forest': ensemble.RandomForestClassifier(criterion='entropy', n_jobs=10, class_weight='balanced', random_state=0),
     'Logistic Reg': linear_model.LogisticRegression(C=1e5, solver='lbfgs', multi_class='multinomial'
