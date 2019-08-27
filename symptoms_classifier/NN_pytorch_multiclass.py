@@ -1,35 +1,26 @@
 import numpy as np
-import pandas as pd
 import sklearn.metrics
-import matplotlib.pyplot as plt
 import matplotlib
-import seaborn as sns
 import torch
 from torch import nn
 import torch.optim as optim
 from sklearn.model_selection import train_test_split
-from symptoms_classifier.tests import quick_embedding_ex
-
 matplotlib.use('Qt5Agg')
 np.random.seed(42)
 
-# testing dataset
-x_emb, y = quick_embedding_ex(
-    data_file="https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv",
-    text_col='text',
-    class_col='airline_sentiment')
 
-
-def train_NN(x_emb, y, test_size=0.2):
+def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5):
     ####################################################################################################################
     # 1. split dataset in train/test
     ####################################################################################################################
-    x_train, x_test, y_train, y_test = train_test_split(x_emb, y, test_size=test_size)
+    x_train, x_test, y_train, y_test = train_test_split(x_emb, y, test_size=test_size, random_state=random_state)
+
+    weights = list(y_train.value_counts()/y_train.count())
+
     x_train = torch.tensor(x_train, dtype=torch.float32)
     y_train = torch.tensor(y_train, dtype=torch.long)
     x_test = torch.tensor(x_test, dtype=torch.float32)
     y_test = torch.tensor(y_test, dtype=torch.long)
-
 
     ####################################################################################################################
     # 2. build network
@@ -39,7 +30,8 @@ def train_NN(x_emb, y, test_size=0.2):
             super(Net, self).__init__()
             self.fc1 = nn.Linear(300, 100)
             self.fc2 = nn.Linear(100, 3)  # 3 classes = 3 neurons
-            self.d1 = nn.Dropout(0.5)  # do we want dropout?
+            if dropout is not None:
+                self.d1 = nn.Dropout(dropout)  # do we want dropout?
 
         def forward(self, x):
             x = self.d1(torch.relu(self.fc1(x)))
@@ -47,9 +39,12 @@ def train_NN(x_emb, y, test_size=0.2):
             return x
 
     net = Net()
-    criterion = nn.CrossEntropyLoss()
-    # to fix the imbalance: add weights to the cross entropy (here we tell the model we have 10 times more negatives)
-    # criterion = nn.CrossEntropyLoss(weight=torch.tensor([0.1, 0.9]))
+    if class_weight == 'balanced':
+        # to fix the imbalance: add weights to the cross entropy
+        criterion = nn.CrossEntropyLoss(weight=torch.tensor(weights))
+    else:
+        criterion = nn.CrossEntropyLoss()
+
     optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.99)  # TODO: move to Adam?
 
     ####################################################################################################################
