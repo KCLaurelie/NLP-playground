@@ -1,6 +1,8 @@
 from code_utils.global_variables import *
 import pickle  # to save models
-from gensim.models import Word2Vec
+from gensim.models import Word2Vec, TfidfModel
+from gensim.matutils import corpus2csc
+from gensim import corpora
 from sklearn.feature_extraction.text import TfidfVectorizer
 from symptoms_classifier.NLP_text_cleaning import *
 import numpy as np
@@ -132,10 +134,18 @@ def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', emb_op
     """
     embedding_algo = str(embedding_algo).lower()
 
-    if 'idf' in embedding_algo:
+    if 'idf' in embedding_algo and ('sklearn' in embedding_algo or 'gensim' not in embedding_algo): # TFIDF with sklearn
+        print('embedding using sklearn TfIdf model')
         if isinstance(embedding_model, str):  # load model if stored in file
             embedding_model = pickle.load(open(embedding_model), "rb")
         snt_emb = embedding_model.transform(tkn_sentences).toarray()
+    elif 'idf' in embedding_algo and 'gensim' in embedding_algo:  # TFIDF with gensim
+        print('embedding using gensim TfIdf model')
+        if isinstance(embedding_model, str):  # load model if stored in file
+            embedding_model = TfidfModel.load(embedding_model)
+        tkn_sentences_dict = corpora.Dictionary(tkn_sentences)
+        tkn_sentences_corpus = [tkn_sentences_dict.doc2bow(stn) for stn in tkn_sentences]
+        snt_emb = corpus2csc(embedding_model[tkn_sentences_corpus]).T.toarray()
     elif 'word2vec' in embedding_algo or 'w2v' in embedding_algo:
         if isinstance(embedding_model, str):  # load model if stored in file
             embedding_model = Word2Vec.load(embedding_model)
@@ -145,6 +155,8 @@ def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', emb_op
             for idx, snt in enumerate(tkn_sentences):
                 snt_emb[idx] = [embedding_model.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
         else:  # Convert each sentence into the average sum of its tokens
+            print('embedding using Word2Vec model (using average sum of tokens) with:', '\nuse of weights:', use_weights,
+                  '\nkeywords:', keywords, '\ncontext:', context)
             snt_emb = convert_snt2avgtoken(tkn_sentences, w2v_model=embedding_model, use_weights=use_weights
                                            , keywords=keywords, context=context)
 
@@ -179,7 +191,9 @@ def fit_embedding_model(sentences, embedding_algo='w2v', saved_model_path=None, 
     if stop_words == 'english':
         stop_words = stopwords.words('english')
         stop_words = [x for x in stop_words if ('no' not in x) and ('n\'t' not in x)]  # we want to keep negations
-    if 'idf' in embedding_algo:
+    if 'idf' in embedding_algo and ('sklearn' in embedding_algo or 'gensim' not in embedding_algo):
+        print('training sklearn TfIdf vectorizer with:', '\nmax features:', max_features, '\nmindf:', min_df,
+              '\nmaxdf', max_df, '\nngram', ngram_range)
         _vectorizer = TfidfVectorizer(min_df=min_df, max_df=max_df, ngram_range=ngram_range, stop_words=stop_words,
                                       sublinear_tf=sublinear_tf, use_idf=True, preprocessor=' '.join, max_features=max_features)
 
@@ -187,7 +201,15 @@ def fit_embedding_model(sentences, embedding_algo='w2v', saved_model_path=None, 
         if saved_model_path is not None:
             with open(saved_model_path + '_mindf_' + str(min_df) + '_maxdf_' + str(max_df) + '_ngram_' + str(ngram_range) + '.pickle', 'wb') as fin:
                 pickle.dump(w2v, fin)
+    elif 'idf' in embedding_algo and 'gensim' in embedding_algo:
+        print('training gensim TfIdf model')
+        tkn_sentences_dict = corpora.Dictionary(sentences)
+        tkn_sentences_corpus = [tkn_sentences_dict.doc2bow(stn) for stn in sentences]
+        w2v = TfidfModel(tkn_sentences_corpus)
+        if saved_model_path is not None:
+            w2v.save(saved_model_path + embedding_algo + '.model')
     elif 'word2vec' in embedding_algo or 'w2v' in embedding_algo:
+        print('training Word2Vec model with:', '\nsize:', size, '\nwindow:', window, '\nmincount:', min_count)
         w2v = Word2Vec(sentences, size=size, window=window, min_count=min_count, workers=workers)  # train word2vec
         if saved_model_path is not None:
             w2v.save(saved_model_path + '_size_' + str(size) + '_win_' + str(window) + '_mincount_' + str(min_count) + '.model')
