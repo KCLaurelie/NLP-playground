@@ -4,16 +4,22 @@ import time
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.externals import joblib
-
+import xgboost as xgb
+import catboost
 
 classifiers = {
+    'LightGBM': 'LightGBM',
+    'XGBOOST': xgb.XGBRegressor(objective='reg:squarederror', colsample_bytree=0.3, learning_rate=0.1,
+                                max_depth=5, alpha=10, n_estimators=10, random_state=0),
+    'CatBoost': catboost.CatBoostRegressor(iterations=1000, learning_rate=0.1, random_state=0),
     'Multinomial NB': naive_bayes.MultinomialNB(),
     'Gaussian NB': naive_bayes.GaussianNB(),
     'KNN': neighbors.KNeighborsClassifier(n_neighbors=5, n_jobs=-1, weights='distance'),
     'Decision Tree': tree.DecisionTreeClassifier(class_weight='balanced', random_state=0),
-    'Random Forest': ensemble.RandomForestClassifier(criterion='entropy', n_jobs=10, class_weight='balanced', random_state=0),
+    'Random Forest': ensemble.RandomForestClassifier(criterion='entropy', n_jobs=10, class_weight='balanced',
+                                                     random_state=0),
     'Logistic Reg': linear_model.LogisticRegression(C=1e5, solver='lbfgs', multi_class='multinomial'
-                                                           , class_weight='balanced', max_iter=1000, random_state=0),
+                                                    , class_weight='balanced', max_iter=1000, random_state=0),
     'Logistic Reg CV': linear_model.LogisticRegressionCV(class_weight='balanced', solver='liblinear', random_state=0),
     'Linear SVM': svm.LinearSVC(multi_class='crammer_singer', class_weight='balanced', random_state=0),
     'SVM': svm.SVC(gamma='scale', class_weight='balanced', random_state=0),
@@ -91,4 +97,3 @@ def perf_metrics(data_labels, data_preds):
 
     res = {'acc': acc_score, 'precision': precision, 'recall': recall, 'f1': f1score}
     return res
-

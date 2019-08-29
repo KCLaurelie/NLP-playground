@@ -6,7 +6,7 @@ from code_utils.general_utils import list_to_excel
 
 def test_final():
     tweets = TextsToClassify(
-        filepath='https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv',
+        filepath=r'C:\Users\K1774755\Downloads\phd\Tweets.csv',
         class_col='airline_sentiment', text_col='text',
         embedding_algo='w2v', embedding_model=None,
         binary_main_class='positive',
@@ -30,7 +30,7 @@ def test_final():
                                     test_size=0.2,
                                     binary=True, binary_main_class='negative',
                                     save_model=False)
-        row += list_to_excel(res, 'test3.xlsx', startrow=0, startcol=0)
+        row += list_to_excel(res, 'testfinal.xlsx', sheet_name=str(model), startrow=0, startcol=0)
 
     text_series = pd.read_csv('files/list_docs_w2v.csv')
     test = tokenize_text_series(text_series, manually_clean_text=True)

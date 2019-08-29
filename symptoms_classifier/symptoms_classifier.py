@@ -1,18 +1,10 @@
-#import os
-import numpy as np
-import pandas as pd
-from gensim.models import Word2Vec
+import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, accuracy_score
-#import matplotlib
 from symptoms_classifier.NLP_embedding import *
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
-from code_utils.general_utils import super_read_csv
 import symptoms_classifier.classifiers_utils as cutils
-
-#os.chdir(r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier')
-#matplotlib.use('Qt5Agg')
 
 
 class TextsToClassify:
@@ -153,10 +145,26 @@ class TextsToClassify:
 
         # train classifier
         classifier = cutils.load_classifier(classifier_model)
-        try:
-            classifier.fit(x_emb_train, y_train)
-        except:
-            return 'classification algo failed'
+        if classifier == 'LightGBM':
+            parameters = {
+                'application': 'binary',
+                'objective': 'binary',
+                'metric': 'auc',
+                'is_unbalance': 'true',
+                'boosting': 'gbdt',
+                'num_leaves': 31,
+                'feature_fraction': 0.5,
+                'bagging_fraction': 0.5,
+                'bagging_freq': 20,
+                'learning_rate': 0.05,
+                'verbose': 0
+            }
+            classifier = lgb.train(parameters, lgb.Dataset(x_emb_train, label=y_train), 100)
+        else:
+            try:
+                classifier.fit(x_emb_train, y_train)
+            except:
+                return 'classification algo failed'
 
         if save_model:
             saved_model_path = os.getcwd() + '\\symptoms_classifier\\files\\' + os.path.basename(
@@ -174,21 +182,21 @@ class TextsToClassify:
 
         title = str(classifier)
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
-        test_report = classification_report(y_test, test_preds, output_dict=True)
+        test_report = classification_report(y_test, [round(value) for value in test_preds], output_dict=True)
         df_test = pd.DataFrame(test_report).transpose()
-        df_test['accuracy'] = accuracy_score(y_test, test_preds)
+        df_test['accuracy'] = accuracy_score(y_test, [round(value) for value in test_preds])
         df_test.index.names = ['TEST']
 
-        train_report = classification_report(y_train, train_preds, output_dict=True)
+        train_report = classification_report(y_train, [round(value) for value in train_preds], output_dict=True)
         df_train = pd.DataFrame(train_report).transpose()
-        df_train['accuracy'] = accuracy_score(y_train, train_preds)
+        df_train['accuracy'] = accuracy_score(y_train, [round(value) for value in train_preds])
         df_train.index.names = ['TRAIN']
 
-        print(str(classifier), '\n',
-              'CLASSES\n', classes, '\n\n',
-              'TEST SET\n', df_test,
-              'TRAIN SET\n', df_train
-              )
+        # print(str(classifier), '\n',
+        #       'CLASSES\n', classes, '\n\n',
+        #       'TEST SET\n', df_test,
+        #       'TRAIN SET\n', df_train
+        #       )
         return [title, classes, df_test, df_train]
 
     def run_all(self, manually_clean_text=True, embedding_model=None, classifier_model=None, binary=None,
