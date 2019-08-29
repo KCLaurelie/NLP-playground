@@ -12,14 +12,14 @@ from collections import OrderedDict
 # GENERAL UTILS FUNCTIONS
 ##############################################################################
 def list_to_excel(lst_to_print, filepath='out.xlsx', sheet_name='Sheet1', startrow=0, startcol=0):
-    mode = 'a'if os.path.isfile(filepath) else 'w'
+    mode = 'a' if os.path.isfile(filepath) else 'w'
+    print('adding sheet', sheet_name, 'using mode:', ('append' if mode == 'a' else 'new workbook'))
     writer = pd.ExcelWriter(filepath, engine='openpyxl', mode=mode)
     cpt_row = startrow
-
     lst_to_print = to_list(lst_to_print)
     for i in lst_to_print:
         to_print = i if isinstance(i, pd.core.frame.DataFrame) else pd.DataFrame([i])
-        print(to_print)
+        print('printing to excel:\n', to_print)
         to_print.to_excel(writer, sheet_name=sheet_name, startrow=cpt_row, startcol=startcol)
         cpt_row += len(to_print) + 2
     writer.save()
