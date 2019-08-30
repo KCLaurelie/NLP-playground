@@ -13,6 +13,7 @@ import code_utils.general_utils as gutils
 import spacy
 import nltk
 nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
+spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
 nltk.download('wordnet')
 
 
@@ -30,11 +31,11 @@ def top_features_idf(vectorizer, top_n=2):
     return _top_features
 
 
-def tokenize_text_series(text_series, manually_clean_text=True, output_file_path=None):
+def tokenize_text_series(text_series, tokenization_type='lem', output_file_path=None):
     """
     tokenizes series of texts using spacy (first splits in sentences then tokens)
     :param text_series: pd.Series of texts
-    :param manually_clean_text: set to True to expand contractions etc
+    :param tokenization_type: 'lem' (lemmatized), 'lem_stop' (lemmatized and stopwords removed), 'wo_space' (simple tokenization)
     :param output_file_path: to save tokenized sentences in a file
     :return:
     """
@@ -42,11 +43,51 @@ def tokenize_text_series(text_series, manually_clean_text=True, output_file_path
     for rawtext in text_series:
         snt_tmp = text2sentences(rawtext, remove_punctuation=False)
         snt = snt.append(snt_tmp, ignore_index=True)
-    res = tokenize_sentences(snt, manually_clean_text=manually_clean_text, output_file_path=output_file_path)
+    res = tokenize_sentences(snt, tokenization_type=tokenization_type, output_file_path=output_file_path)
     return res
 
 
-def tokenize_sentences(sentences, manually_clean_text=True, output_file_path=None):
+def tokenize_sentences(sentences, tokenization_type='lem', output_file_path=None):
+    if output_file_path is not None: file = open(output_file_path, 'w', encoding='utf8')
+    if 'lem' not in tokenization_type and 'stop' not in tokenization_type:
+        print('simple tokenization')
+        tokenization_type = 'wo_space'
+    elif 'lem' in tokenization_type and 'stop' not in tokenization_type:
+        print('tokenizing and lemmatizing')
+        tokenization_type = 'lem'
+    else:
+        print('tokenizing, lemmatizing and removing stopwords')
+        tokenization_type = 'lem_stop'
+    tok_snts = []
+    for snt in sentences:
+        tkns = nlp.tokenizer(snt)
+        if tokenization_type == 'wo_space':
+            _tkns = [str(x.text) for x in tkns if not x.is_space]
+        elif tokenization_type == 'lem':
+            _tkns = [str(x.lemma_).lower() for x in tkns if not x.is_space and not x.is_punct]
+        else:
+            _tkns = [str(x.lemma_).lower() for x in tkns if not x.is_space and not x.is_punct
+                     and not (x.is_stop and 'no' not in str(x) and 'n\'t' not in str(x))]
+        tok_snts.append(_tkns)
+        if output_file_path is not None: file.write("{}\n".format("\t".join(_tkns)))
+
+    if output_file_path is not None: file.close()
+    return tok_snts
+
+
+def read_tokens_list(filename):
+    class SentenceIterator:
+        def __init__(self, filepath):
+            self.filepath = filepath
+
+        def __iter__(self):
+            for line in open(self.filepath):
+                yield line.split("\t")
+
+    return SentenceIterator(filename)
+
+
+def tokenize_sentences_old(sentences, manually_clean_text=True, output_file_path=None):
     """
     tokenize text using spacy
     :param sentences: pd.Series of sentences
@@ -76,12 +117,12 @@ def tokenize_sentences(sentences, manually_clean_text=True, output_file_path=Non
     return tok_snts
 
 
-def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=False, keywords=None, context=10):
+def convert_snt2avgtoken(sentences, w2v_model, tokenization_type='lem', use_weights=False, keywords=None, context=10):
     """
     convert sentences to embedded sentences using pre-trained Word2Vec model
     :param sentences: pd.Series of sentences to vectorize
     :param w2v_model: Word2Vec pre-trained model (either model object or filepath to savec model)
-    :param clean_text: set to true to remove punctuations and special characters (only keeps alphanumerics)
+    :param tokenization_type: 'lem' (lemmatized), 'lem_stop' (lemmatized and stopwords removed), 'wo_space' (simple tokenization)
     :param use_weights: use weight average instead f simple average, based on distance from specific keyword(s)
     :param keywords: string or list of strings to compute distance from for weighted average option
     :param context: number of tokens to use around the keywords for weighted average option
@@ -89,13 +130,16 @@ def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=Fals
     """
     if isinstance(w2v_model, str):  # load model if saved in file
         w2v_model = Word2Vec.load(w2v_model)
+        if 'lem' in w2v_model: tokenization_type = 'lem'
+        if 'stop' in w2v_model: tokenization_type = 'lem_stop'
+        if 'wo_space' in w2v_model: tokenization_type = 'wo_space'
     size = w2v_model.wv.vector_size  # size of embeeding vectors
 
     sentences_emb = np.zeros((len(sentences), size))  # to store embedded sentences
 
     # tokenize the text and further cleans it (needed otherwise it would take 1 token = 1 letter)
     if not isinstance(sentences[0], list):
-        sentences = tokenize_sentences(sentences, manually_clean_text=clean_text)
+        sentences = tokenize_sentences(sentences, tokenization_type=tokenization_type)
 
     # convert each sentence into the average sum of the vector representations of its tokens
     not_in_model = []
@@ -119,14 +163,14 @@ def convert_snt2avgtoken(sentences, w2v_model, clean_text=True, use_weights=Fals
     return sentences_emb
 
 
-def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', emb_option='sentence',
+def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', w2v_emb_option='sentence',
                     use_weights=False, keywords=None, context=10):
     """
     embed text using pre-trained embedding model
     :param tkn_sentences: pd.Series of tokenized sentences (1 row = 1 list of tokens)
     :param embedding_model: pre-trained embedding model to use (model object or filepath to model)
     :param embedding_algo: embedding model type (can be either tfidf or word2vec)
-    :param emb_option: represent each word separately ('word') or do an average sum by sentence (default) (only for w2v)
+    :param w2v_emb_option: represent each word separately ('word') or do an average sum by sentence (default) (only for w2v)
     :param use_weights: use weight average instead f simple average, based on distance from specific keyword(s)
     :param keywords: string or list of strings to compute distance from for weighted average option
     :param context: number of tokens to use around the keywords for weighted average option
@@ -150,7 +194,7 @@ def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', emb_op
         if isinstance(embedding_model, str):  # load model if stored in file
             embedding_model = Word2Vec.load(embedding_model)
 
-        if emb_option == 'word':  # TODO: IS THIS WORKING ????
+        if w2v_emb_option == 'word':  # TODO: IS THIS WORKING ????
             snt_emb = np.zeros((len(tkn_sentences), embedding_model.wv.vector_size))
             for idx, snt in enumerate(tkn_sentences):
                 snt_emb[idx] = [embedding_model.wv.get_vector(x) for x in tokenize.word_tokenize(snt)]
@@ -165,13 +209,14 @@ def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', emb_op
     return snt_emb
 
 
-def fit_embedding_model(sentences, embedding_algo='w2v', saved_model_path=None, stop_words=None, sublinear_tf=True,
+def fit_embedding_model(sentences, embedding_algo='w2v', tokenization_type='lem', saved_model_path=None, stop_words=None, sublinear_tf=True,
                         ngram_range=(1, 5), size=100, window=5, min_count=4, workers=4, min_df=0.00125, max_df=0.7, max_features=None):
     """
     train embedding model using series of texts (at the moment only allows tfidf and word2vec)
     :param sentences: pd.Series of texts or tokens (1 row = 1 sentence or 1 list of tokens)
     :param min_df: ignore words below that frequency (tfidf parameter)
     :param max_df: ignore words above that frequency (tfidf parameter)
+    :param tokenization_type: 'lem' (lemmatized), 'lem_stop' (lemmatized and stopwords removed), 'wo_space' (simple tokenization)
     :param sublinear_tf: replace tf with 1 + log(tf) (tfidf parameter)
     :param max_features: only consider the top max_features ordered by term frequency across the corpus (tfidf parameter)
     :param ngram_range: lower and upper boundary of the range of n-values for n-grams to be extracted (tfidf parameter)
@@ -187,7 +232,7 @@ def fit_embedding_model(sentences, embedding_algo='w2v', saved_model_path=None, 
 
     embedding_algo = str(embedding_algo).lower()
     if not isinstance(sentences[0], list):  # sentences have not been tokenized
-        sentences = tokenize_sentences(sentences, manually_clean_text=True)  # tokenize sentences
+        sentences = tokenize_sentences(sentences, tokenization_type=tokenization_type)  # tokenize sentences
     if stop_words == 'english':
         stop_words = stopwords.words('english')
         stop_words = [x for x in stop_words if ('no' not in x) and ('n\'t' not in x)]  # we want to keep negations

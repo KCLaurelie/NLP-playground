@@ -12,7 +12,7 @@ def test_final():
         binary_main_class='positive',
         classifier_model='SVM')
     df = tweets.load_data()
-    tkns = tweets.tokenize_text(manually_clean_text=True, update_obj=True)
+    tkns = tweets.tokenize_text(tokenization_type='lem', update_obj=True)
     w2v = tweets.train_embedding_model(embedding_algo='w2v')
     w2v.wv['you']
     x_embw2v = tweets.embed_text(update_obj=True, embedding_algo='w2v')
@@ -33,14 +33,14 @@ def test_final():
         row += list_to_excel(res, 'testfinal.xlsx', sheet_name=str(model), startrow=0, startcol=0)
 
     text_series = pd.read_csv('files/list_docs_w2v.csv')
-    test = tokenize_text_series(text_series, manually_clean_text=True)
+    test = tokenize_text_series(text_series, tokenization_type='lem')
 
 
 def trainw2v(
         file_path='https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv',
         text_col='text'):
     data = pd.read_csv(file_path, low_memory=False, header=0, encoding='utf8', engine='c', error_bad_lines=False)
-    tok_snts = tokenize_sentences(data[text_col], manually_clean_text=True)  # tokenize sentences
+    tok_snts = tokenize_sentences(data[text_col], tokenization_type='lem')  # tokenize sentences
     print('text tokenized')
     w2v_model = Word2Vec(tok_snts, size=100, window=5, min_count=4, workers=4)  # train word2vec
     w2v_model.save(file_path.replace('.csv', '_w2v.model'))
