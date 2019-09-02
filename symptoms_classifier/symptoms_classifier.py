@@ -127,22 +127,34 @@ class TextsToClassify:
             self.dataset['class_numeric'] = lb_make.fit_transform(self.dataset[self.class_col])
             return 0
 
-    def run_classifier(self, classifier_model=None, binary=None, binary_main_class=None, test_size=0.2, random_state=0, save_model=True):
-        # if object default values not overriden
-        if binary is None: binary = self.binary
-        if classifier_model is None: classifier_model = self.classifier_model
-
+    # TODO create utils function outside scope
+    def convert_class_2_numeric(self, binary=None, binary_main_class=None):
         # convert annotations to binary class if needed
         if binary:
             self.make_binary_class(binary_main_class=binary_main_class)
         else:
             self.make_numeric_class()
+        return 0
+
+    def run_classifier(self, classifier_model=None, binary=None, binary_main_class=None, test_size=0.2, random_state=0
+                       , save_model=False, output_errors=False):
+        # if object default values not overriden
+        if binary is None: binary = self.binary
+        if classifier_model is None: classifier_model = self.classifier_model
+
+        # convert annotations to binary class if needed
+        # if binary:
+        #     self.make_binary_class(binary_main_class=binary_main_class)
+        # else:
+        #     self.make_numeric_class()
+        self.convert_class_2_numeric(self, binary=binary, binary_main_class=binary_main_class)
         text_class = self.dataset['class_numeric']
 
         x_emb_train, x_emb_test, y_train, y_test = train_test_split(self.embedded_text, text_class, test_size=test_size, random_state=random_state)
 
         # train classifier
         classifier = cutils.load_classifier(classifier_model)
+        title = str(classifier)
         if classifier == 'LightGBM':
             parameters = {
                 'application': 'binary',
@@ -162,7 +174,7 @@ class TextsToClassify:
             try:
                 classifier.fit(x_emb_train, y_train)
             except:
-                return 'classification algo failed'
+                return ['classification algo failed for:', title]
 
         if save_model:
             saved_model_path = os.getcwd() + '\\symptoms_classifier\\files\\' + os.path.basename(
@@ -177,8 +189,12 @@ class TextsToClassify:
         self.dataset.loc[y_test.index, 'split'] = 'test'
         self.dataset.loc[y_train.index, 'preds'] = train_preds
         self.dataset.loc[y_test.index, 'preds'] = test_preds
+        self.dataset['error_pred'] = np.abs(self.dataset.preds - self.dataset.class_numeric)
+        errors = self.dataset.loc[self.dataset.error_pred > 0.5,
+                                  [self.text_col, 'tokenized_text', 'class_numeric', 'preds', 'error_pred']]\
+            .sort_values(by='error_pred')
+        self.__setattr__('classifier_errors', errors)
 
-        title = str(classifier)
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
         test_report = classification_report(y_test, [round(value) for value in test_preds], output_dict=True)
         df_test = pd.DataFrame(test_report).transpose()
@@ -195,7 +211,7 @@ class TextsToClassify:
         #       'TEST SET\n', df_test,
         #       'TRAIN SET\n', df_train
         #       )
-        return [title, classes, df_test, df_train]
+        return [title, classes, df_test, df_train, errors] if output_errors else [title, classes, df_test, df_train]
 
     def run_all(self, tokenization_type='lem', embedding_model=None, classifier_model=None, binary=None,
                 binary_main_class=None, test_size=0.2):

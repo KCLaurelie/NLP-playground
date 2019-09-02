@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import sklearn.metrics
 import matplotlib
 import torch
@@ -9,18 +10,20 @@ matplotlib.use('Qt5Agg')
 np.random.seed(42)
 
 
-def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5):
+def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5, n_epochs=5000):
     ####################################################################################################################
     # 1. split dataset in train/test
     ####################################################################################################################
-    x_train, x_test, y_train, y_test = train_test_split(x_emb, y, test_size=test_size, random_state=random_state)
+    x_train, x_test, y_train_np, y_test_np = train_test_split(x_emb, y, test_size=test_size, random_state=random_state)
 
-    weights = list(y_train.value_counts()/y_train.count())
+    weights = list(y_train_np.value_counts()/y_train_np.count())
+    nb_classes = y_train_np.nunique()
+    first_layer_neurons = x_train.shape[1]
 
     x_train = torch.tensor(x_train, dtype=torch.float32)
-    y_train = torch.tensor(y_train, dtype=torch.long)
+    y_train = torch.tensor(y_train_np.values, dtype=torch.long)
     x_test = torch.tensor(x_test, dtype=torch.float32)
-    y_test = torch.tensor(y_test, dtype=torch.long)
+    y_test = torch.tensor(y_test_np.values, dtype=torch.long)
 
     ####################################################################################################################
     # 2. build network
@@ -28,8 +31,8 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
     class Net(nn.Module):
         def __init__(self):
             super(Net, self).__init__()
-            self.fc1 = nn.Linear(300, 100)
-            self.fc2 = nn.Linear(100, 3)  # 3 classes = 3 neurons
+            self.fc1 = nn.Linear(first_layer_neurons, 100)
+            self.fc2 = nn.Linear(100, nb_classes)  # 3 classes = 3 neurons
             if dropout is not None:
                 self.d1 = nn.Dropout(dropout)  # do we want dropout?
 
@@ -51,7 +54,7 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
     # 3. train
     ####################################################################################################################
     net.train()
-    for epoch in range(5000):
+    for epoch in range(n_epochs):
         optimizer.zero_grad()
         outputs = net(x_train)  # forward
         loss = criterion(outputs, y_train)
@@ -61,9 +64,9 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
         # print statistics
         if epoch % 500 == 0:
             net.eval()
-            outputs_idx = torch.max(outputs, dim=1).indices.numpy()  # Use max to get the index of max for each row
+            outputs_idx = outputs.argmax(1).numpy()  # torch.max(outputs, dim=1).indices.numpy()  # Use max to get the index of max for each row
             outputs_dev = net(x_test)
-            outputs_dev_idx = torch.max(outputs_dev, dim=1).indices.numpy()  # Get the index of max per row
+            outputs_dev_idx = outputs_dev.argmax(1).numpy()  # torch.max(outputs_dev, dim=1).indices.numpy()  # Get the index of max per row
 
             # performance metrics
             acc = sklearn.metrics.accuracy_score(outputs_idx, y_train.numpy())
@@ -78,4 +81,11 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
 
     print('Finished Training')
 
-    print(outputs_idx)
+    # print(outputs_idx)
+    preds = pd.DataFrame({'class': y})
+    preds.loc[y_train_np.index, 'split'] = 'train'
+    preds.loc[y_test_np.index, 'split'] = 'test'
+    preds.loc[y_train_np.index, 'preds'] = outputs_idx
+    preds.loc[y_test_np.index, 'preds'] = outputs_dev_idx
+
+    return preds

@@ -2,6 +2,7 @@ from symptoms_classifier.symptoms_classifier import *
 from symptoms_classifier.NLP_embedding import *
 from gensim.models import Word2Vec
 from code_utils.general_utils import list_to_excel
+from symptoms_classifier.NN_pytorch_multiclass import train_nn
 
 
 def test_final():
@@ -21,17 +22,21 @@ def test_final():
     tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
     x_embidf = tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
 
-    res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative')
+    res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative', output_errors=True)
     row = list_to_excel(res, 'test.xlsx', sheet_name='test2', startrow=0, startcol=0)
 
+    res = []
     for model in cutils.classifiers.keys():
-        row = 0
-        res = tweets.run_classifier(classifier_model=model,  # 'SVM with sigmoid kernel'
-                                    test_size=0.2,
-                                    binary=True, binary_main_class='negative',
-                                    save_model=False)
-        row += list_to_excel(res, 'testfinal.xlsx', sheet_name=str(model), startrow=0, startcol=0)
+        res += tweets.run_classifier(classifier_model=model,
+                                     test_size=0.2,
+                                     binary=True, binary_main_class='negative',
+                                     save_model=False)
+    list_to_excel(res, 'testnew.xlsx', sheet_name=str(tweets.embedding_algo), startrow=0, startcol=0)
 
+    tweets.convert_class_2_numeric(binary=True, binary_main_class='negative')
+    # x_emb, y, test_size, random_state, class_weight, dropout = [tweets.embedded_text, tweets.dataset.class_numeric, 0.2,
+    #                                                             0, 'balanced', 0.5]
+    nn_test = train_nn(x_emb=tweets.embedded_text, y=tweets.dataset.class_numeric)
     text_series = pd.read_csv('files/list_docs_w2v.csv')
     test = tokenize_text_series(text_series, tokenization_type='lem')
 
