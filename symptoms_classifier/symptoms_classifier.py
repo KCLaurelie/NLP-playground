@@ -147,7 +147,7 @@ class TextsToClassify:
         #     self.make_binary_class(binary_main_class=binary_main_class)
         # else:
         #     self.make_numeric_class()
-        self.convert_class_2_numeric(self, binary=binary, binary_main_class=binary_main_class)
+        self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
         text_class = self.dataset['class_numeric']
 
         x_emb_train, x_emb_test, y_train, y_test = train_test_split(self.embedded_text, text_class, test_size=test_size, random_state=random_state)
