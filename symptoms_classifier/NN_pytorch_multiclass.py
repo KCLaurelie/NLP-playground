@@ -38,7 +38,8 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
                 self.d1 = nn.Dropout(dropout)  # do we want dropout?
 
         def forward(self, x):
-            x = self.d1(torch.relu(self.fc1(x)))
+            if dropout is not None:
+                x = self.d1(torch.relu(self.fc1(x)))
             x = torch.sigmoid(self.fc2(x))
             return x
 

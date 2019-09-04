@@ -145,12 +145,13 @@ class TextsToClassify:
             self.__setattr__('classifier_errors', errors)
         return errors
 
-    def run_neural_net(self, binary=None, binary_main_class=None, test_size=0.2, random_state=0, dropout=None
+    def run_neural_net(self, binary=None, binary_main_class=None, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5, n_epochs=5000
                        , save_model=False, output_errors=False):
         title = 'Neural Net'
         if binary is None: binary = self.binary
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
-        preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, random_state=random_state, test_size=test_size, dropout=dropout)
+        preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, n_epochs=n_epochs,
+                                            random_state=random_state, test_size=test_size, dropout=dropout, class_weight=class_weight)
         self.dataset = self.dataset.merge(preds)
         errors = self.generate_errors_report(preds_col='preds')
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
