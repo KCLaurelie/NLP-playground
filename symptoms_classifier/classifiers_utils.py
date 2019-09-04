@@ -2,7 +2,7 @@ import pandas as pd
 import datetime
 import time
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.externals import joblib
 import xgboost as xgb
 import catboost
@@ -27,6 +27,22 @@ classifiers = {
     'SVM sigmoid kernel': svm.SVC(kernel='sigmoid', class_weight='balanced', random_state=0),
     'SVM poly kernel': svm.SVC(kernel='poly', class_weight='balanced', random_state=0)
 }
+
+
+def formatted_classification_report(y_test, y_train, test_preds, train_preds):
+    preds_test_clean = [round(value) for value in test_preds]
+    test_report = classification_report(y_test, preds_test_clean, output_dict=True)
+    df_test = pd.DataFrame(test_report).transpose()
+    df_test['accuracy'] = accuracy_score(y_test, preds_test_clean)
+    df_test.index.names = ['TEST']
+
+    preds_train_clean = [round(value) for value in train_preds]
+    train_report = classification_report(y_train, preds_train_clean, output_dict=True)
+    df_train = pd.DataFrame(train_report).transpose()
+    df_train['accuracy'] = accuracy_score(y_train, preds_train_clean)
+    df_train.index.names = ['TRAIN']
+
+    return [df_test, df_train]
 
 
 def save_classifier_to_file(model, filename='finalized_model.sav', timestamp=True):

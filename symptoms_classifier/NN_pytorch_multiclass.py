@@ -6,6 +6,7 @@ import torch
 from torch import nn
 import torch.optim as optim
 from sklearn.model_selection import train_test_split
+import symptoms_classifier.classifiers_utils as cutils
 matplotlib.use('Qt5Agg')
 np.random.seed(42)
 
@@ -88,4 +89,5 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
     preds.loc[y_train_np.index, 'preds'] = outputs_idx
     preds.loc[y_test_np.index, 'preds'] = outputs_dev_idx
 
-    return preds
+    df_test, df_train = cutils.formatted_classification_report(y_test_np, y_train_np, outputs_dev_idx, outputs_idx)
+    return [preds, df_test, df_train]

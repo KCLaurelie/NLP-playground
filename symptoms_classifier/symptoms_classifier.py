@@ -1,8 +1,8 @@
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import classification_report, accuracy_score
 from symptoms_classifier.NLP_embedding import *
+from symptoms_classifier.NN_pytorch_multiclass import train_nn
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
 import symptoms_classifier.classifiers_utils as cutils
 
@@ -136,17 +136,32 @@ class TextsToClassify:
             self.make_numeric_class()
         return 0
 
+    def generate_errors_report(self, preds_col, update_obj=True):
+        self.dataset['error_pred'] = np.abs(self.dataset[preds_col] - self.dataset.class_numeric)
+        errors = self.dataset.loc[self.dataset.error_pred > 0.5,
+                                  [self.text_col, 'tokenized_text', 'class_numeric', preds_col, 'error_pred']] \
+            .sort_values(by='error_pred')
+        if update_obj:
+            self.__setattr__('classifier_errors', errors)
+        return errors
+
+    def run_neural_net(self, binary=None, binary_main_class=None, test_size=0.2, random_state=0, dropout=None
+                       , save_model=False, output_errors=False):
+        title = 'Neural Net'
+        if binary is None: binary = self.binary
+        self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
+        preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, random_state=random_state, test_size=test_size, dropout=dropout)
+        self.dataset = self.dataset.merge(preds)
+        errors = self.generate_errors_report(preds_col='preds')
+        classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
+        return [title, classes, df_test, df_train, errors] if output_errors else [title, classes, df_test, df_train]
+
     def run_classifier(self, classifier_model=None, binary=None, binary_main_class=None, test_size=0.2, random_state=0
                        , save_model=False, output_errors=False):
         # if object default values not overriden
         if binary is None: binary = self.binary
         if classifier_model is None: classifier_model = self.classifier_model
 
-        # convert annotations to binary class if needed
-        # if binary:
-        #     self.make_binary_class(binary_main_class=binary_main_class)
-        # else:
-        #     self.make_numeric_class()
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
         text_class = self.dataset['class_numeric']
 
@@ -174,7 +189,7 @@ class TextsToClassify:
             try:
                 classifier.fit(x_emb_train, y_train)
             except:
-                return ['classification algo failed for:', title]
+                return ['classification algo failed for:' + title]
 
         if save_model:
             saved_model_path = os.getcwd() + '\\symptoms_classifier\\files\\' + os.path.basename(
@@ -189,28 +204,10 @@ class TextsToClassify:
         self.dataset.loc[y_test.index, 'split'] = 'test'
         self.dataset.loc[y_train.index, 'preds'] = train_preds
         self.dataset.loc[y_test.index, 'preds'] = test_preds
-        self.dataset['error_pred'] = np.abs(self.dataset.preds - self.dataset.class_numeric)
-        errors = self.dataset.loc[self.dataset.error_pred > 0.5,
-                                  [self.text_col, 'tokenized_text', 'class_numeric', 'preds', 'error_pred']]\
-            .sort_values(by='error_pred')
-        self.__setattr__('classifier_errors', errors)
 
+        errors = self.generate_errors_report(preds_col='preds')
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
-        test_report = classification_report(y_test, [round(value) for value in test_preds], output_dict=True)
-        df_test = pd.DataFrame(test_report).transpose()
-        df_test['accuracy'] = accuracy_score(y_test, [round(value) for value in test_preds])
-        df_test.index.names = ['TEST']
-
-        train_report = classification_report(y_train, [round(value) for value in train_preds], output_dict=True)
-        df_train = pd.DataFrame(train_report).transpose()
-        df_train['accuracy'] = accuracy_score(y_train, [round(value) for value in train_preds])
-        df_train.index.names = ['TRAIN']
-
-        # print(str(classifier), '\n',
-        #       'CLASSES\n', classes, '\n\n',
-        #       'TEST SET\n', df_test,
-        #       'TRAIN SET\n', df_train
-        #       )
+        df_test, df_train = cutils.formatted_classification_report(y_test, y_train, test_preds, train_preds)
         return [title, classes, df_test, df_train, errors] if output_errors else [title, classes, df_test, df_train]
 
     def run_all(self, tokenization_type='lem', embedding_model=None, classifier_model=None, binary=None,

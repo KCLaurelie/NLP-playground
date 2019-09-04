@@ -15,7 +15,7 @@ def test_final():
     df = tweets.load_data()
     tkns = tweets.tokenize_text(tokenization_type='lem', update_obj=True)
     w2v = tweets.train_embedding_model(embedding_algo='w2v')
-    w2v.wv['you']
+    #w2v.wv['you']
     x_embw2v = tweets.embed_text(update_obj=True, embedding_algo='w2v')
     x_embw2v2 = tweets.embed_text(update_obj=False, embedding_algo='w2v', use_weights=True,
                                   keywords=['virgin', 'awesome'])
@@ -34,8 +34,7 @@ def test_final():
     list_to_excel(res, 'testnew.xlsx', sheet_name=str(tweets.embedding_algo), startrow=0, startcol=0)
 
     tweets.convert_class_2_numeric(binary=True, binary_main_class='negative')
-    # x_emb, y, test_size, random_state, class_weight, dropout = [tweets.embedded_text, tweets.dataset.class_numeric, 0.2,
-    #                                                             0, 'balanced', 0.5]
+    x_emb, y, test_size, random_state, class_weight, dropout = [tweets.embedded_text, tweets.dataset.class_numeric, 0.2, 0, 'balanced', 0.5]
     nn_test = train_nn(x_emb=tweets.embedded_text, y=tweets.dataset.class_numeric)
     text_series = pd.read_csv('files/list_docs_w2v.csv')
     test = tokenize_text_series(text_series, tokenization_type='lem')
