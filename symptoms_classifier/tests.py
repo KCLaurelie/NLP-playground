@@ -31,13 +31,9 @@ def test_final():
                                      test_size=0.2,
                                      binary=True, binary_main_class='negative',
                                      save_model=False)
+    res += tweets.run_neural_net(binary=True, binary_main_class='negative', dropout=0.5, output_errors=False)
     list_to_excel(res, 'testnew.xlsx', sheet_name=str(tweets.embedding_algo), startrow=0, startcol=0)
 
-    tweets.convert_class_2_numeric(binary=True, binary_main_class='negative')
-    x_emb, y, test_size, random_state, class_weight, dropout = [tweets.embedded_text, tweets.dataset.class_numeric, 0.2, 0, 'balanced', 0.5]
-    nn_test = train_nn(x_emb=tweets.embedded_text, y=tweets.dataset.class_numeric)
-    text_series = pd.read_csv('files/list_docs_w2v.csv')
-    test = tokenize_text_series(text_series, tokenization_type='lem')
 
 
 def trainw2v(
