@@ -87,36 +87,6 @@ def read_tokens_list(filename):
     return SentenceIterator(filename)
 
 
-def tokenize_sentences_old(sentences, manually_clean_text=True, output_file_path=None):
-    """
-    tokenize text using spacy
-    :param sentences: pd.Series of sentences
-    :param manually_clean_text: set to True to expand contractions etc
-    :param output_file_path: to save tokenized sentences in a file
-    :return: list of tokenized sentences
-    """
-    tok_snts = []
-    if output_file_path is not None:
-        with open(output_file_path, 'w') as myfile:
-            wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-            for snt in sentences:
-                if manually_clean_text:
-                    snt = clean_string(snt, remove_punctuation=True)
-                tkns = [tkn.lemma_.lower() for tkn in nlp.tokenizer(snt.replace('…', '. '))
-                        if (not tkn.is_punct) and (not tkn.is_space) and tkn.is_ascii]
-                if len(tkns) > 0:
-                    tok_snts.append(tkns)
-                    wr.writerow([tkns])
-    else:
-        for snt in sentences:
-            if manually_clean_text:
-                snt = clean_string(snt, remove_punctuation=True)
-            tkns = [tkn.lemma_.lower() for tkn in nlp.tokenizer(snt.replace('…', '. '))
-                    if (not tkn.is_punct) and (not tkn.is_space) and tkn.is_ascii]
-            if len(tkns) > 0: tok_snts.append(tkns)
-    return tok_snts
-
-
 def convert_snt2avgtoken(sentences, w2v_model, tokenization_type='lem', use_weights=False, keywords=None, context=10):
     """
     convert sentences to embedded sentences using pre-trained Word2Vec model
@@ -261,3 +231,57 @@ def fit_embedding_model(sentences, embedding_algo='w2v', tokenization_type='lem'
     else:
         return 'unknown embedding_algo'
     return w2v
+
+
+def clean_and_embed_text(sentences, w2v, tokenization_type, keywords, ln=15):
+    EMB_SIZE = w2v.wv.vector_size
+    # tokenize text
+    x = tokenize_sentences(sentences, tokenization_type=tokenization_type)
+
+    # Get embedding weights
+    emb_weights = []
+    tkn_ind = {}
+    for word in w2v.wv.vocab.keys():
+        tkn_ind[word] = len(emb_weights)
+        emb_weights.append(w2v.wv[word])
+
+    # Add the special tokens
+    tkn_ind["<pad>"] = len(emb_weights)
+    emb_weights.append(np.random.rand(EMB_SIZE))
+
+    tkn_ind["<unk>"] = len(emb_weights)
+    emb_weights.append(np.random.rand(EMB_SIZE))
+
+    # Convert to numpy
+    emb_weights = np.array(emb_weights)
+
+    ind_tkn = {}
+    for key in tkn_ind.keys():
+        ind_tkn[tkn_ind[key]] = key
+
+    # Remove above 7 from each side
+    new_x = [None] * len(x)
+    for ind, row in enumerate(x):
+        n_row = row[0:ln * 2]
+        for i, word in enumerate(row):
+            if any([x in word for x in keywords]):
+                n_row = x[ind][max(0, i - ln):(i + ln)]
+        new_x[ind] = n_row
+    x = new_x
+
+    c_ind = [-1] * len(x)
+    for ind, row in enumerate(x):
+        for i, word in enumerate(row):
+            if any([x in word for x in keywords]):
+                c_ind[ind] = i
+
+    # Index 'x'
+    x_ind = [[tkn_ind[tkn] if tkn in tkn_ind else tkn_ind['<unk>'] for tkn in tkns] for tkns in x]
+
+    # Pad 'x'
+    MAX_LENGTH = max([len(doc) for doc in x_ind])
+    for i in range(len(x_ind)):
+        while len(x_ind[i]) != MAX_LENGTH:
+            x_ind[i].append(tkn_ind['<pad>'])
+
+    return [emb_weights, x_ind, c_ind]
