@@ -2,7 +2,6 @@ from symptoms_classifier.symptoms_classifier import *
 from symptoms_classifier.NLP_embedding import *
 from gensim.models import Word2Vec
 from code_utils.general_utils import list_to_excel
-from symptoms_classifier.NN_pytorch_multiclass import train_nn
 
 
 def test_final():
@@ -15,8 +14,9 @@ def test_final():
     df = tweets.load_data()
     tkns = tweets.tokenize_text(tokenization_type='lem', update_obj=True)
     w2v = tweets.train_embedding_model(embedding_algo='w2v')
-    #w2v.wv['you']
+    tweets.make_binary_class(binary_main_class='negative')
     x_embw2v = tweets.embed_text(update_obj=True, embedding_algo='w2v')
+    x_emb, y, test_size, random_state, class_weight, dropout, n_epochs = [tweets.embedded_text, tweets.dataset.class_numeric, 0.2, 0, 'balanced', None, 100]
     x_embw2v2 = tweets.embed_text(update_obj=False, embedding_algo='w2v', use_weights=True,
                                   keywords=['virgin', 'awesome'])
     tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
@@ -31,10 +31,9 @@ def test_final():
                                      test_size=0.2,
                                      binary=True, binary_main_class='negative',
                                      save_model=False)
-    res += tweets.run_neural_net(binary=True, binary_main_class='negative', dropout=0.5, output_errors=False)
+    res = tweets.run_neural_net(binary=True, binary_main_class='negative', dropout=0.5, output_errors=False)
     list_to_excel(res, 'testnew.xlsx', sheet_name=str(tweets.embedding_algo), startrow=0, startcol=0)
-
-
+    #w2v.wv['you']
 
 def trainw2v(
         file_path='https://raw.githubusercontent.com/kolaveridi/kaggle-Twitter-US-Airline-Sentiment-/master/Tweets.csv',

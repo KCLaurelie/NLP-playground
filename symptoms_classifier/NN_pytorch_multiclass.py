@@ -18,7 +18,7 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
     x_train, x_test, y_train_np, y_test_np = train_test_split(x_emb, y, test_size=test_size, random_state=random_state)
 
     weights = list(y_train_np.value_counts()/y_train_np.count())
-    nb_classes = y_train_np.nunique()
+    nb_classes = y_train_np.nunique() if y_train_np.nunique() > 2 else 1
     first_layer_neurons = x_train.shape[1]
 
     x_train = torch.tensor(x_train, dtype=torch.float32)
@@ -35,20 +35,26 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
             self.fc1 = nn.Linear(first_layer_neurons, 100)
             self.fc2 = nn.Linear(100, nb_classes)  # 3 classes = 3 neurons
             if dropout is not None:
+                print('using dropout')
                 self.d1 = nn.Dropout(dropout)  # do we want dropout?
 
         def forward(self, x):
             if dropout is not None:
+                print('using dropout')
                 x = self.d1(torch.relu(self.fc1(x)))
+            else:
+                x = torch.relu(self.fc1(x)) # torch.sigmoid(self.fc1(x))
             x = torch.sigmoid(self.fc2(x))
             return x
 
     net = Net()
-    if class_weight == 'balanced':
-        # to fix the imbalance: add weights to the cross entropy
-        criterion = nn.CrossEntropyLoss(weight=torch.tensor(weights))
+    weight = torch.tensor(weights) if class_weight == 'balanced' else None
+    if nb_classes < 2:
+        criterion = nn.BCELoss()
+        y_train = torch.tensor(y_train_np.values, dtype=torch.float32)
+        y_test = torch.tensor(y_test_np.values, dtype=torch.float32)
     else:
-        criterion = nn.CrossEntropyLoss()
+        criterion = nn.CrossEntropyLoss(weight=weight)
 
     optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.99)  # TODO: move to Adam?
 

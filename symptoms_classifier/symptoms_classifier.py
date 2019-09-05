@@ -152,7 +152,7 @@ class TextsToClassify:
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
         preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, n_epochs=n_epochs,
                                             random_state=random_state, test_size=test_size, dropout=dropout, class_weight=class_weight)
-        self.dataset = self.dataset.merge(preds)
+        self.dataset = self.dataset.merge(preds, left_index=True, right_index=True)
         errors = self.generate_errors_report(preds_col='preds')
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
         return [title, classes, df_test, df_train, errors] if output_errors else [title, classes, df_test, df_train]
