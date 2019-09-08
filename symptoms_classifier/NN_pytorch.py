@@ -1,121 +1,62 @@
 import numpy as np
-import sklearn.metrics
-import matplotlib.pyplot as plt
-import matplotlib
-import seaborn as sns
-# Get torch stuff
+from sklearn.metrics import accuracy_score
 import torch
 from torch import nn
 import torch.optim as optim
-matplotlib.use('Qt5Agg')
+from sklearn.model_selection import train_test_split
+import symptoms_classifier.classifiers_utils as cutils
+from code_utils.plot_utils import plot_multi_lists
 np.random.seed(42)
 
 
-# **Activation functions**
-def step(z):
-    return np.array(z > 0, dtype=np.int32)
+def train_nn_simple(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5, n_epochs=5000, debug_mode=True):
 
+    x_train, x_test, y_train, y_test = train_test_split(x_emb, y, test_size=test_size, random_state=random_state)
 
-def tanh(z):
-    return np.tanh(z)
+    """#Convert the inputs to PyTorch"""
+    x_train = torch.tensor(x_train, dtype=torch.float32)
+    y_train_torch = torch.tensor(y_train.values.reshape(-1, 1), dtype=torch.float32)
+    x_test = torch.tensor(x_test, dtype=torch.float32)
+    first_layer_neurons = x_train.shape[1]
 
+    """# Initialize the NN, create the criterion (loss function) and the optimizer """
+    net = cutils.create_nn(nb_classes=1, first_layer_neurons=first_layer_neurons, dropout=dropout)
+    criterion = nn.BCELoss()  # loss function (binary cross entropy loss or log loss)
+    optimizer = optim.SGD(net.parameters(), lr=0.0001, momentum=0.999)  # sigmoid gradient descent optimizer to update the weights
 
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
+    """# Train the NN"""
+    losses, accs, ws, bs = [[], [], [], []]
+    for epoch in range(n_epochs):
+        net.train()
+        optimizer.zero_grad()  # zero the gradients
+        train_preds = net(x_train)  # Forward
+        loss = criterion(train_preds, y_train_torch)  # Calculate error
+        loss.backward()  # Backward
+        optimizer.step()  # Optimize/Update parameters
 
+        # Track the changes - This is normally done using tensorboard or similar
+        if debug_mode:
+            losses.append(loss.item())
+            accs.append(accuracy_score([1 if x > 0.5 else 0 for x in train_preds.detach().numpy()], y_train))
+            ws.append(net.fc1.weight.detach().numpy()[0][0])
+            bs.append(net.fc1.bias.detach().numpy()[0])
 
-def relu(z):
-    return np.maximum(0, z)
+        # print statistics
+        if epoch % 500 == 0:
+            net.eval()
+            test_preds = net(x_test)
+            print("Epoch: {:4} Loss: {:.5f} ".format(epoch, loss.item()))
+            cutils.print_nn_perf(train_preds=train_preds.detach(), y_train=y_train,
+                                 test_preds=test_preds.detach(), y_test=y_test, multi_class=False)
+    print('Finished Training')
 
+    if debug_mode:
+        plot_multi_lists({'Bias': bs, 'Weight': ws, 'Loss': losses, 'Accuracy': accs})
 
-# DATASET:  1000 integers with values from -30 to 40 (hot if >20)
-x = np.random.randint(-30, 40, 1000)
-y = np.array([1 if v > 20 else 0 for v in x])
+    preds, df_test, df_train = cutils.evaluate_nn(y, train_preds.detach(), y_train, test_preds.detach(), y_test, multi_class=False)
 
-# Generate a train/test/dev dataset
-inds = np.random.permutation(len(x))
-inds_train = inds[0:int(0.8*len(x))]  # 80% of the dataset
-inds_test = inds[int(0.8*len(x)):int(0.9*len(x))]  # 10% of the dataset
-inds_dev = inds[int(0.9*len(x)):]  # 10% of the dataset
+    #net.eval()  # switch network to evaluation mode
+    #net(torch.tensor([22], dtype=torch.float32))  # 22: input temperature
+    #net(torch.tensor([100], dtype=torch.float32))  # how well the network generalizes with never seen temperatures
 
-x_train = x[inds_train]
-y_train = y[inds_train]
-x_test = x[inds_test]
-y_test = y[inds_test]
-x_dev = x[inds_dev]
-y_dev = y[inds_dev]
-
-"""#Convert the inputs to PyTorch"""
-x_train = torch.tensor(x_train.reshape(-1, 1), dtype=torch.float32)
-y_train = torch.tensor(y_train.reshape(-1, 1), dtype=torch.float32)
-x_dev = torch.tensor(x_dev.reshape(-1, 1), dtype=torch.float32)
-y_dev = torch.tensor(y_dev.reshape(-1, 1), dtype=torch.float32)
-x_test = torch.tensor(x_test.reshape(-1, 1), dtype=torch.float32)
-y_test = torch.tensor(y_test.reshape(-1, 1), dtype=torch.float32)
-
-
-"""# Build the Neural Network"""
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(1, 4)  # layer 1: 1 input (1 variable: temperature), 4 outputs (4 neurons)
-        self.fc2 = nn.Linear(4, 3)  # layer 2: 4 inputs, 3 outputs (3 neurons)
-        self.fc3 = nn.Linear(3, 1)  # layer 3: 3 inputs, 1 output/neuron (only 1 prediction)
-
-    def forward(self, x):
-        x1 = torch.sigmoid(self.fc1(x))  # linear layer receives as input x
-        x2 = torch.sigmoid(self.fc2(x1))
-        x3 = torch.sigmoid(self.fc3(x2))
-        return x3
-
-
-"""# Initialize the NN, create the criterion (loss function) and the optimizer """
-net = Net()  # instantiate the class
-criterion = nn.BCELoss()  # loss function (binary cross entropy loss or log loss)
-optimizer = optim.SGD(net.parameters(), lr=0.0001, momentum=0.999)  # to update the weights
-# here optimizer = sigmoid gradient descent with learning rate or 0.0001
-
-"""# Train the NN"""
-
-net.train()
-losses = []
-accs = []
-ws = []
-bs = []
-for epoch in range(10000):  # do 10,000 epoch
-    optimizer.zero_grad()  # zero the gradients
-    outputs = net(x_train)  # Forward
-    loss = criterion(outputs, y_train)  # Calculate error
-    loss.backward()  # Backward
-    optimizer.step()  # Optimize/Update parameters
-
-    # Track the changes - This is normally done using tensorboard or similar
-    losses.append(loss.item())
-    accs.append(sklearn.metrics.accuracy_score([1 if x > 0.5 else 0 for x in outputs.numpy()], y_train.cpu().numpy()))
-    ws.append(net.fc1.weight.numpy()[0][0])
-    bs.append(net.fc1.bias.numpy()[0])
-
-    # print statistics
-    if epoch % 500 == 0:
-        acc = sklearn.metrics.accuracy_score([1 if x > 0.5 else 0 for x in outputs.numpy()],y_train.cpu().numpy())
-        print("Epoch: {:4} Loss: {:.5} Acc: {:.3}".format(epoch, loss.item(), acc))
-
-print('Finished Training')
-
-"""# Plot Everything"""
-fig = plt.figure()
-fig.subplots_adjust(hspace=0.6, wspace=0.6)
-fig.set_size_inches(10, 10)
-plt.subplot(2, 2, 1)
-sns.lineplot(np.arange(0, len(bs)), bs).set_title("Bias")
-plt.subplot(2, 2, 2)
-sns.lineplot(np.arange(0, len(ws)), ws).set_title("Weight")
-plt.subplot(2, 2, 3)
-sns.lineplot(np.arange(0, len(losses)), losses).set_title("loss")
-plt.subplot(2, 2, 4)
-sns.lineplot(np.arange(0, len(accs)), accs).set_title("accuracy")
-fig.show()
-
-net.eval()  # switch network to evaluation mode
-net(torch.tensor([22], dtype=torch.float32))  # 22: input temperature
-net(torch.tensor([100], dtype=torch.float32))  # how well the network generalizes with never seen temperatures
+    return [preds, df_test, df_train]

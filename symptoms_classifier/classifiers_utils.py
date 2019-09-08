@@ -1,6 +1,8 @@
 import pandas as pd
 import datetime
 import time
+import torch
+from torch import nn
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
 from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.externals import joblib
@@ -113,3 +115,72 @@ def perf_metrics(data_labels, data_preds):
 
     res = {'acc': acc_score, 'precision': precision, 'recall': recall, 'f1': f1score}
     return res
+
+
+def create_nn(nb_classes, first_layer_neurons, dropout):
+    class Net(nn.Module):
+        def __init__(self):
+            super(Net, self).__init__()
+            self.fc1 = nn.Linear(first_layer_neurons, 100)
+            self.fc2 = nn.Linear(100, nb_classes)  # 3 classes = 3 neurons
+            if dropout is not None:
+                print('using dropout')
+                self.d1 = nn.Dropout(dropout)  # do we want dropout?
+
+        def forward(self, x):
+            if dropout is not None:
+                x = self.d1(torch.relu(self.fc1(x)))
+            else:
+                x = torch.relu(self.fc1(x))  # torch.sigmoid(self.fc1(x))
+            x = torch.sigmoid(self.fc2(x))
+            return x
+
+    return Net()
+
+
+def print_nn_perf(train_preds, y_train, test_preds, y_test, multi_class=False):
+    train_preds, y_train, test_preds, y_test = clean_torch_outputs(train_preds, y_train, test_preds, y_test, multi_class=multi_class)
+
+    acc = accuracy_score(train_preds, y_train)
+    f1 = f1_score(train_preds, y_train)  # Use f1 from sklearn
+    p = precision_score(train_preds, y_train)  # Use precision from sklearn
+    r = recall_score(train_preds, y_train)  # Use recall from sklearn
+    acc_test = accuracy_score(test_preds, y_test)
+    f1_test = f1_score(test_preds, y_test)  # Use f1 from sklearn
+    p_test = precision_score(test_preds, y_test)  # Use precision from sklearn
+    r_test = recall_score(test_preds, y_test)  # Use recall from sklearn
+
+    print("TRAIN -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}"
+          .format(acc, f1, p, r))
+    print("TEST -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}"
+          .format(acc_test, f1_test, p_test, r_test))
+
+
+def evaluate_nn(y, train_preds, y_train, test_preds, y_test, multi_class=False):
+    train_preds, y_train, test_preds, y_test = clean_torch_outputs(train_preds, y_train, test_preds, y_test, multi_class=multi_class)
+
+    preds = pd.DataFrame({'class': y})
+    preds.loc[y_train.index, 'split'] = 'train'
+    preds.loc[y_test.index, 'split'] = 'test'
+    preds.loc[y_train.index, 'preds'] = train_preds
+    preds.loc[y_test.index, 'preds'] = test_preds
+
+    df_test, df_train = formatted_classification_report(y_test, y_train, test_preds, train_preds)
+
+    return [preds, df_test, df_train]
+
+
+def clean_torch_outputs(train_preds, y_train, test_preds, y_test, multi_class=False):
+    if isinstance(train_preds, torch.Tensor): train_preds = train_preds.numpy()
+    if isinstance(y_train, torch.Tensor): y_train = y_train.numpy()
+    if isinstance(test_preds, torch.Tensor): test_preds = test_preds.numpy()
+    if isinstance(y_test, torch.Tensor): y_test = y_test.numpy()
+
+    if multi_class:  # get the index of max for each row
+        train_preds = train_preds.argmax(1)  #.numpy()  # torch.max(train_preds, dim=1).indices.numpy()
+        test_preds = test_preds.argmax(1)  #.numpy()
+    else:
+        test_preds = [1 if x > 0.5 else 0 for x in test_preds]
+        train_preds = [1 if x > 0.5 else 0 for x in train_preds]
+
+    return [train_preds, y_train, test_preds, y_test]

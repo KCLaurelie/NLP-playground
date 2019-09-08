@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from symptoms_classifier.NLP_embedding import *
 from symptoms_classifier.NN_pytorch_multiclass import train_nn
+from symptoms_classifier.NN_pytorch import train_nn_simple
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
 import symptoms_classifier.classifiers_utils as cutils
 
@@ -120,12 +121,12 @@ class TextsToClassify:
     def make_numeric_class(self):
         if sorted(list(self.dataset[self.class_col].unique())) == ['negative', 'neutral', 'positive']:
             self.dataset['class_numeric'] = self.dataset[self.class_col].replace(
-                {'positive': 1, 'negative': -1, 'neutral': 0})
-            return 0
-        if self.dataset[self.class_col].dtypes == 'O':  # any other case
+                {'positive': 1, 'negative': 2, 'neutral': 0})
+        else:
+            self.dataset[self.class_col].replace({-1: 999}, inplace=True)
             lb_make = LabelEncoder()
             self.dataset['class_numeric'] = lb_make.fit_transform(self.dataset[self.class_col])
-            return 0
+        return 0
 
     # TODO create utils function outside scope
     def convert_class_2_numeric(self, binary=None, binary_main_class=None):
@@ -146,13 +147,20 @@ class TextsToClassify:
         return errors
 
     def run_neural_net(self, binary=None, binary_main_class=None, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5, n_epochs=5000
-                       , save_model=False, output_errors=False):
+                       , save_model=False, output_errors=False, multi_class=True, debug_mode=True):
         title = 'Neural Net'
         if binary is None: binary = self.binary
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
-        preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, n_epochs=n_epochs,
-                                            random_state=random_state, test_size=test_size, dropout=dropout, class_weight=class_weight)
-        self.dataset = self.dataset.merge(preds, left_index=True, right_index=True)
+        if multi_class:
+            preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, n_epochs=n_epochs
+                                                , random_state=random_state, test_size=test_size, dropout=dropout
+                                                , class_weight=class_weight, debug_mode=debug_mode)
+        else:
+            preds, df_test, df_train = train_nn_simple(x_emb=self.embedded_text, y=self.dataset.class_numeric, n_epochs=n_epochs
+                                                       , random_state=random_state, test_size=test_size, dropout=dropout
+                                                       , class_weight=class_weight, debug_mode=debug_mode)
+        # self.dataset = self.dataset.merge(preds[['split', 'preds']], left_index=True, right_index=True, suffixes=('_old', ''))
+        self.dataset[['split', 'preds']] = preds[['split', 'preds']]
         errors = self.generate_errors_report(preds_col='preds')
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
         return [title, classes, df_test, df_train, errors] if output_errors else [title, classes, df_test, df_train]

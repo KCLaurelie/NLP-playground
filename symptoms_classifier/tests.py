@@ -15,13 +15,14 @@ def test_final():
     tkns = tweets.tokenize_text(tokenization_type='lem', update_obj=True)
     w2v = tweets.train_embedding_model(embedding_algo='w2v')
     tweets.make_binary_class(binary_main_class='negative')
-    x_embw2v = tweets.embed_text(update_obj=True, embedding_algo='w2v')
-    x_emb, y, test_size, random_state, class_weight, dropout, n_epochs = [tweets.embedded_text, tweets.dataset.class_numeric, 0.2, 0, 'balanced', None, 100]
-    x_embw2v2 = tweets.embed_text(update_obj=False, embedding_algo='w2v', use_weights=True,
-                                  keywords=['virgin', 'awesome'])
-    tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
-    x_embidf = tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
+    x_embw2v = tweets.embed_text(update_obj=True, embedding_algo='w2v') #, use_weights=True, keywords=['virgin', 'awesome'])
+    x_emb, y, test_size, random_state, class_weight, dropout, n_epochs, debug_mode = [tweets.embedded_text, tweets.dataset.class_numeric, 0.2, 0, 'balanced', None, 100, True]
+    binary, binary_main_class, random_state, output_errors, multi_class, debug_mode= [True, 'negative', 0, False, True, True]
 
+    #tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
+    #x_embidf = tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
+
+    res = tweets.run_neural_net(binary=True, binary_main_class='negative', dropout=0.5, multi_class=True, n_epochs=5000)
     res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative', output_errors=True)
     row = list_to_excel(res, 'test.xlsx', sheet_name='test2', startrow=0, startcol=0)
 
@@ -31,7 +32,6 @@ def test_final():
                                      test_size=0.2,
                                      binary=True, binary_main_class='negative',
                                      save_model=False)
-    res = tweets.run_neural_net(binary=True, binary_main_class='negative', dropout=0.5, output_errors=False)
     list_to_excel(res, 'testnew.xlsx', sheet_name=str(tweets.embedding_algo), startrow=0, startcol=0)
     #w2v.wv['you']
 
