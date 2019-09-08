@@ -45,3 +45,17 @@ def plot_correl(df, cols_to_plot):
     sns.heatmap(df.corr(), linewidths=0.1, vmax=1.0, square=True, cmap=colormap, linecolor='white',
                 annot=True)
 
+
+def plot_multi_lists(lists_dic):
+    fig = plt.figure()
+    fig.subplots_adjust(hspace=0.6, wspace=0.6)
+    fig.set_size_inches(10, 10)
+
+    cpt = 0
+    for k, v in lists_dic.items():
+        cpt += 1
+        plt.subplot(2, 2, cpt)
+        sns.lineplot(np.arange(0, len(v)), v).set_title(k)
+
+    fig.show()
+
