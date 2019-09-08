@@ -25,7 +25,8 @@ def test_final():
 
     res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative', output_errors=False)
 
-    model = load_classifier_from_file(output_path + '\\test_nn_simple.pt', model_type='nn', first_layer_neurons=100)
+    model = load_classifier_from_file(output_path + '\\test_nn_simple.pt', classifier_type='nn', first_layer_neurons=100
+                                      , dropout=0.5, nb_classes=1)
     test_classifier('i love virgin america, they are awesome', classifier=model,
                     embedding_model_path=output_path + '\\test_w2v.dat', classifier_type='nn', tokenization_type='lem')
 
