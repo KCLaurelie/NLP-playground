@@ -20,7 +20,7 @@ def train_nn_simple(x_emb, y, test_size=0.2, random_state=0, class_weight='balan
     first_layer_neurons = x_train.shape[1]
 
     """# Initialize the NN, create the criterion (loss function) and the optimizer """
-    net = cutils.create_nn(nb_classes=1, first_layer_neurons=first_layer_neurons, dropout=dropout)
+    net = cutils.nn_create(nb_classes=1, first_layer_neurons=first_layer_neurons, dropout=dropout)
     criterion = nn.BCELoss()  # loss function (binary cross entropy loss or log loss)
     optimizer = optim.SGD(net.parameters(), lr=0.0001, momentum=0.999)  # sigmoid gradient descent optimizer to update the weights
 
@@ -46,17 +46,15 @@ def train_nn_simple(x_emb, y, test_size=0.2, random_state=0, class_weight='balan
             net.eval()
             test_preds = net(x_test)
             print("Epoch: {:4} Loss: {:.5f} ".format(epoch, loss.item()))
-            cutils.print_nn_perf(train_preds=train_preds.detach(), y_train=y_train,
+            cutils.nn_print_perf(train_preds=train_preds.detach(), y_train=y_train,
                                  test_preds=test_preds.detach(), y_test=y_test, multi_class=False)
     print('Finished Training')
 
     if debug_mode:
         plot_multi_lists({'Bias': bs, 'Weight': ws, 'Loss': losses, 'Accuracy': accs})
 
-    preds, df_test, df_train = cutils.evaluate_nn(y, train_preds.detach(), y_train, test_preds.detach(), y_test, multi_class=False)
+    preds, df_test, df_train = cutils.nn_classification_report(y, train_preds.detach(), y_train, test_preds.detach(), y_test, multi_class=False)
 
-    #net.eval()  # switch network to evaluation mode
     #net(torch.tensor([22], dtype=torch.float32))  # 22: input temperature
-    #net(torch.tensor([100], dtype=torch.float32))  # how well the network generalizes with never seen temperatures
 
-    return [preds, df_test, df_train]
+    return [net, preds, df_test, df_train]

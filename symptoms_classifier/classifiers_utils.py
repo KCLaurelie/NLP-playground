@@ -1,4 +1,3 @@
-import pandas as pd
 import datetime
 import time
 import torch
@@ -6,6 +5,7 @@ from torch import nn
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
 from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.externals import joblib
+from symptoms_classifier.symptoms_classifier import *
 import xgboost as xgb
 import catboost
 
@@ -47,35 +47,43 @@ def formatted_classification_report(y_test, y_train, test_preds, train_preds):
     return [df_test, df_train]
 
 
-def save_classifier_to_file(model, filename='finalized_model.sav', timestamp=True):
+def save_classifier_to_file(model, filename='finalized_model.sav', timestamp=True, model_type=None):
     if timestamp:
         st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%Hh%M')
-        filename = filename + '_created_' + str(st) + '.sav'
+        filename = str(st) + '_' + filename
     # pickle.dump(model, open(filename, 'wb'))
-    joblib.dump(model, filename)
+    if 'neural' in model_type.lower() or model_type.lower() == 'nn':
+        torch.save(model.state_dict(), filename)
+    else:
+        joblib.dump(model, filename)
     print('model saved under:', filename)
     return 0
 
 
 def load_classifier(classifier_model):
-    if isinstance(classifier_model, str):
+    if isinstance(classifier_model, str):  # loading from file / dict
         if classifier_model in classifiers.keys():
             classifier = classifiers[classifier_model]
         else:
             classifier = load_classifier_from_file(classifier_model)
-    else:
+    else:  # loading from variable
         classifier = classifier_model
     return classifier
 
 
-def load_classifier_from_file(filename):  # load the model from disk
+def load_classifier_from_file(filename, model_type=None, nn_model=None,
+                              nb_classes=1, first_layer_neurons=300, dropout=None):  # load the model from disk
     # loaded_model = pickle.load(open(filename, 'rb'))
-    loaded_model = joblib.load(filename)
-    # result = loaded_model.score(X_test, Y_test)
-    return loaded_model
+    if 'neural' in model_type.lower() or model_type.lower() == 'nn':
+        if nn_model is None:
+            nn_model = nn_create(nb_classes=nb_classes, first_layer_neurons=first_layer_neurons, dropout=dropout)
+        nn_model.load_state_dict(torch.load(filename))
+        nn_model.eval()
+        return nn_model
+    else:
+        return joblib.load(filename)
 
 
-# save trained model
 def save_model_json(model, output_file="model.json", weights_file="model.h5"):
     # serialize model to JSON
     model_json = model.to_json()
@@ -117,7 +125,7 @@ def perf_metrics(data_labels, data_preds):
     return res
 
 
-def create_nn(nb_classes, first_layer_neurons, dropout):
+def nn_create(nb_classes=1, first_layer_neurons=300, dropout=None):
     class Net(nn.Module):
         def __init__(self):
             super(Net, self).__init__()
@@ -138,25 +146,22 @@ def create_nn(nb_classes, first_layer_neurons, dropout):
     return Net()
 
 
-def print_nn_perf(train_preds, y_train, test_preds, y_test, multi_class=False):
+def nn_print_perf(train_preds, y_train, test_preds, y_test, multi_class=False):
     train_preds, y_train, test_preds, y_test = clean_torch_outputs(train_preds, y_train, test_preds, y_test, multi_class=multi_class)
 
-    acc = accuracy_score(train_preds, y_train)
-    f1 = f1_score(train_preds, y_train)  # Use f1 from sklearn
-    p = precision_score(train_preds, y_train)  # Use precision from sklearn
-    r = recall_score(train_preds, y_train)  # Use recall from sklearn
-    acc_test = accuracy_score(test_preds, y_test)
-    f1_test = f1_score(test_preds, y_test)  # Use f1 from sklearn
-    p_test = precision_score(test_preds, y_test)  # Use precision from sklearn
-    r_test = recall_score(test_preds, y_test)  # Use recall from sklearn
-
     print("TRAIN -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}"
-          .format(acc, f1, p, r))
+          .format(accuracy_score(train_preds, y_train),
+                  f1_score(train_preds, y_train),
+                  precision_score(train_preds, y_train),
+                  recall_score(train_preds, y_train)))
     print("TEST -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}"
-          .format(acc_test, f1_test, p_test, r_test))
+          .format(accuracy_score(test_preds, y_test),
+                  f1_score(test_preds, y_test),
+                  precision_score(test_preds, y_test),
+                  recall_score(test_preds, y_test)))
 
 
-def evaluate_nn(y, train_preds, y_train, test_preds, y_test, multi_class=False):
+def nn_classification_report(y, train_preds, y_train, test_preds, y_test, multi_class=False):
     train_preds, y_train, test_preds, y_test = clean_torch_outputs(train_preds, y_train, test_preds, y_test, multi_class=multi_class)
 
     preds = pd.DataFrame({'class': y})
@@ -168,6 +173,26 @@ def evaluate_nn(y, train_preds, y_train, test_preds, y_test, multi_class=False):
     df_test, df_train = formatted_classification_report(y_test, y_train, test_preds, train_preds)
 
     return [preds, df_test, df_train]
+
+
+def test_classifier(raw_text, classifier, embedding_model_path, classifier_type, embedding_algo=None,
+                    tokenization_type=None, use_weights=False, keywords=None):
+    test = TextsToClassify(
+        dataset=pd.DataFrame([[raw_text, 0]], columns=['text', 'class']),
+        class_col='class', text_col='text')
+    # Tokenize and embed text
+    if tokenization_type is None:
+        tokenization_type = detect_tokenization_type(embedding_model_path)
+    if embedding_algo is None:
+        embedding_algo = detect_embedding_model(embedding_model_path)
+    test.tokenize_text(tokenization_type=tokenization_type, update_obj=True)
+    test.embed_text(update_obj=True, embedding_model=embedding_model_path, embedding_algo=embedding_algo, use_weights=use_weights, keywords=keywords)
+    if 'nn' in classifier_type.lower() or 'neural' in classifier_type.lower():
+        emb = torch.tensor(test.embedded_text, dtype=torch.float32)
+        res = classifier(emb)
+    else:
+        res = classifier.predict(test.embedded_text)
+    return res
 
 
 def clean_torch_outputs(train_preds, y_train, test_preds, y_test, multi_class=False):

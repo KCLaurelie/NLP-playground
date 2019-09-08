@@ -65,7 +65,7 @@ class TextsToClassify:
             print('object updated with tokenized text, to view use self.dataset.tokenized_text')
         return tokenized_text
 
-    def train_embedding_model(self, embedding_algo='w2v', tokenization_type='lem', save_model=True, update_obj=True,
+    def train_embedding_model(self, embedding_algo='w2v', tokenization_type='lem', save_model_path=None, update_obj=True,
                               size=100, window=5, min_count=4,  # w2v parameters
                               min_df=0.00125, max_df=0.99, ngram_range=(1, 5), max_features=None  # tfidf params
                               ):
@@ -74,14 +74,8 @@ class TextsToClassify:
         if embedding_algo is None:
             embedding_algo = self.embedding_algo
 
-        if save_model:
-            saved_model_path = os.getcwd() + '\\symptoms_classifier\\files\\' + os.path.basename(self.filepath) + '_' \
-                               + embedding_algo
-        else:
-            saved_model_path = None
-
         w2v = fit_embedding_model(sentences=self.dataset['tokenized_text'], embedding_algo=embedding_algo,
-                                  saved_model_path=saved_model_path,
+                                  save_model_path=save_model_path,
                                   size=size, window=window, min_count=min_count,
                                   ngram_range=ngram_range, min_df=min_df, max_df=max_df, max_features=max_features)
         if update_obj:
@@ -147,26 +141,28 @@ class TextsToClassify:
         return errors
 
     def run_neural_net(self, binary=None, binary_main_class=None, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5, n_epochs=5000
-                       , save_model=False, output_errors=False, multi_class=True, debug_mode=True):
-        title = 'Neural Net'
+                       , save_model_path=None, output_errors=False, multi_class=True, debug_mode=True):
+        title = 'Neural Net' + ('_multiclass' if multi_class else '') + '_dropout=' + str(dropout)
         if binary is None: binary = self.binary
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
         if multi_class:
-            preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, n_epochs=n_epochs
-                                                , random_state=random_state, test_size=test_size, dropout=dropout
-                                                , class_weight=class_weight, debug_mode=debug_mode)
+            net, preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric,
+                                                     n_epochs=n_epochs, random_state=random_state, test_size=test_size,
+                                                     dropout=dropout, class_weight=class_weight, debug_mode=debug_mode)
         else:
-            preds, df_test, df_train = train_nn_simple(x_emb=self.embedded_text, y=self.dataset.class_numeric, n_epochs=n_epochs
-                                                       , random_state=random_state, test_size=test_size, dropout=dropout
-                                                       , class_weight=class_weight, debug_mode=debug_mode)
-        # self.dataset = self.dataset.merge(preds[['split', 'preds']], left_index=True, right_index=True, suffixes=('_old', ''))
+            net, preds, df_test, df_train = train_nn_simple(x_emb=self.embedded_text, y=self.dataset.class_numeric,
+                                                            n_epochs=n_epochs, random_state=random_state, test_size=test_size,
+                                                            dropout=dropout, class_weight=class_weight, debug_mode=debug_mode)
         self.dataset[['split', 'preds']] = preds[['split', 'preds']]
-        errors = self.generate_errors_report(preds_col='preds')
+        errors = self.generate_errors_report(preds_col='preds') if output_errors else 'error report not generated'
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
-        return [title, classes, df_test, df_train, errors] if output_errors else [title, classes, df_test, df_train]
+        self.__setattr__('trained_NN', net)
+        if save_model_path is not None:
+            cutils.save_classifier_to_file(net, filename=save_model_path, timestamp=True, model_type='nn')
+        return {'model': net, 'report': [title, classes, df_test, df_train, errors]}
 
     def run_classifier(self, classifier_model=None, binary=None, binary_main_class=None, test_size=0.2, random_state=0
-                       , save_model=False, output_errors=False):
+                       , save_model_path=None, output_errors=False):
         # if object default values not overriden
         if binary is None: binary = self.binary
         if classifier_model is None: classifier_model = self.classifier_model
@@ -187,11 +183,8 @@ class TextsToClassify:
                 'is_unbalance': 'true',
                 'boosting': 'gbdt',
                 'num_leaves': 31,
-                'feature_fraction': 0.5,
-                'bagging_fraction': 0.5,
-                'bagging_freq': 20,
-                'learning_rate': 0.05,
-                'verbose': 0
+                'feature_fraction': 0.5, 'bagging_fraction': 0.5, 'bagging_freq': 20,
+                'learning_rate': 0.05, 'verbose': 0
             }
             classifier = lgb.train(parameters, lgb.Dataset(x_emb_train, label=y_train), 100)
         else:
@@ -200,10 +193,9 @@ class TextsToClassify:
             except:
                 return ['classification algo failed for:' + title]
 
-        if save_model:
-            saved_model_path = os.getcwd() + '\\symptoms_classifier\\files\\' + os.path.basename(
-                self.filepath) + '_' + str(classifier_model)
-            cutils.save_classifier_to_file(classifier, filename=saved_model_path, timestamp=True)
+        self.__setattr__('trained_' + str(classifier_model), classifier)
+        if save_model_path is not None:
+            cutils.save_classifier_to_file(classifier, filename=save_model_path, timestamp=True)
 
         # test classifier
         test_preds = classifier.predict(x_emb_test)
@@ -214,10 +206,10 @@ class TextsToClassify:
         self.dataset.loc[y_train.index, 'preds'] = train_preds
         self.dataset.loc[y_test.index, 'preds'] = test_preds
 
-        errors = self.generate_errors_report(preds_col='preds')
+        errors = self.generate_errors_report(preds_col='preds') if output_errors else 'error report not generated'
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
         df_test, df_train = cutils.formatted_classification_report(y_test, y_train, test_preds, train_preds)
-        return [title, classes, df_test, df_train, errors] if output_errors else [title, classes, df_test, df_train]
+        return {'model': classifier, 'report': [title, classes, df_test, df_train, errors]}
 
     def run_all(self, tokenization_type='lem', embedding_model=None, classifier_model=None, binary=None,
                 binary_main_class=None, test_size=0.2):

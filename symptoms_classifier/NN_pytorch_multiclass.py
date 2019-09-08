@@ -24,7 +24,7 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
     ####################################################################################################################
     # 2. build network
     ####################################################################################################################
-    net = cutils.create_nn(nb_classes=nb_classes, first_layer_neurons=first_layer_neurons, dropout=dropout)
+    net = cutils.nn_create(nb_classes=nb_classes, first_layer_neurons=first_layer_neurons, dropout=dropout)
     weight = torch.tensor(weights) if class_weight == 'balanced' else None
     criterion = nn.CrossEntropyLoss(weight=weight)
     optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.99)  # TODO: move to Adam?
@@ -47,11 +47,11 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
             test_preds = net(x_test)
 
             print("Epoch: {:4} Loss: {:.5f} ".format(epoch, loss.item()))
-            cutils.print_nn_perf(train_preds=train_preds.detach(), y_train=y_train,
+            cutils.nn_print_perf(train_preds=train_preds.detach(), y_train=y_train,
                                  test_preds=test_preds.detach(), y_test=y_test, multi_class=True)
 
     print('Finished Training')
 
-    preds, df_test, df_train = cutils.evaluate_nn(y, train_preds.detach(), y_train, test_preds.detach(), y_test, multi_class=True)
+    preds, df_test, df_train = cutils.nn_classification_report(y, train_preds.detach(), y_train, test_preds.detach(), y_test, multi_class=True)
 
-    return [preds, df_test, df_train]
+    return [net, preds, df_test, df_train]

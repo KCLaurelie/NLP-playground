@@ -48,16 +48,7 @@ def tokenize_text_series(text_series, tokenization_type='lem', output_file_path=
 
 
 def tokenize_sentences(sentences, tokenization_type='lem', output_file_path=None):
-    if output_file_path is not None: file = open(output_file_path, 'w', encoding='utf8')
-    if 'lem' not in tokenization_type and 'stop' not in tokenization_type:
-        print('simple tokenization')
-        tokenization_type = 'wo_space'
-    elif 'lem' in tokenization_type and 'stop' not in tokenization_type:
-        print('tokenizing and lemmatizing')
-        tokenization_type = 'lem'
-    else:
-        print('tokenizing, lemmatizing and removing stopwords')
-        tokenization_type = 'lem_stop'
+    tokenization_type = detect_tokenization_type(tokenization_type)
     tok_snts = []
     for snt in sentences:
         tkns = nlp.tokenizer(snt)
@@ -69,20 +60,59 @@ def tokenize_sentences(sentences, tokenization_type='lem', output_file_path=None
             _tkns = [str(x.lemma_).lower() for x in tkns if not x.is_space and not x.is_punct
                      and not (x.is_stop and 'no' not in str(x) and 'n\'t' not in str(x))]
         tok_snts.append(_tkns)
-        if output_file_path is not None: file.write("{}\n".format("\t".join(_tkns)))
+        if output_file_path is not None: output_file_path.write("{}\n".format("\t".join(_tkns)))
 
-    if output_file_path is not None: file.close()
+    if output_file_path is not None: output_file_path.close()
     return tok_snts
 
 
-def read_tokens_list(filename):
+def detect_tokenization_type(emb_model_file):
+    emb_model_file = emb_model_file.lower()
+    if 'lem' not in emb_model_file and 'stop' not in emb_model_file:
+        res = 'wo_space'
+    elif 'lem' in emb_model_file and 'stop' not in emb_model_file:
+        res = 'lem'
+    else:
+        res = 'lem_stop'
+    print('tokenization method detected:', res)
+    return res
+
+
+def detect_embedding_model(emb_model_file):
+    emb_model_file = emb_model_file.lower()
+    if 'w2v' in emb_model_file or 'word2' in emb_model_file:
+        res = 'w2v'
+    elif 'idf' in emb_model_file and 'gensim' in emb_model_file:
+        res = 'gensim_tfidf'
+    elif 'idf' in emb_model_file:
+        res = 'tfidf'
+    else:
+        raise NotImplementedError("Model cannot be inferred from file name")
+    print('embedding model detected:', res)
+    return res
+
+
+def load_embedding_model(filename, model_type=None):
+    if model_type is None:
+        model_type = detect_embedding_model(filename.lower())
+    else:
+        model_type = model_type.lower()
+    if 'w2v' in model_type or 'word2' in model_type:
+        return Word2Vec.load(filename)
+    elif 'idf' in model_type and 'gensim' in model_type:
+        return TfidfModel.load(filename)
+    else:
+        raise NotImplementedError("Model not currently supported")
+
+
+def read_tokens_list(filename, sep="\t"):
     class SentenceIterator:
         def __init__(self, filepath):
             self.filepath = filepath
 
         def __iter__(self):
             for line in open(self.filepath):
-                yield line.split("\t")
+                yield line.split(sep)
 
     return SentenceIterator(filename)
 
@@ -98,12 +128,13 @@ def convert_snt2avgtoken(sentences, w2v_model, tokenization_type='lem', use_weig
     :param context: number of tokens to use around the keywords for weighted average option
     :return: embedded sentences
     """
+
+    if tokenization_type is None:
+        tokenization_type = detect_tokenization_type(w2v_model)
     if isinstance(w2v_model, str):  # load model if saved in file
         w2v_model = Word2Vec.load(w2v_model)
-        if 'lem' in w2v_model: tokenization_type = 'lem'
-        if 'stop' in w2v_model: tokenization_type = 'lem_stop'
-        if 'wo_space' in w2v_model: tokenization_type = 'wo_space'
-    size = w2v_model.wv.vector_size  # size of embeeding vectors
+
+    size = w2v_model.wv.vector_size  # size of embedding vectors
 
     sentences_emb = np.zeros((len(sentences), size))  # to store embedded sentences
 
@@ -146,6 +177,10 @@ def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', w2v_em
     :param context: number of tokens to use around the keywords for weighted average option
     :return: embedded sentences
     """
+
+    if embedding_algo is None:
+        embedding_algo = detect_embedding_model(str(embedding_model))
+
     embedding_algo = str(embedding_algo).lower()
 
     if 'idf' in embedding_algo and ('sklearn' in embedding_algo or 'gensim' not in embedding_algo): # TFIDF with sklearn
@@ -179,7 +214,7 @@ def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', w2v_em
     return snt_emb
 
 
-def fit_embedding_model(sentences, embedding_algo='w2v', tokenization_type='lem', saved_model_path=None, stop_words=None, sublinear_tf=True,
+def fit_embedding_model(sentences, embedding_algo='w2v', tokenization_type='lem', save_model_path=None, stop_words=None, sublinear_tf=True,
                         ngram_range=(1, 5), size=100, window=5, min_count=4, workers=4, min_df=0.00125, max_df=0.7, max_features=None):
     """
     train embedding model using series of texts (at the moment only allows tfidf and word2vec)
@@ -196,7 +231,7 @@ def fit_embedding_model(sentences, embedding_algo='w2v', tokenization_type='lem'
     :param embedding_algo: embedding model type (can be either tfidf or word2vec)
     :param stop_words: tokens that will be removed from the resulting tokens. If 'english' will load nltk list
     :param size: desired size for each embedding vector
-    :param saved_model_path: option to save trained model (if None will not save, otherwise will use value as file_path)
+    :param save_model_path: option to save trained model (if None will not save, otherwise will use value as file_path)
     :return: word embeddings
     """
 
@@ -213,21 +248,21 @@ def fit_embedding_model(sentences, embedding_algo='w2v', tokenization_type='lem'
                                       sublinear_tf=sublinear_tf, use_idf=True, preprocessor=' '.join, max_features=max_features)
 
         w2v = _vectorizer.fit(sentences)
-        if saved_model_path is not None:
-            with open(saved_model_path + '_mindf_' + str(min_df) + '_maxdf_' + str(max_df) + '_ngram_' + str(ngram_range) + '.pickle', 'wb') as fin:
+        if save_model_path is not None:
+            with open(save_model_path + '_mindf_' + str(min_df) + '_maxdf_' + str(max_df) + '_ngram_' + str(ngram_range) + '.pickle', 'wb') as fin:
                 pickle.dump(w2v, fin)
     elif 'idf' in embedding_algo and 'gensim' in embedding_algo:
         print('training gensim TfIdf model')
         tkn_sentences_dict = corpora.Dictionary(sentences)
         tkn_sentences_corpus = [tkn_sentences_dict.doc2bow(stn) for stn in sentences]
         w2v = TfidfModel(tkn_sentences_corpus)
-        if saved_model_path is not None:
-            w2v.save(saved_model_path + embedding_algo + '.model')
+        if save_model_path is not None:
+            w2v.save(save_model_path + embedding_algo + '.model')
     elif 'word2vec' in embedding_algo or 'w2v' in embedding_algo:
         print('training Word2Vec model with:', '\nsize:', size, '\nwindow:', window, '\nmincount:', min_count)
         w2v = Word2Vec(sentences, size=size, window=window, min_count=min_count, workers=workers)  # train word2vec
-        if saved_model_path is not None:
-            w2v.save(saved_model_path + '_size_' + str(size) + '_win_' + str(window) + '_mincount_' + str(min_count) + '.model')
+        if save_model_path is not None:
+            w2v.save(save_model_path + '_size_' + str(size) + '_win_' + str(window) + '_mincount_' + str(min_count) + '.model')
     else:
         return 'unknown embedding_algo'
     return w2v

@@ -1,7 +1,6 @@
-from symptoms_classifier.symptoms_classifier import *
-from symptoms_classifier.NLP_embedding import *
-from gensim.models import Word2Vec
 from code_utils.general_utils import list_to_excel
+from symptoms_classifier.classifiers_utils import *
+output_path = r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier\files'
 
 
 def test_final():
@@ -13,25 +12,29 @@ def test_final():
         classifier_model='SVM')
     df = tweets.load_data()
     tkns = tweets.tokenize_text(tokenization_type='lem', update_obj=True)
-    w2v = tweets.train_embedding_model(embedding_algo='w2v')
+    w2v = tweets.train_embedding_model(embedding_algo='w2v',
+                                       save_model_path=output_path + '\\test_w2v.dat')
     tweets.make_binary_class(binary_main_class='negative')
-    x_embw2v = tweets.embed_text(update_obj=True, embedding_algo='w2v') #, use_weights=True, keywords=['virgin', 'awesome'])
-    x_emb, y, test_size, random_state, class_weight, dropout, n_epochs, debug_mode = [tweets.embedded_text, tweets.dataset.class_numeric, 0.2, 0, 'balanced', None, 100, True]
-    binary, binary_main_class, random_state, output_errors, multi_class, debug_mode= [True, 'negative', 0, False, True, True]
+    emb = tweets.embed_text(update_obj=True, embedding_model=w2v, embedding_algo='w2v') #, use_weights=True, keywords=['virgin', 'awesome'])
 
-    #tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
-    #x_embidf = tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
+    # tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
+    # tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
 
-    res = tweets.run_neural_net(binary=True, binary_main_class='negative', dropout=0.5, multi_class=True, n_epochs=5000)
-    res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative', output_errors=True)
-    row = list_to_excel(res, 'test.xlsx', sheet_name='test2', startrow=0, startcol=0)
+    res = tweets.run_neural_net(binary=True, binary_main_class='negative', dropout=0.5, multi_class=False, n_epochs=50,
+                                save_model_path=output_path + '\\test_nn_simple.pt')
+
+    res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative', output_errors=False)
+
+    model = load_classifier_from_file(output_path + '\\test_nn_simple.pt', model_type='nn', first_layer_neurons=100)
+    test_classifier('i love virgin america, they are awesome', classifier=model,
+                    embedding_model_path=output_path + '\\test_w2v.dat', classifier_type='nn', tokenization_type='lem')
+
+    row = list_to_excel(res['report'], 'test.xlsx', sheet_name='test2', startrow=0, startcol=0)
 
     res = []
     for model in cutils.classifiers.keys():
-        res += tweets.run_classifier(classifier_model=model,
-                                     test_size=0.2,
-                                     binary=True, binary_main_class='negative',
-                                     save_model=False)
+        tmp_res = tweets.run_classifier(classifier_model=model,test_size=0.2, binary=True, binary_main_class='negative',save_model=False)
+        res += tmp_res['report']
     list_to_excel(res, 'testnew.xlsx', sheet_name=str(tweets.embedding_algo), startrow=0, startcol=0)
     #w2v.wv['you']
 
