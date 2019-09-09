@@ -9,7 +9,6 @@ import numpy as np
 from nltk import tokenize
 from nltk.corpus import stopwords
 import code_utils.general_utils as gutils
-# spacy stuff
 import spacy
 import nltk
 nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
@@ -215,7 +214,7 @@ def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', w2v_em
 
 
 def fit_embedding_model(sentences, embedding_algo='w2v', tokenization_type='lem', save_model_path=None, stop_words=None, sublinear_tf=True,
-                        ngram_range=(1, 5), size=100, window=5, min_count=4, workers=4, min_df=0.00125, max_df=0.7, max_features=None):
+                        ngram_range=(1, 5), size=300, window=5, min_count=1, workers=4, min_df=0.00125, max_df=0.7, max_features=None):
     """
     train embedding model using series of texts (at the moment only allows tfidf and word2vec)
     :param sentences: pd.Series of texts or tokens (1 row = 1 sentence or 1 list of tokens)

@@ -96,23 +96,32 @@ def perf_metrics(data_labels, data_preds):
     return res
 
 
-def nn_print_perf(train_preds, y_train, test_preds, y_test, multi_class=False):
-    train_preds, y_train, test_preds, y_test = clean_torch_outputs(train_preds, y_train, test_preds, y_test, multi_class=multi_class)
+def nn_graph_perf(train_preds, y_train, net, loss, losses=[], accs=[], ws=[], bs=[], multi_class=False):
+    train_preds = clean_torch_output(train_preds, multi_class=multi_class)
+    losses.append(loss.item())
+    accs.append(accuracy_score([round(value) for value in train_preds], y_train))
+    ws.append(net.fc1.weight.detach().numpy()[0][0])
+    bs.append(net.fc1.bias.detach().numpy()[0])
+    return [losses, accs, ws, bs]
 
+
+def nn_print_perf(train_preds, y_train, test_preds, y_test, multi_class=False, average='weighted'):
+    train_preds, y_train, test_preds, y_test = clean_torch_vectors(train_preds, y_train, test_preds, y_test, multi_class=multi_class)
+    # average = 'weighted' if y_train.nunique() <= 2 else 'binary'
     print("TRAIN -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}"
           .format(accuracy_score(train_preds, y_train),
-                  f1_score(train_preds, y_train),
-                  precision_score(train_preds, y_train),
-                  recall_score(train_preds, y_train)))
+                  f1_score(train_preds, y_train, average=average),
+                  precision_score(train_preds, y_train, average=average),
+                  recall_score(train_preds, y_train, average=average)))
     print("TEST -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}"
           .format(accuracy_score(test_preds, y_test),
-                  f1_score(test_preds, y_test),
-                  precision_score(test_preds, y_test),
-                  recall_score(test_preds, y_test)))
+                  f1_score(test_preds, y_test, average=average),
+                  precision_score(test_preds, y_test, average=average),
+                  recall_score(test_preds, y_test, average=average)))
 
 
 def nn_classification_report(y, train_preds, y_train, test_preds, y_test, multi_class=False):
-    train_preds, y_train, test_preds, y_test = clean_torch_outputs(train_preds, y_train, test_preds, y_test, multi_class=multi_class)
+    train_preds, y_train, test_preds, y_test = clean_torch_vectors(train_preds, y_train, test_preds, y_test, multi_class=multi_class)
 
     preds = pd.DataFrame({'class': y})
     preds.loc[y_train.index, 'split'] = 'train'
@@ -146,17 +155,25 @@ def test_classifier(raw_text, classifier, embedding_model_path, classifier_type,
     return res
 
 
-def clean_torch_outputs(train_preds, y_train, test_preds, y_test, multi_class=False):
-    if isinstance(train_preds, torch.Tensor): train_preds = train_preds.numpy()
+def clean_torch_vectors(train_preds, y_train, test_preds, y_test, multi_class=False):
     if isinstance(y_train, torch.Tensor): y_train = y_train.numpy()
-    if isinstance(test_preds, torch.Tensor): test_preds = test_preds.numpy()
     if isinstance(y_test, torch.Tensor): y_test = y_test.numpy()
 
-    if multi_class:  # get the index of max for each row
-        train_preds = train_preds.argmax(1)  #.numpy()  # torch.max(train_preds, dim=1).indices.numpy()
-        test_preds = test_preds.argmax(1)  #.numpy()
-    else:
-        test_preds = [1 if x > 0.5 else 0 for x in test_preds]
-        train_preds = [1 if x > 0.5 else 0 for x in train_preds]
+    train_preds = clean_torch_output(train_preds, multi_class=multi_class)
+    test_preds = clean_torch_output(test_preds, multi_class=multi_class)
 
     return [train_preds, y_train, test_preds, y_test]
+
+
+def clean_torch_output(pred_vec, multi_class=False):
+    if isinstance(pred_vec, torch.Tensor):
+        try:
+            pred_vec = pred_vec.numpy()
+        except:
+            # print('detaching')
+            pred_vec = pred_vec.detach().numpy()
+    if multi_class:  # get the index of max for each row
+        pred_vec = pred_vec.argmax(1)
+    else:
+        pred_vec = [1 if x > 0.5 else 0 for x in pred_vec]
+    return pred_vec

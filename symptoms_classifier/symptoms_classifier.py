@@ -2,7 +2,7 @@ import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from symptoms_classifier.NLP_embedding import *
-from symptoms_classifier.NN_pytorch import train_nn_simple, train_nn
+from symptoms_classifier.NN_pytorch import train_nn
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
 import symptoms_classifier.classifiers_utils as cutils
 
@@ -52,6 +52,7 @@ class TextsToClassify:
         data = data[cols]
 
         self.dataset = data
+        self.make_numeric_class()
         print('data loaded')
         return data
 
@@ -64,19 +65,14 @@ class TextsToClassify:
             print('object updated with tokenized text, to view use self.dataset.tokenized_text')
         return tokenized_text
 
-    def train_embedding_model(self, embedding_algo='w2v', tokenization_type='lem', save_model_path=None, update_obj=True,
-                              size=100, window=5, min_count=4,  # w2v parameters
-                              min_df=0.00125, max_df=0.99, ngram_range=(1, 5), max_features=None  # tfidf params
-                              ):
+    def train_embedding_model(self, embedding_algo='w2v', tokenization_type='lem', update_obj=True, **kwargs):
         if 'tokenized_text' not in self.dataset.columns:
             self.tokenize_text(tokenization_type=tokenization_type, update_obj=True)
         if embedding_algo is None:
             embedding_algo = self.embedding_algo
 
-        w2v = fit_embedding_model(sentences=self.dataset['tokenized_text'], embedding_algo=embedding_algo,
-                                  save_model_path=save_model_path,
-                                  size=size, window=window, min_count=min_count,
-                                  ngram_range=ngram_range, min_df=min_df, max_df=max_df, max_features=max_features)
+        w2v = fit_embedding_model(sentences=self.dataset['tokenized_text'], embedding_algo=embedding_algo, **kwargs)
+
         if update_obj:
             self.__setattr__('embedding_model', w2v)
             self.__setattr__('embedding_algo', embedding_algo)
@@ -139,19 +135,17 @@ class TextsToClassify:
             self.__setattr__('classifier_errors', errors)
         return errors
 
-    def run_neural_net(self, binary=None, binary_main_class=None, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5, n_epochs=5000
-                       , save_model_path=None, output_errors=False, multi_class=True, debug_mode=True, timestamp=False):
+    def run_neural_net(self, binary=None, binary_main_class=None, multi_class=True, dropout=0.5
+                       , output_errors=False, save_model_path=None, timestamp=False, **kwargs):
+                       #, test_size=0.2, random_state=0, class_weight='balanced', n_epochs=5000, debug_mode=True):
         title = 'Neural Net' + ('_multiclass' if multi_class else '') + '_dropout=' + str(dropout)
         if binary is None: binary = self.binary
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
-        if multi_class:
-            net, preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric,
-                                                     n_epochs=n_epochs, random_state=random_state, test_size=test_size,
-                                                     dropout=dropout, class_weight=class_weight, debug_mode=debug_mode)
-        else:
-            net, preds, df_test, df_train = train_nn_simple(x_emb=self.embedded_text, y=self.dataset.class_numeric,
-                                                            n_epochs=n_epochs, random_state=random_state, test_size=test_size,
-                                                            dropout=dropout, class_weight=class_weight, debug_mode=debug_mode)
+
+        net, preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, multi_class=multi_class, dropout=dropout, **kwargs)
+                                                 # n_epochs=n_epochs, random_state=random_state, test_size=test_size,
+                                                 #  class_weight=class_weight, debug_mode=debug_mode)
+
         self.dataset[['split', 'preds']] = preds[['split', 'preds']]
         errors = self.generate_errors_report(preds_col='preds') if output_errors else 'error report not generated'
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
