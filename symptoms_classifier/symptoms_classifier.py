@@ -2,8 +2,7 @@ import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from symptoms_classifier.NLP_embedding import *
-from symptoms_classifier.NN_pytorch_multiclass import train_nn
-from symptoms_classifier.NN_pytorch import train_nn_simple
+from symptoms_classifier.NN_pytorch import train_nn_simple, train_nn
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
 import symptoms_classifier.classifiers_utils as cutils
 
@@ -141,7 +140,7 @@ class TextsToClassify:
         return errors
 
     def run_neural_net(self, binary=None, binary_main_class=None, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5, n_epochs=5000
-                       , save_model_path=None, output_errors=False, multi_class=True, debug_mode=True):
+                       , save_model_path=None, output_errors=False, multi_class=True, debug_mode=True, timestamp=False):
         title = 'Neural Net' + ('_multiclass' if multi_class else '') + '_dropout=' + str(dropout)
         if binary is None: binary = self.binary
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
@@ -158,7 +157,7 @@ class TextsToClassify:
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()
         self.__setattr__('trained_NN', net)
         if save_model_path is not None:
-            cutils.save_classifier_to_file(net, filename=save_model_path, timestamp=True, model_type='nn')
+            cutils.save_classifier_to_file(net, filename=save_model_path, timestamp=timestamp, model_type='nn')
         return {'model': net, 'report': [title, classes, df_test, df_train, errors]}
 
     def run_classifier(self, classifier_model=None, binary=None, binary_main_class=None, test_size=0.2, random_state=0

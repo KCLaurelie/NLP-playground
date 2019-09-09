@@ -1,13 +1,14 @@
+import pandas as pd
+import os
 import datetime
 import time
 import torch
-from torch import nn
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
 from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.externals import joblib
-from symptoms_classifier.symptoms_classifier import *
 import xgboost as xgb
 import catboost
+from symptoms_classifier.NLP_embedding import detect_tokenization_type, detect_embedding_model
 
 classifiers = {
     'LightGBM': 'LightGBM',
@@ -47,13 +48,13 @@ def formatted_classification_report(y_test, y_train, test_preds, train_preds):
     return [df_test, df_train]
 
 
-def save_classifier_to_file(model, filename='finalized_model.sav', timestamp=True, model_type=None):
+def save_classifier_to_file(model, filename, timestamp=False, model_type=None):
     if timestamp:
         st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%Hh%M')
-        filename = str(st) + '_' + filename
-    # pickle.dump(model, open(filename, 'wb'))
+        file_root, file_extension = os.path.splitext(filename)
+        filename = file_root + '_' + str(st) + file_extension
     if 'neural' in model_type.lower() or model_type.lower() == 'nn':
-        torch.save(model.state_dict(), filename)
+        torch.save(model, filename)
     else:
         joblib.dump(model, filename)
     print('model saved under:', filename)
@@ -75,41 +76,11 @@ def load_classifier_from_file(filename, classifier_type=None, nn_model=None,
                               nb_classes=1, first_layer_neurons=300, dropout=None):  # load the model from disk
     # loaded_model = pickle.load(open(filename, 'rb'))
     if 'neural' in classifier_type.lower() or classifier_type.lower() == 'nn':
-        if nn_model is None:
-            nn_model = nn_create(nb_classes=nb_classes, first_layer_neurons=first_layer_neurons, dropout=dropout)
-        nn_model.load_state_dict(torch.load(filename))
+        nn_model=torch.load(filename)
         nn_model.eval()
         return nn_model
     else:
         return joblib.load(filename)
-
-
-def save_model_json(model, output_file="model.json", weights_file="model.h5"):
-    # serialize model to JSON
-    model_json = model.to_json()
-    with open(output_file, "w") as json_file:
-        json_file.write(model_json)
-    # serialize weights to HDF5
-    model.save_weights(weights_file)
-    return 0
-
-
-# load json and create model
-def load_model_json(json_file, weights_file):
-    from keras.models import model_from_json
-    json_file = open(json_file, 'r')
-    loaded_model_json = json_file.read()
-    json_file.close()
-    loaded_model = model_from_json(loaded_model_json)
-    # load weights into new model & compile model
-    loaded_model.load_weights(weights_file)
-    loaded_model.compile(loss='binary_crossentropy',
-                         optimizer='adam',
-                         metrics=['accuracy'])
-    print("Loaded model from disk")
-
-    # score_saved_model = loaded_model.evaluate(x_test, y_test, verbose=0)
-    return loaded_model
 
 
 def perf_metrics(data_labels, data_preds):
@@ -123,27 +94,6 @@ def perf_metrics(data_labels, data_preds):
 
     res = {'acc': acc_score, 'precision': precision, 'recall': recall, 'f1': f1score}
     return res
-
-
-def nn_create(nb_classes=1, first_layer_neurons=300, dropout=None):
-    class Net(nn.Module):
-        def __init__(self):
-            super(Net, self).__init__()
-            self.fc1 = nn.Linear(first_layer_neurons, 100)
-            self.fc2 = nn.Linear(100, nb_classes)  # 3 classes = 3 neurons
-            if dropout is not None:
-                print('using dropout')
-                self.d1 = nn.Dropout(dropout)  # do we want dropout?
-
-        def forward(self, x):
-            if dropout is not None:
-                x = self.d1(torch.relu(self.fc1(x)))
-            else:
-                x = torch.relu(self.fc1(x))  # torch.sigmoid(self.fc1(x))
-            x = torch.sigmoid(self.fc2(x))
-            return x
-
-    return Net()
 
 
 def nn_print_perf(train_preds, y_train, test_preds, y_test, multi_class=False):
@@ -177,6 +127,7 @@ def nn_classification_report(y, train_preds, y_train, test_preds, y_test, multi_
 
 def test_classifier(raw_text, classifier, embedding_model_path, classifier_type, embedding_algo=None,
                     tokenization_type=None, use_weights=False, keywords=None):
+    from symptoms_classifier.symptoms_classifier import TextsToClassify
     test = TextsToClassify(
         dataset=pd.DataFrame([[raw_text, 0]], columns=['text', 'class']),
         class_col='class', text_col='text')

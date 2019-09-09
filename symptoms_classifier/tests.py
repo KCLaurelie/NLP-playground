@@ -1,5 +1,5 @@
 from code_utils.general_utils import list_to_excel
-from symptoms_classifier.classifiers_utils import *
+from symptoms_classifier.symptoms_classifier import *
 output_path = r'C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier\files'
 
 
@@ -23,14 +23,12 @@ def test_final():
     res = tweets.run_neural_net(binary=True, binary_main_class='negative', dropout=0.5, multi_class=False, n_epochs=50,
                                 save_model_path=output_path + '\\test_nn_simple.pt')
 
+
     res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative', output_errors=False)
 
-    model = load_classifier_from_file(output_path + '\\test_nn_simple.pt', classifier_type='nn', first_layer_neurons=100
-                                      , dropout=0.5, nb_classes=1)
-    test_classifier('i love virgin america, they are awesome', classifier=model,
+    model = cutils.load_classifier_from_file(output_path + '\\test_nn_simple.pt', classifier_type='nn')
+    cutils.test_classifier('i love virgin america, they are awesome', classifier=model,
                     embedding_model_path=output_path + '\\test_w2v.dat', classifier_type='nn', tokenization_type='lem')
-
-    row = list_to_excel(res['report'], 'test.xlsx', sheet_name='test2', startrow=0, startcol=0)
 
     res = []
     for model in cutils.classifiers.keys():
