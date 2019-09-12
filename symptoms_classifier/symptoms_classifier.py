@@ -56,18 +56,20 @@ class TextsToClassify:
         print('data loaded')
         return data
 
-    def tokenize_text(self, tokenization_type='lem', update_obj=True, output_file_path=None):
+    def tokenize_text(self, tokenization_type='lem', update_obj=True, output_file_path=None, remove_contractions=True):
         sentences = self.dataset[self.text_col]
-        tokenized_text = tokenize_sentences(sentences, tokenization_type=tokenization_type, output_file_path=output_file_path)
+        tokenized_text = tokenize_sentences(sentences, tokenization_type=tokenization_type
+                                            , output_file_path=output_file_path, remove_contractions=remove_contractions)
         if update_obj:
             self.dataset['tokenized_text'] = tokenized_text
             self.__setattr__('tokenization_type', tokenization_type)
             print('object updated with tokenized text, to view use self.dataset.tokenized_text')
         return tokenized_text
 
-    def train_embedding_model(self, embedding_algo='w2v', tokenization_type='lem', update_obj=True, **kwargs):
+    def train_embedding_model(self, embedding_algo='w2v', tokenization_type='lem', update_obj=True,
+                              remove_contractions=True, **kwargs):
         if 'tokenized_text' not in self.dataset.columns:
-            self.tokenize_text(tokenization_type=tokenization_type, update_obj=True)
+            self.tokenize_text(tokenization_type=tokenization_type, update_obj=True, remove_contractions=remove_contractions)
         if embedding_algo is None:
             embedding_algo = self.embedding_algo
 
@@ -80,13 +82,21 @@ class TextsToClassify:
 
         return w2v
 
-    def embed_text(self, embedding_algo=None, embedding_model=None, tokenization_type='lem', use_weights=False, keywords=None, context=10, update_obj=True):
+    def embed_text(self, embedding_algo=None, embedding_model=None, tokenization_type=None, remove_contractions=True
+                   , use_weights=False, keywords=None, context=10, update_obj=True):
         if embedding_model is None:
             embedding_model = self.embedding_model
         if embedding_algo is None:
             embedding_algo = self.embedding_algo
-        if 'tokenized_text' not in self.dataset.columns:
-            self.tokenize_text(tokenization_type=tokenization_type, update_obj=True)
+        if tokenization_type is not None:
+            print('overriding previous tokenization with:', tokenization_type)
+            self.tokenize_text(tokenization_type=tokenization_type, update_obj=True, remove_contractions=remove_contractions)
+        elif (tokenization_type is None) and ('tokenized_text' not in self.dataset.columns):
+            print('trying to detect tokenization from embedding model:', tokenization_type)
+            tokenization_type = detect_tokenization_type(str(embedding_model))
+            self.tokenize_text(tokenization_type=tokenization_type, update_obj=True, remove_contractions=remove_contractions)
+        else:
+            print('using tokenization previosuly saved:', self.tokenization_type)
 
         # TODO: extend to other models?
         embedded_text = embed_sentences(tkn_sentences=self.dataset.tokenized_text,
@@ -137,14 +147,11 @@ class TextsToClassify:
 
     def run_neural_net(self, binary=None, binary_main_class=None, multi_class=True, dropout=0.5
                        , output_errors=False, save_model_path=None, timestamp=False, **kwargs):
-                       #, test_size=0.2, random_state=0, class_weight='balanced', n_epochs=5000, debug_mode=True):
         title = 'Neural Net' + ('_multiclass' if multi_class else '') + '_dropout=' + str(dropout)
         if binary is None: binary = self.binary
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
 
         net, preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, multi_class=multi_class, dropout=dropout, **kwargs)
-                                                 # n_epochs=n_epochs, random_state=random_state, test_size=test_size,
-                                                 #  class_weight=class_weight, debug_mode=debug_mode)
 
         self.dataset[['split', 'preds']] = preds[['split', 'preds']]
         errors = self.generate_errors_report(preds_col='preds') if output_errors else 'error report not generated'
@@ -204,10 +211,10 @@ class TextsToClassify:
         df_test, df_train = cutils.formatted_classification_report(y_test, y_train, test_preds, train_preds)
         return {'model': classifier, 'report': [title, classes, df_test, df_train, errors]}
 
-    def run_all(self, tokenization_type='lem', embedding_model=None, classifier_model=None, binary=None,
-                binary_main_class=None, test_size=0.2):
+    def run_all(self, tokenization_type='lem', remove_contractions=True, embedding_model=None, classifier_model=None,
+                binary=None, binary_main_class=None, test_size=0.2):
         self.load_data()
-        self.tokenize_text(tokenization_type=tokenization_type, update_obj=True)
+        self.tokenize_text(tokenization_type=tokenization_type, update_obj=True, remove_contractions=remove_contractions)
         if embedding_model is None:
             embedding_model = self.train_embedding_model(update_obj=True)
         self.embed_text(update_obj=True, embedding_model=embedding_model)

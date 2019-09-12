@@ -1,6 +1,6 @@
 from code_utils.global_variables import *
 import pickle  # to save models
-from gensim.models import Word2Vec, TfidfModel
+from gensim.models import Word2Vec, TfidfModel, KeyedVectors
 from gensim.matutils import corpus2csc
 from gensim import corpora
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -30,7 +30,7 @@ def top_features_idf(vectorizer, top_n=2):
     return _top_features
 
 
-def tokenize_text_series(text_series, tokenization_type='lem', output_file_path=None):
+def tokenize_text_series(text_series, **kwargs):
     """
     tokenizes series of texts using spacy (first splits in sentences then tokens)
     :param text_series: pd.Series of texts
@@ -42,17 +42,19 @@ def tokenize_text_series(text_series, tokenization_type='lem', output_file_path=
     for rawtext in text_series:
         snt_tmp = text2sentences(rawtext, remove_punctuation=False)
         snt = snt.append(snt_tmp, ignore_index=True)
-    res = tokenize_sentences(snt, tokenization_type=tokenization_type, output_file_path=output_file_path)
+    res = tokenize_sentences(snt, **kwargs)
     return res
 
 
-def tokenize_sentences(sentences, tokenization_type='lem', output_file_path=None):
-    tokenization_type = detect_tokenization_type(tokenization_type)
+def tokenize_sentences(sentences, tokenization_type=None, output_file_path=None, remove_contractions=True):
+    if tokenization_type not in ('lem', 'wo_space', 'lem_stop'):
+        tokenization_type = detect_tokenization_type(tokenization_type)
+    print('tokenizing text using', tokenization_type)
     tok_snts = []
     for snt in sentences:
-        tkns = nlp.tokenizer(snt)
+        tkns = nlp.tokenizer(contractions.fix(snt.replace('i', 'I'))) if remove_contractions else nlp.tokenizer(snt)
         if tokenization_type == 'wo_space':
-            _tkns = [str(x.text) for x in tkns if not x.is_space]
+            _tkns = [str(x.text).lower() for x in tkns if not x.is_space]
         elif tokenization_type == 'lem':
             _tkns = [str(x.lemma_).lower() for x in tkns if not x.is_space and not x.is_punct]
         else:
@@ -66,6 +68,9 @@ def tokenize_sentences(sentences, tokenization_type='lem', output_file_path=None
 
 
 def detect_tokenization_type(emb_model_file):
+    if emb_model_file is None:
+        print('no embedding file or tokenization type provided, using default tokenization method (simple without space)')
+        return 'wo_space'
     emb_model_file = emb_model_file.lower()
     if 'lem' not in emb_model_file and 'stop' not in emb_model_file:
         res = 'wo_space'
@@ -97,9 +102,14 @@ def load_embedding_model(filename, model_type=None):
     else:
         model_type = model_type.lower()
     if 'w2v' in model_type or 'word2' in model_type:
-        return Word2Vec.load(filename)
+        try:
+            return Word2Vec.load(filename)
+        except:
+            return KeyedVectors.load(filename)
     elif 'idf' in model_type and 'gensim' in model_type:
         return TfidfModel.load(filename)
+    elif 'idf' in model_type and 'sklearn' in model_type:  # TFIDF with sklearn
+        return pickle.load(open(filename), "rb")
     else:
         raise NotImplementedError("Model not currently supported")
 
@@ -182,21 +192,24 @@ def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', w2v_em
 
     embedding_algo = str(embedding_algo).lower()
 
+    if isinstance(embedding_model, str):
+        embedding_model = load_embedding_model(embedding_model, model_type=embedding_algo)
+
     if 'idf' in embedding_algo and ('sklearn' in embedding_algo or 'gensim' not in embedding_algo): # TFIDF with sklearn
         print('embedding using sklearn TfIdf model')
-        if isinstance(embedding_model, str):  # load model if stored in file
-            embedding_model = pickle.load(open(embedding_model), "rb")
+        # if isinstance(embedding_model, str):  # load model if stored in file
+        #     embedding_model = pickle.load(open(embedding_model), "rb")
         snt_emb = embedding_model.transform(tkn_sentences).toarray()
     elif 'idf' in embedding_algo and 'gensim' in embedding_algo:  # TFIDF with gensim
         print('embedding using gensim TfIdf model')
-        if isinstance(embedding_model, str):  # load model if stored in file
-            embedding_model = TfidfModel.load(embedding_model)
+        # if isinstance(embedding_model, str):  # load model if stored in file
+        #     embedding_model = TfidfModel.load(embedding_model)
         tkn_sentences_dict = corpora.Dictionary(tkn_sentences)
         tkn_sentences_corpus = [tkn_sentences_dict.doc2bow(stn) for stn in tkn_sentences]
         snt_emb = corpus2csc(embedding_model[tkn_sentences_corpus]).T.toarray()
     elif 'word2vec' in embedding_algo or 'w2v' in embedding_algo:
-        if isinstance(embedding_model, str):  # load model if stored in file
-            embedding_model = Word2Vec.load(embedding_model)
+        # if isinstance(embedding_model, str):  # load model if stored in file
+        #     embedding_model = Word2Vec.load(embedding_model)
 
         if w2v_emb_option == 'word':  # TODO: IS THIS WORKING ????
             snt_emb = np.zeros((len(tkn_sentences), embedding_model.wv.vector_size))
@@ -267,7 +280,7 @@ def fit_embedding_model(sentences, embedding_algo='w2v', tokenization_type='lem'
     return w2v
 
 
-def clean_and_embed_text(sentences, w2v, tokenization_type, keywords, ln=15):
+def embed_text_with_padding(sentences, w2v, tokenization_type, keywords, ln=40):
     EMB_SIZE = w2v.wv.vector_size
     # tokenize text
     x = tokenize_sentences(sentences, tokenization_type=tokenization_type)
