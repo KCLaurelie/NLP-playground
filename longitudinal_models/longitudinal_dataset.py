@@ -169,6 +169,8 @@ class DatasetMMSE(Dataset):
         df[static_data_col] = df[static_data_col].apply(lambda x: x.astype(str).str.lower())
         df['age_bucket_report'] = '[' + (gutils.round_nearest(df.age_at_score, 5, 'up') - 5).astype(str) + '-' \
                                   + gutils.round_nearest(df.age_at_score, 5, 'up').astype(str) + ']'
+        df['imd_bucket'] = '[' + (gutils.round_nearest(df.imd, 10, 'up') - 10).astype(str) + '-' \
+                           + gutils.round_nearest(df.imd, 10, 'up').astype(str) + ']'
         df.loc[df['ethnicity'].str.contains('other', case=False, na=False), 'ethnicity'] = 'other ethnicity'
         df[static_data_col] = df[static_data_col].replace(
             ['null', 'unknown', np.nan, 'nan', 'other', 'not specified', 'not disclosed', 'not stated (z)', 'Not Known']
@@ -268,7 +270,7 @@ class DatasetMMSE(Dataset):
 default_dataset = DatasetMMSE(
     file_path='https://raw.githubusercontent.com/KCLaurelie/toy-models/master/longitudinal_models/mmse_trajectory_synthetic.csv?token=ALKII2WYE6LIQJM6RFQCEQK5JSILS',
     baseline_cols=['brcid', 'age_at_score', 'score_date', 'score_combined', 'bmi_score', 'plasma_glucose_value', 'diastolic_value',
-                   'systolic_value', 'smoking_status', 'bmi_bucket', 'diabetes_bucket', 'bp_bucket'],
+                   'systolic_value', 'smoking_status', 'bmi_bucket', 'diabetes_bucket', 'bp_bucket', 'imd_bucket'],
     key='brcid',
     timestamp='age_at_score',
     health_numeric_cols=['bmi_score', 'plasma_glucose_value', 'diastolic_value', 'systolic_value'],
@@ -277,7 +279,7 @@ default_dataset = DatasetMMSE(
                 'age_at_score', 'age_at_score_baseline', 'score_combined_baseline', 'gender', 'ethnicity_group',
                 'first_language', 'occupation', 'living_status', 'marital_status', 'education_bucket_raw',
                 'smoking_status_baseline', 'plasma_glucose_value_baseline', 'diastolic_value_baseline', 'systolic_value_baseline',
-                'bmi_score_baseline', 'diabetes_bucket_baseline', 'bp_bucket_baseline', 'bmi_bucket_baseline'],
+                'bmi_score_baseline', 'diabetes_bucket_baseline', 'bp_bucket_baseline', 'bmi_bucket_baseline', 'imd_bucket_baseline'],
     na_values=None,
     to_bucket='age_at_score',
     bucket_min=50,
