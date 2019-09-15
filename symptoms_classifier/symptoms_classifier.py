@@ -73,7 +73,7 @@ class TextsToClassify:
         if embedding_algo is None:
             embedding_algo = self.embedding_algo
 
-        w2v = fit_embedding_model(sentences=self.dataset['tokenized_text'], embedding_algo=embedding_algo, **kwargs)
+        w2v = train_embedding_model(sentences=self.dataset['tokenized_text'], embedding_algo=embedding_algo, **kwargs)
 
         if update_obj:
             self.__setattr__('embedding_model', w2v)
@@ -99,8 +99,8 @@ class TextsToClassify:
             print('using tokenization previosuly saved:', self.tokenization_type)
 
         # TODO: extend to other models?
-        embedded_text = embed_sentences(tkn_sentences=self.dataset.tokenized_text,
-                                        embedding_algo=embedding_algo, embedding_model=embedding_model, **kwargs)
+        embedded_text = sentences2embedding(tkn_sentences=self.dataset.tokenized_text,
+                                            embedding_algo=embedding_algo, embedding_model=embedding_model, **kwargs)
         if update_obj:
             self.__setattr__('embedded_text', embedded_text)
             print('object updated with embedded text, to view use self.embedded_text')

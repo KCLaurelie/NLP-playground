@@ -125,8 +125,8 @@ def read_tokens_list(filename, sep="\t"):
     return SentenceIterator(filename)
 
 
-def snt_2_w2vemb(sentences, w2v_model, tokenization_type='lem',
-                 do_avg=True, use_weights=False, keywords=None, context=10):
+def sentences2embedding_w2v(sentences, w2v_model, tokenization_type='lem',
+                            do_avg=True, use_weights=False, keywords=None, context=10):
     """
     convert sentences to embedded sentences using pre-trained Word2Vec model
     :param sentences: pd.Series of sentences to vectorize
@@ -180,7 +180,7 @@ def snt_2_w2vemb(sentences, w2v_model, tokenization_type='lem',
     return sentences_emb
 
 
-def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', **kwargs):
+def sentences2embedding(tkn_sentences, embedding_model, embedding_algo='w2v', **kwargs):
     """
     embed text using pre-trained embedding model
     :param tkn_sentences: pd.Series of tokenized sentences (1 row = 1 list of tokens)
@@ -206,15 +206,15 @@ def embed_sentences(tkn_sentences, embedding_model, embedding_algo='w2v', **kwar
         tkn_sentences_corpus = [tkn_sentences_dict.doc2bow(stn) for stn in tkn_sentences]
         snt_emb = corpus2csc(embedding_model[tkn_sentences_corpus]).T.toarray()
     elif 'word2vec' in embedding_algo or 'w2v' in embedding_algo:
-        snt_emb = snt_2_w2vemb(tkn_sentences, w2v_model=embedding_model, **kwargs)
+        snt_emb = sentences2embedding_w2v(tkn_sentences, w2v_model=embedding_model, **kwargs)
 
     else:
         return 'unknown embedding_algo'
     return snt_emb
 
 
-def fit_embedding_model(sentences, embedding_algo='w2v', tokenization_type='lem', save_model_path=None, stop_words=None, sublinear_tf=True,
-                        ngram_range=(1, 5), size=300, window=5, min_count=1, workers=4, min_df=0.00125, max_df=0.7, max_features=None):
+def train_embedding_model(sentences, embedding_algo='w2v', tokenization_type='lem', save_model_path=None, stop_words=None, sublinear_tf=True,
+                          ngram_range=(1, 5), size=300, window=5, min_count=1, workers=4, min_df=0.00125, max_df=0.7, max_features=None):
     """
     train embedding model using series of texts (at the moment only allows tfidf and word2vec)
     :param sentences: pd.Series of texts or tokens (1 row = 1 sentence or 1 list of tokens)

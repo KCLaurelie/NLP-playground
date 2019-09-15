@@ -15,8 +15,8 @@ def test_final():
     emb = tweets.embed_text(update_obj=True, embedding_model=w2v, tokenization_type='lem', embedding_algo='w2v') #, use_weights=True, keywords=['virgin', 'awesome'])
     emb = tweets.embed_text(update_obj=True, embedding_model=r'C:\Users\K1774755\Downloads\phd\w2v_wiki.model'
                             , embedding_algo='w2v') #, w2v_emb_option='words')
-    # tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
-    # tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
+    tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
+    tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
     tweets.make_binary_class(binary_main_class='negative')
     res1 = train_nn(x_emb=tweets.embedded_text, y=tweets.dataset.class_numeric, random_state=0, n_epochs=2000, multi_class=False, debug_mode=True)
 
@@ -46,7 +46,7 @@ def trainw2v(
     w2v_model = Word2Vec(tok_snts, size=100, window=5, min_count=4, workers=4)  # train word2vec
     w2v_model.save(file_path.replace('.csv', '_w2v.model'))
     print('w2v model saved')
-    # x_emb = snt_2_w2vemb(data[text_col], w2v_model, clean_text=True)  # embed sentences
+    # x_emb = sentences2embedding_w2v(data[text_col], w2v_model, clean_text=True)  # embed sentences
     return 0
 
 
@@ -56,8 +56,8 @@ def classifier_test():
     data_clean = data[['airline_sentiment', 'text']].rename(columns={'airline_sentiment': 'class'})
     data_clean['text'] = preprocess_text(data_clean['text'])
     emb_algo = 'tfidf'  # 'word2vec'
-    vectorizer = fit_embedding_model(data_clean['text'], embedding_algo=emb_algo, size=100)
-    processed_features = embed_sentences(data_clean['text'], vectorizer, embedding_algo=emb_algo)
+    vectorizer = train_embedding_model(data_clean['text'], embedding_algo=emb_algo, size=100)
+    processed_features = sentences2embedding(data_clean['text'], vectorizer, embedding_algo=emb_algo)
     from sklearn.model_selection import train_test_split
     x_train, x_test, y_train, y_test = train_test_split(processed_features, data_clean['class'], test_size=0.8,
                                                         random_state=0)
@@ -84,7 +84,8 @@ def w2v_test():
     vectors = [w2v_model[x] for x in "the patient shows poor concentration".split(' ')]
 
     sentences = parse_text('C:\\temp\\bla.txt', convert_to_series=True, remove_punctuation=True)
-    emb_snt = snt_2_w2vemb(sentences, w2v_model)
+    sentences = ['hello my name is zelda', 'cool', 'cool cool cool', 'really cool']
+    emb_snt = sentences2embedding_w2v(sentences, w2v_model, do_avg=True)
 
 
 def test0():
@@ -102,11 +103,11 @@ def test0():
     clean_text = preprocess_text(txt)
     preprocess_text(txt, remove_stopwords=True, stemmer='snowball', lemmatizer=None)
     # vocab = [["cat", "say", "meow"], ["dog", "say", "woof"]]
-    w2v = fit_embedding_model(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='tfidf', size=100)
+    w2v = train_embedding_model(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='tfidf', size=100)
     list(w2v.vocabulary_.keys())[:10]
-    processed_features = embed_sentences(clean_text, w2v, embedding_algo='tfidf')
+    processed_features = sentences2embedding(clean_text, w2v, embedding_algo='tfidf')
 
-    w2v = fit_embedding_model(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='word2vec', size=100)
+    w2v = train_embedding_model(clean_text, min_df=0.00125, max_df=0.7, embedding_algo='word2vec', size=100)
     list(w2v.wv.vocab)
     return 0
 
@@ -119,9 +120,9 @@ def run_classifier_test(classifier_model, train_data, test_data):
     test_class = test_data[['class']]
 
     # vectorize text data
-    vectorizer = fit_embedding_model(train_text)
-    train_data_features = embed_sentences(train_text, vectorizer)
-    test_data_features = embed_sentences(test_text, vectorizer)
+    vectorizer = train_embedding_model(train_text)
+    train_data_features = sentences2embedding(train_text, vectorizer)
+    test_data_features = sentences2embedding(test_text, vectorizer)
 
     # train classifier
     classifier = cutils.classifiers[classifier_model]
