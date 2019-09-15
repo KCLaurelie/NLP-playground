@@ -13,7 +13,8 @@ def test_final():
     w2v = tweets.train_embedding_model(embedding_algo='w2v', size=300,
                                        save_model_path=output_path + '\\test_w2v.dat')
     emb = tweets.embed_text(update_obj=True, embedding_model=w2v, tokenization_type='lem', embedding_algo='w2v') #, use_weights=True, keywords=['virgin', 'awesome'])
-    emb = tweets.embed_text(update_obj=True, embedding_model=r'C:\Users\K1774755\Downloads\phd\w2v_wiki.model', embedding_algo='w2v')
+    emb = tweets.embed_text(update_obj=True, embedding_model=r'C:\Users\K1774755\Downloads\phd\w2v_wiki.model'
+                            , embedding_algo='w2v') #, w2v_emb_option='words')
     # tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
     # tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
     tweets.make_binary_class(binary_main_class='negative')
@@ -45,7 +46,7 @@ def trainw2v(
     w2v_model = Word2Vec(tok_snts, size=100, window=5, min_count=4, workers=4)  # train word2vec
     w2v_model.save(file_path.replace('.csv', '_w2v.model'))
     print('w2v model saved')
-    # x_emb = convert_snt2avgtoken(data[text_col], w2v_model, clean_text=True)  # embed sentences
+    # x_emb = snt_2_w2vemb(data[text_col], w2v_model, clean_text=True)  # embed sentences
     return 0
 
 
@@ -74,16 +75,16 @@ def classifier_test():
 
 
 def w2v_test():
-    # w2v_model = Word2Vec.load(r'C:\Users\K1774755\Downloads\phd\discharge_summaries_unigram_size100_window5_mincount5')
     w2v_model = Word2Vec.load(
         r'C:\Users\K1774755\Downloads\phd\early_intervention_services_unigram_size100_window5_mincount5')
+    w2v_model = load_embedding_model(r'C:\Users\K1774755\Downloads\phd\w2v_wiki.model', model_type='w2v')
     w2v_model.wv['attention']
     w2v_model.wv.similar_by_vector(w2v_model.wv['attention'], topn=10)
     w2v_model.wv.similarity('attention', 'concentration')
     vectors = [w2v_model[x] for x in "the patient shows poor concentration".split(' ')]
 
     sentences = parse_text('C:\\temp\\bla.txt', convert_to_series=True, remove_punctuation=True)
-    emb_snt = convert_snt2avgtoken(sentences, w2v_model)
+    emb_snt = snt_2_w2vemb(sentences, w2v_model)
 
 
 def test0():

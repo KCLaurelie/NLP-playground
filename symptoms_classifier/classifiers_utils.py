@@ -72,8 +72,7 @@ def load_classifier(classifier_model):
     return classifier
 
 
-def load_classifier_from_file(filename, classifier_type=None, nn_model=None,
-                              nb_classes=1, first_layer_neurons=300, dropout=None):  # load the model from disk
+def load_classifier_from_file(filename, classifier_type=None):  # load the model from disk
     # loaded_model = pickle.load(open(filename, 'rb'))
     if 'neural' in classifier_type.lower() or classifier_type.lower() == 'nn':
         nn_model=torch.load(filename)

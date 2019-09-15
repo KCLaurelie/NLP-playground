@@ -83,7 +83,7 @@ class TextsToClassify:
         return w2v
 
     def embed_text(self, embedding_algo=None, embedding_model=None, tokenization_type=None, remove_contractions=True
-                   , use_weights=False, keywords=None, context=10, update_obj=True):
+                   , update_obj=True, **kwargs):
         if embedding_model is None:
             embedding_model = self.embedding_model
         if embedding_algo is None:
@@ -100,8 +100,7 @@ class TextsToClassify:
 
         # TODO: extend to other models?
         embedded_text = embed_sentences(tkn_sentences=self.dataset.tokenized_text,
-                                        embedding_model=embedding_model, embedding_algo=embedding_algo,
-                                        w2v_emb_option='sentence', use_weights=use_weights, keywords=keywords, context=context)
+                                        embedding_algo=embedding_algo, embedding_model=embedding_model, **kwargs)
         if update_obj:
             self.__setattr__('embedded_text', embedded_text)
             print('object updated with embedded text, to view use self.embedded_text')
