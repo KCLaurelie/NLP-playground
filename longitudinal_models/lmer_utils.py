@@ -1,10 +1,10 @@
 from code_utils.global_variables import *
 import pandas as pd
 import numpy as np
+from rpy2.robjects.packages import importr
 
 
 def check_r_loc():
-    from rpy2.robjects.packages import importr
     base = importr('base')
     return base.R_home()
 
@@ -24,6 +24,8 @@ def lmer_formula(model_type='linear_rdn_int',
         model_str = regressor + ' ~ ' + timestamp + str_cov + ' + (1|' + group + ')'
     elif model_type == 'linear_rdn_int_slope':
         model_str = regressor + ' ~  (' + timestamp + str_cov + ' | ' + group + ')'
+        # TODO check which one is correct
+        # model_str = regressor + ' ~  ' + timestamp + str_cov + ' (1 + ' + timestamp + ' | ' + group + ')'
     elif model_type == 'quadratic_rdn_int':
         model_str = regressor + ' ~ ' + timestamp + ' + I(' + timestamp + '^2)' + str_cov + ' + (1|' + group + ')'
     else:
@@ -32,8 +34,8 @@ def lmer_formula(model_type='linear_rdn_int',
 
 
 def print_r_model_output(model):
-    stat = pd.DataFrame({'type': 'stats', 'Estimate (SE)': [np.round(model.logLike, 3), np.round(model.AIC, 3)]},
-                        index=['-2LL', 'AIC'])
+    stat = pd.DataFrame({'type': 'stats', 'Estimate (SE)': [np.round(model.logLike, 3), np.round(model.AIC, 3), BIC(model)]},
+                        index=['-2LL', 'AIC', 'BIC'])
     rnd_eff = model.ranef_var.Var.round(3).astype(str) + ' (' + model.ranef_var.Std.round(3).astype(str) + ')'
     rnd_eff = pd.DataFrame({'type': 'variances', 'Estimate (SE)': rnd_eff}).set_index(
         (model.ranef_var.index + ' ' + model.ranef_var.Name).values)
@@ -47,3 +49,18 @@ def print_r_model_output(model):
 
     res = pd.concat([coefs, rnd_eff, stat, various], sort=True)[['type', 'Estimate (SE)', 'CI', 'P-val']]
     return res.set_index(['type', res.index])
+
+
+def BIC(model):
+    resid = model.data['residuals']
+    x = model.design_matrix
+    res = np.log((len(resid))) * x.shape[1] - 2 * model.logLike
+    return res
+
+
+def ICC(df, groups_col='brcid', values_col='score_combined'):
+    # from here: https://stackoverflow.com/questions/40965579/intraclass-correlation-in-python-module
+    r_icc = importr("ICC")
+    icc_res = r_icc.ICCbare(groups_col, values_col, data=df)
+    icc_val = icc_res[0]  # icc_val now holds the icc value
+    return icc_val
