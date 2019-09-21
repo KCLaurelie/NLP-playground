@@ -1,34 +1,22 @@
 from code_utils.global_variables import *
-import datetime
-import time
+from code_utils.general_utils import list_combos
 import longitudinal_models.longitudinal_dataset as ds
 from longitudinal_models.lmer_utils import *
+import datetime
+import time
 from pymer4.models import Lmer  # , Lm
-# for python models
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
+
 
 ##############################################################################################
 # LONGITUDINAL MODELLING
 ##############################################################################################
 # TODO compare age at baseline vs age a diagnosis
 # https://rpsychologist.com/r-guide-longitudinal-lme-lmer
-# TODO add missing values (??)
+# TODO add missing values (impute or complete case??)
 # TODO plots for 200 sample in each subgroup: https://stats.idre.ucla.edu/r/faq/how-can-i-visualize-longitudinal-data-in-ggplot2/
-"""
-OPTION A) Here grouping variable is Organic only/SMI only/SMI + O
-- MODEL 1: Unconditional with MMSE= intercept (fixed)
-- MODEL 2: Unconditional with MMSE= intercept (random)
-- MODEL 3: Unconditional with MMSE= intercept + time (fixed)
-- MODEL 4: Unconditional with MMSE= intercept + time (random)
-- MODEL 5: Conditional with MMSE= intercept + time + grouping variable
-
-OPTION B) Run model 1- 4 in each group of the grouping variable. 3 outputs
-
-Model 2: adjusted for socio-demographic covariates (age at first measurement, education, ethnicity, occupation, living status, marital status). 
-Model 3: adjusted for health factors at baseline (BMI, systolic BP, smoking, glucose)
-"""
 
 
 def run_report(dataset=ds.default_dataset):
@@ -39,57 +27,106 @@ def run_report(dataset=ds.default_dataset):
     dataset.write_report(r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_report_2classes.xlsx')
 
 
-def all_models(dataset=ds.default_dataset,
-               timestamps=['score_date_centered'],  # 'age_at_score_upbound'],
+def prep_regression_data(dataset=ds.default_dataset,
+                         raw_data_path=None):
+    if raw_data_path is not None:  # need to prepare data for regression
+        dataset.file_path = raw_data_path
+    regression_data = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
+    to_predict = dataset.to_predict[0]
+    key = dataset.key
+    covariates = dataset.regressors
+    timestamps = dataset.timestamp_cols
+    return [regression_data, to_predict, key, covariates, timestamps]
+
+
+def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx',
+               to_predict='score_combined',
+               key='brcid',
                covariates=None,
-               models=['linear_rdn_int', 'linear_rdn_int_slope', 'quadratic_rdn_int'],
-               input_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_trajectory_data_final6.csv',
-               output_file_path=r'T:\aurelie_mascio\multimorbidity\mmse_work\regression_results.xlsx'):
-    if input_file_path is not None: dataset.file_path = input_file_path
-    df = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
-    st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%Hh%M')
-    writer = pd.ExcelWriter(output_file_path.replace('.xlsx', '_' + st + '.xlsx'), engine='xlsxwriter')
+               timestamps=('score_date_centered',),
+               models=('linear_rdn_int', 'linear_rdn_all', 'linear_rdn_all_uncorrel', 'quadratic_rdn_int'),
+               output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_new_formula.xlsx'):
+    if isinstance(model_data, str) and 'xlsx' in model_data:  # regression data in file
+        model_data = pd.read_excel(model_data, index_col=None)
+
+    if output_file_path is not None:
+        st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%Hh%M')
+        writer = pd.ExcelWriter(output_file_path.replace('.xlsx', '_' + st + '.xlsx'), engine='xlsxwriter')
+
+    res = []
     col_num = 0
-    for patient_group in ['all'] + list(df.patient_diagnosis_super_class.unique()):
-        df_tmp = df[df.patient_diagnosis_super_class == patient_group] if patient_group != 'all' else df
+    for patient_group in list(model_data.patient_diagnosis_super_class.unique()):
+        df_tmp = model_data[model_data.patient_diagnosis_super_class == patient_group] \
+            if patient_group != 'all' else model_data
         row_num = 0
         for ts in timestamps:
             for m in models:
-                formula = lmer_formula(model_type=m, regressor=dataset.to_predict[0], timestamp=ts,
-                                       covariates=covariates, group=dataset.key)
+                print('running model:', m, '(patient group:', patient_group, ', timestamp:', ts, ')')
+                formula = lmer_formula(model_type=m, regressor=to_predict, timestamp=ts,
+                                       covariates=covariates, group=key)
+                print('using formula', formula)
                 model = Lmer(formula, data=df_tmp)
-                model.fit()
-                title = pd.DataFrame([str(patient_group)], columns=['MODEL ' + m + ': ' + str(model.formula)],
-                                     index=[ts])
-                title.to_excel(writer, startrow=row_num, startcol=col_num)
+                model.fit(REML=True)
+                if model.warnings is not None:  # try unrestricted maximum likelihood estimation if convergence failed
+                    model.fit(REML=False)
                 to_print = print_r_model_output(model)
-                to_print.to_excel(writer, startrow=row_num + 2, startcol=col_num)
-                row_num += 5 + len(to_print)
-        col_num += to_print.shape[1] + 3
-    writer.save()
+                to_print = pd.concat([to_print], keys=[patient_group], names=[m])
+
+                if output_file_path is not None:
+                    to_print.to_excel(writer, startrow=row_num, startcol=col_num)
+                    row_num += 2 + len(to_print)
+                else:
+                    res = res.append(to_print)
+
+        if output_file_path is not None: col_num += to_print.shape[1] + 3
+    if output_file_path is not None: writer.save()
+    return res
+
+
+def all_covariates(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx',
+                   model='linear_rdn_all',
+                   covariates=('gender', 'ethnicity_group', 'first_language', 'marital_status', 'education_bucket_raw',
+                               'smoking_status_baseline', 'imd_bucket_baseline', 'cvd_problem'),
+                   missing_data='complete_case',
+                   **kwargs):
+    df = pd.read_excel(model_data, index_col=None)
+    df = df.replace({'not known': np.nan, 'Not Known': np.nan, 'unknown': np.nan, 'Unknown': np.nan})
+    # create all combinations of vaiables possible
+    cov_comb = list_combos(covariates)
+
+    res = []
+    for cov in cov_comb:
+        print('running models for', cov)
+        df_tmp = df.dropna(subset=list(cov), how='any') if missing_data == 'complete_case' else df
+
+        res = res.append(run_models(model_data=df_tmp,
+                                    covariates=cov,
+                                    models=(model,),
+                                    output_file_path=None,
+                                    **kwargs))
+
+    return res
 
 
 def model_playground(dataset=ds.default_dataset, intercept='score_combined_baseline', timestamp='score_date_upbound'):
-    # df = dataset.regression_cleaning(normalize=False, dummyfy=False, keep_only_baseline=False)
     df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx',
                        index_col=None)
     df_smi = df[df.patient_diagnosis_super_class == 'smi only']
     df_orga = df[df.patient_diagnosis_super_class == 'organic only']
     df_smi_orga = df[df.patient_diagnosis_super_class == 'smi+organic']
+    df_to_use = df_orga
 
-    df_to_use = df_smi
     # MODEL 1: basic model (random intercept and fixed slope)
     model = Lmer('score_combined ~ score_date_centered  + (1|brcid)', data=df_to_use)  # MMSE score by year
-    model = Lmer('score_combined ~ score_date_centered  + (1|brcid)', data=df_to_use)  # for subgroup
     model = Lmer('score_combined ~ score_date_centered  + age_at_score_baseline + (1|brcid)',
-                 data=df)  # adding age at baseline as covariate (is this correct??)
+                 data=df_to_use)  # adding age at baseline as covariate (is this correct??)
 
     # MODEL 2: random intercept and random slope
-    model = Lmer('score_combined ~  (score_date_centered  | brcid)', data=df_to_use)  # fails to converge
+    model = Lmer('score_combined ~  (score_date_centered  | brcid)', data=df_to_use)  # this removes the intercept?
     model = Lmer("score_combined ~ score_date_centered + (1 + score_date_centered | brcid)",
                  data=df_to_use)  # correct one?
     model = Lmer('score_combined ~  1 + score_date_centered  + (1|brcid) + (0 + score_date_centered  | brcid)',
-                 data=df)  # this converges but is it correct?
+                 data=df)  # 2 random effects constrained to be uncorrelated
     model = Lmer('score_combined ~  (score_date_centered  + age_at_score_baseline| brcid)', data=df_to_use)
 
     # MODEL 3: basic model but quadratic
