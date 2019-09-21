@@ -125,22 +125,30 @@ def read_tokens_list(filename, sep="\t"):
     return SentenceIterator(filename)
 
 
+def pad_embeddings(sentences_emb, embsize, maxlen=None, padding='pre', truncating='post'):
+    if maxlen is not None:
+        sentences_emb = truncate_tokens(sentences_emb, maxlen=maxlen*embsize, truncating=truncating)
+    if padding == 'pre':  # move zeros to beginning
+        sentences_emb = np.flip(sentences_emb, axis=1)
+    return sentences_emb
+
+
+def truncate_tokens(sentences_tkns, maxlen, truncating='post'):
+    sentences_tkns = sentences_tkns[:, 0:maxlen] if truncating == 'post' else sentences_tkns[:, -maxlen:]
+    return sentences_tkns
+
+
 def sentences2embedding_w2v(sentences, w2v_model, tokenization_type='lem',
-                            do_avg=True, use_weights=False, keywords=None, context=10):
+                            do_avg=True, use_weights=False, **kwargs):
     """
     convert sentences to embedded sentences using pre-trained Word2Vec model
     :param sentences: pd.Series of sentences to vectorize
     :param w2v_model: Word2Vec pre-trained model (either model object or filepath to savec model)
     :param tokenization_type: 'lem' (lemmatized), 'lem_stop' (lemmatized and stopwords removed), 'wo_space' (simple tokenization)
     :param do_avg: (True or False) if set to True, compute average of embedding vectors (instead of storing them for each word)
-    :param use_weights: use weight average instead f simple average, based on distance from specific keyword(s)
-    :param keywords: string or list of strings to compute distance from for weighted average option
-    :param context: number of tokens to use around the keywords for weighted average option
+    :param use_weights: use weighted average instead of simple average, based on distance from specific keyword(s)
     :return: embedded sentences
     """
-    print('embedding using Word2Vec model (using average sum of tokens) with:', '\nuse of weights:', use_weights,
-          '\nkeywords:', keywords, '\ncontext:', context)
-
     if isinstance(w2v_model, str):  # load model if saved in file
         w2v_model = Word2Vec.load(w2v_model)
 
@@ -160,8 +168,9 @@ def sentences2embedding_w2v(sentences, w2v_model, tokenization_type='lem',
     for i_snt, snt in enumerate(sentences):  # Loop over sentences
         cnt = 0
         if use_weights:
-            weights = gutils.get_wa(sentence=snt, keywords=keywords, context=context)
-            if i_snt < 20: print(snt, weights)  # print first 20 sentences to check
+            if i_snt == 0: print('embedding using Word2Vec model (using average sum of tokens)')
+            debug = True if i_snt < 5 else False  # print first 5 sentences to check
+            weights = gutils.get_wa(sentence=snt, debug=debug, **kwargs)
         for i_word, word in enumerate(snt):  # Loop over the words of a sentence
             if word in w2v_model.wv:
                 word_emb = w2v_model.wv.get_vector(word) * (weights[i_word] if use_weights else 1)
@@ -286,10 +295,10 @@ def embed_text_with_padding(sentences, w2v, tokenization_type, keywords, ln=40):
         emb_weights.append(w2v.wv[word])
 
     # Add the special tokens
-    tkn_ind["<pad>"] = len(emb_weights)
+    tkn_ind["<unk>"] = len(emb_weights)
     emb_weights.append(np.random.rand(EMB_SIZE))
 
-    tkn_ind["<unk>"] = len(emb_weights)
+    tkn_ind["<pad>"] = len(emb_weights)
     emb_weights.append(np.zeros(EMB_SIZE))
 
     # Convert to numpy

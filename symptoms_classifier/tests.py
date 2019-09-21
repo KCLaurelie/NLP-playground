@@ -85,7 +85,7 @@ def w2v_test():
 
     sentences = parse_text('C:\\temp\\bla.txt', convert_to_series=True, remove_punctuation=True)
     sentences = ['hello my name is zelda', 'cool', 'cool cool cool', 'really cool']
-    emb_snt = sentences2embedding_w2v(sentences, w2v_model, do_avg=True)
+    emb_snt = sentences2embedding_w2v(sentences, w2v_model, do_avg=True, use_weights=True, keywords='cool')
 
 
 def test0():
