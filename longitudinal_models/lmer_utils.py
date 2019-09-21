@@ -31,10 +31,10 @@ def lmer_formula(model_type='linear_rdn_int',
     elif model_type == 'linear_rdn_all_no_intercept':  # random slope only, no intercept (??)
         model_str = regressor + ' ~  (' + timestamp + str_cov + ' | ' + group + ')'
     elif model_type == 'linear_rdn_all':  # random slope, random intercept
-        model_str = regressor + ' ~  ' + timestamp + str_cov + ' + (1 + ' + timestamp + str_cov + ' | ' + group + ')'
+        model_str = regressor + ' ~  ' + timestamp + str_cov + ' + (1 + ' + timestamp + ' | ' + group + ')'
     elif model_type == 'linear_rdn_all_uncorrel':  # random effects are constrained to be uncorrelated
         model_str = regressor + ' ~  1 + ' + timestamp + str_cov \
-                    + ' + (0 + ' + timestamp + str_cov + ' | ' + group + ')' \
+                    + ' + (0 + ' + timestamp + ' | ' + group + ')' \
                     + ' + (1|' + group + ')'
     elif model_type == 'quadratic_rdn_int':  # random intercept only, quadratic model
         model_str = regressor + ' ~ ' + timestamp + ' + I(' + timestamp + '^2)' + str_cov + ' + (1|' + group + ')'

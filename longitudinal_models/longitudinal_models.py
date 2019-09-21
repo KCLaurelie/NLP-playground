@@ -44,7 +44,7 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
                key='brcid',
                covariates=None,
                timestamps=('score_date_centered',),
-               models=('linear_rdn_int', 'linear_rdn_all', 'linear_rdn_all_uncorrel', 'quadratic_rdn_int'),
+               models=('linear_rdn_int', 'linear_rdn_all_no_intercept', 'linear_rdn_all', 'quadratic_rdn_int'),
                output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_new_formula.xlsx'):
     if isinstance(model_data, str) and 'xlsx' in model_data:  # regression data in file
         model_data = pd.read_excel(model_data, index_col=None)
@@ -91,7 +91,7 @@ def all_covariates(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mms
                    **kwargs):
     df = pd.read_excel(model_data, index_col=None)
     df = df.replace({'not known': np.nan, 'Not Known': np.nan, 'unknown': np.nan, 'Unknown': np.nan})
-    # create all combinations of vaiables possible
+    # create all combinations of variables possible
     cov_comb = list_combos(covariates)
 
     res = []
@@ -118,16 +118,18 @@ def model_playground(dataset=ds.default_dataset, intercept='score_combined_basel
 
     # MODEL 1: basic model (random intercept and fixed slope)
     model = Lmer('score_combined ~ score_date_centered  + (1|brcid)', data=df_to_use)  # MMSE score by year
-    model = Lmer('score_combined ~ score_date_centered  + age_at_score_baseline + (1|brcid)',
+    model = Lmer('score_combined ~ score_date_centered  + gender + (1|brcid)',
                  data=df_to_use)  # adding age at baseline as covariate (is this correct??)
 
     # MODEL 2: random intercept and random slope
     model = Lmer('score_combined ~  (score_date_centered  | brcid)', data=df_to_use)  # this removes the intercept?
-    model = Lmer("score_combined ~ score_date_centered + (1 + score_date_centered | brcid)",
-                 data=df_to_use)  # correct one?
+    model = Lmer('score_combined ~  (score_date_centered  + gender| brcid)', data=df_to_use)
+
+    model = Lmer("score_combined ~ score_date_centered + (1 + score_date_centered | brcid)", data=df_to_use)  # correct one?
+    model = Lmer('score_combined ~  score_date_centered + gender + (1 + score_date_centered | brcid)', data=df_to_use)
+
     model = Lmer('score_combined ~  1 + score_date_centered  + (1|brcid) + (0 + score_date_centered  | brcid)',
                  data=df)  # 2 random effects constrained to be uncorrelated
-    model = Lmer('score_combined ~  (score_date_centered  + age_at_score_baseline| brcid)', data=df_to_use)
 
     # MODEL 3: basic model but quadratic
     model = Lmer('score_combined ~ score_date_centered  + I(score_date_centered ^2) + (1|brcid)', data=df_to_use)
