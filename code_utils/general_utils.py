@@ -4,13 +4,20 @@ import pandas as pd
 import numpy as np
 import datetime
 from collections import OrderedDict
-# import pyximport
-# pyximport.install()
+from itertools import combinations
 
 
 ##############################################################################
 # GENERAL UTILS FUNCTIONS
 ##############################################################################
+def list_combos(lst):
+    lst = list(lst)
+    res = []
+    for r in range(1, len(lst) + 1):
+        res += list(combinations(lst, r))
+    return res
+
+
 def list_to_excel(lst_to_print, filepath='out.xlsx', sheet_name='Sheet1', startrow=0, startcol=0):
     mode = 'a' if os.path.isfile(filepath) else 'w'
     print('adding sheet', sheet_name, 'using mode:', ('append' if mode == 'a' else 'new workbook'))
@@ -26,25 +33,32 @@ def list_to_excel(lst_to_print, filepath='out.xlsx', sheet_name='Sheet1', startr
     return cpt_row
 
 
-def get_wa(sentence, keywords, context=10):
+def get_wa(sentence, keywords, context=10, fixed_weights=False, debug=False):
     """
     generate vector of weighted averages given specific keywords in a tokenized sentence.
     the words closest to the keyword will get maximum weight etc...
     :param sentence: tokenized sentence
     :param keywords: keywords to look for in the sentence (can be either a list or string)
     :param context: number of words before/after keyword to use
+    :param fixed_weights: set to true to use weight=1 for all words in context
+    :param debug: printouts for debugging
     :return: array of weights
     """
+    if debug:
+        print('assigning word weights using:\n', ('fixed weights' if fixed_weights else 'decreasing weights'),
+              '\nkeywords:', keywords, '\ncontext:', context)
     sentence = to_list(sentence)
     keywords = to_list(keywords)
     # kw_idx = [sentence.index(x) for x in keywords if x in sentence]
     kw_idx = [sentence.index(s) for s in sentence if any(xs in s for xs in keywords)]
     weights = [0]*len(sentence)
+    context_weights = [0]+[1]*context if fixed_weights else list(np.arange(0, 1 + 1 / context, 1 / context))
     for i in kw_idx:
-        left = (list(np.arange(0, 1 + 1 / context, 1 / context))[-i:] if i > 0 else [])
-        right = list(np.arange(0, 1 + 1 / context, 1 / context))[::-1][:len(sentence) - i - 1]
+        left = context_weights[-i:] if i > 0 else []
+        right = context_weights[::-1][:len(sentence) - i - 1]
         lst = [0] * (i - context - 1) + left + [1] + right + [0] * (len(sentence) - i - context - 2)
         weights = np.maximum(weights, lst)
+    if debug: print(sentence, weights)
     return weights
 
 
