@@ -10,15 +10,33 @@ from itertools import combinations
 ##############################################################################
 # GENERAL UTILS FUNCTIONS
 ##############################################################################
-def list_combos(lst):
+def list_combos(lst, r=None):
+    """
+    Return successive r-length combinations of elements in the iterable.
+    :param lst: iterable (can be list or tuple of elements)
+    :param r: (default None) length of combinations desired. by default will generate combinations for all lengths
+    :return: list of combinations
+    """
     lst = list(lst)
-    res = []
-    for r in range(1, len(lst) + 1):
-        res += list(combinations(lst, r))
+    if r is not None: # list combinations for specific r
+        res = list(combinations(lst, r))
+    else: # list all combinations
+        res = []
+        for r in range(1, len(lst) + 1):
+            res += list(combinations(lst, r))
     return res
 
 
 def list_to_excel(lst_to_print, filepath='out.xlsx', sheet_name='Sheet1', startrow=0, startcol=0):
+    """
+    prints a list of elements in an excel workbook
+    :param lst_to_print: list of elements to be printed
+    :param filepath: path of excel workbook
+    :param sheet_name: sheet where to print the data
+    :param startrow: row at which to start printing the data
+    :param startcol: column at which to start printing the data
+    :return: last row at which data has been printed
+    """
     mode = 'a' if os.path.isfile(filepath) else 'w'
     print('adding sheet', sheet_name, 'using mode:', ('append' if mode == 'a' else 'new workbook'))
     writer = pd.ExcelWriter(filepath, engine='openpyxl', mode=mode)
@@ -92,6 +110,11 @@ def date2year(date):
 
 
 def to_list(x):
+    """
+    converts variable to a list
+    :param x: variable to convert
+    :return: variable converted to list
+    """
     if x is None:
         res = []
     elif isinstance(x, str):
@@ -109,14 +132,29 @@ def print_pv_to_excel(pv, writer, sheet_name, startrow=0, startcol=0):
 
 
 def concat_clean(df1, df2):
+    """
+    concatenate 2 dataframes and removes duplicate columns found
+    :param df1:
+    :param df2:
+    :return:
+    """
     df = pd.concat([df1, df2], axis=1, sort=True)
     df.sort_index(axis=1, inplace=True)
     df = df.loc[:, ~df.columns.duplicated()]
     return df.reindex([x for x in df.index if x != 'not known'] + ['not known'])
 
 
-# standardize dataframe data
 def clean_df(df, to_numeric=True, filter_col=None, filter_value=None, threshold_col=None, threshold_value=None):
+    """
+    cleans/standardizes dataframe data
+    :param df:
+    :param to_numeric: to convert numerical-like data to numeric type
+    :param filter_col: to slice on a specific column based on a value
+    :param filter_value: value to slice filter_col on
+    :param threshold_col: to slice on a specific column based on a minimum threshold
+    :param threshold_value: threshold (minimum) to slice threshold_col on
+    :return: cleaned dataframe
+    """
     df.columns = df.columns.str.lower()
     df.rename(columns={'brc_id': 'brcid', 'ï»¿brcid': 'brcid'}, inplace=True)
     if 'brcid' in df.columns: df.dropna(subset=['brcid'], inplace=True)
