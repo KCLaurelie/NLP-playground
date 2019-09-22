@@ -44,14 +44,20 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
                key='brcid',
                covariates=None,
                timestamps=('score_date_centered',),
+               complete_case=False,
                models=('linear_rdn_int', 'linear_rdn_all_no_intercept', 'linear_rdn_all', 'quadratic_rdn_int'),
-               output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_new_formula.xlsx'):
-    if isinstance(model_data, str) and 'xlsx' in model_data:  # regression data in file
+               output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression.xlsx'):
+    if isinstance(model_data, str) and 'xlsx' in model_data:  # load regression data
         model_data = pd.read_excel(model_data, index_col=None)
-
+    if complete_case:
+        model_data = model_data.replace(
+            {'not known': np.nan, 'Not Known': np.nan, 'unknown': np.nan, 'Unknown': np.nan, '[nan-nan]': np.nan})
+        model_data = model_data.dropna(subset=list(covariates), how='any')
     if output_file_path is not None:
         st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%Hh%M')
-        writer = pd.ExcelWriter(output_file_path.replace('.xlsx', '_' + st + '.xlsx'), engine='xlsxwriter')
+        tag = '_' + st + ('_cov_' + str(covariates) if covariates is not None else '') \
+              + ('_complete_case' if complete_case else '')
+        writer = pd.ExcelWriter(output_file_path.replace('.xlsx', tag + '.xlsx'), engine='xlsxwriter')
 
     res = []
     col_num = 0
@@ -66,10 +72,14 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
                                        covariates=covariates, group=key)
                 print('using formula', formula)
                 model = Lmer(formula, data=df_tmp)
-                model.fit(REML=True)
-                if model.warnings is not None:  # try unrestricted maximum likelihood estimation if convergence failed
-                    model.fit(REML=False)
-                to_print = print_r_model_output(model)
+                try:
+                    model.fit(REML=True)
+                    if model.warnings is not None:  # try unrestricted MLE if convergence failed
+                        model.fit(REML=False)
+                    to_print = print_r_model_output(model)
+                except:
+                    print('something went wrong with model fitting')
+                    to_print = pd.DataFrame({'output': 'failure'}, index=[0])
                 to_print = pd.concat([to_print], keys=[patient_group], names=[m])
 
                 if output_file_path is not None:
@@ -84,31 +94,25 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
 
 
 def all_covariates(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx',
-                   model='linear_rdn_all',
+                   models='linear_rdn_all',
                    covariates=('gender', 'ethnicity_group', 'first_language', 'marital_status', 'education_bucket_raw',
                                'smoking_status_baseline', 'imd_bucket_baseline', 'cvd_problem'),
-                   missing_data='complete_case',
+                   combos_length=None,
                    **kwargs):
     df = pd.read_excel(model_data, index_col=None)
-    df = df.replace({'not known': np.nan, 'Not Known': np.nan, 'unknown': np.nan, 'Unknown': np.nan})
-    # create all combinations of variables possible
-    cov_comb = list_combos(covariates)
+    df = df.replace({'not known': np.nan, 'Not Known': np.nan, 'unknown': np.nan, 'Unknown': np.nan, '[nan-nan]': np.nan})
+    cov_comb = list_combos(covariates, r=combos_length)  # create all combinations of covariates
 
     res = []
     for cov in cov_comb:
         print('running models for', cov)
-        df_tmp = df.dropna(subset=list(cov), how='any') if missing_data == 'complete_case' else df
-
-        res = res.append(run_models(model_data=df_tmp,
-                                    covariates=cov,
-                                    models=(model,),
-                                    output_file_path=None,
-                                    **kwargs))
+        res = res.append(
+            run_models(model_data=df, covariates=cov, models=(models,), output_file_path=None, **kwargs))
 
     return res
 
 
-def model_playground(dataset=ds.default_dataset, intercept='score_combined_baseline', timestamp='score_date_upbound'):
+def model_playground():
     df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx',
                        index_col=None)
     df_smi = df[df.patient_diagnosis_super_class == 'smi only']
@@ -118,9 +122,8 @@ def model_playground(dataset=ds.default_dataset, intercept='score_combined_basel
 
     # MODEL 1: basic model (random intercept and fixed slope)
     model = Lmer('score_combined ~ score_date_centered  + (1|brcid)', data=df_to_use)  # MMSE score by year
-    model = Lmer('score_combined ~ score_date_centered  + gender + (1|brcid)',
-                 data=df_to_use)  # adding age at baseline as covariate (is this correct??)
-
+    model = Lmer('score_combined ~ score_date_centered  + gender + (1|brcid)', data=df_to_use)  # adding age at baseline as covariate (is this correct??)
+    to_print = print_r_model_output(model.fit())
     # MODEL 2: random intercept and random slope
     model = Lmer('score_combined ~  (score_date_centered  | brcid)', data=df_to_use)  # this removes the intercept?
     model = Lmer('score_combined ~  (score_date_centered  + gender| brcid)', data=df_to_use)
