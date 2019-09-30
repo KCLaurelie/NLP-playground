@@ -45,20 +45,25 @@ def tokenize_text_series(text_series, **kwargs):
     return res
 
 
-def tokenize_sentences(sentences, tokenization_type=None, output_file_path=None, remove_contractions=True):
-    if tokenization_type not in ('lem', 'wo_space', 'lem_stop'):
+def tokenize_sentences(sentences, tokenization_type=None, output_file_path=None, remove_contractions=False):
+    if tokenization_type not in ('lem', 'wo_space', 'lem_stop', 'clean'):
         tokenization_type = detect_tokenization_type(tokenization_type)
     print('tokenizing text using', tokenization_type)
     tok_snts = []
     for snt in sentences:
-        tkns = nlp.tokenizer(contractions.fix(snt.replace('i', 'I'))) if remove_contractions else nlp.tokenizer(snt)
+        if remove_contractions or tokenization_type == 'clean':
+            snt = quick_clean_txt(snt, remove_contractions=True)
+        tkns = nlp.tokenizer(snt)
         if tokenization_type == 'wo_space':
             _tkns = [str(x.text).lower() for x in tkns if not x.is_space]
         elif tokenization_type == 'lem':
             _tkns = [str(x.lemma_).lower() for x in tkns if not x.is_space and not x.is_punct]
-        else:
+        elif tokenization_type == 'lem_stop':
+            tkns = nlp.tokenizer(snt)
             _tkns = [str(x.lemma_).lower() for x in tkns if not x.is_space and not x.is_punct
                      and not (x.is_stop and 'no' not in str(x) and 'n\'t' not in str(x))]
+        else:
+            _tkns = [str(x.text).lower() for x in tkns if not x.is_space and not x.is_punct]
         tok_snts.append(_tkns)
         if output_file_path is not None: output_file_path.write("{}\n".format("\t".join(_tkns)))
 
@@ -71,12 +76,16 @@ def detect_tokenization_type(emb_model_file):
         print('no embedding file or tokenization type provided, using default tokenization method (simple without space)')
         return 'wo_space'
     emb_model_file = emb_model_file.lower()
-    if 'lem' not in emb_model_file and 'stop' not in emb_model_file:
+    if 'clean' in emb_model_file:
+        res = 'clean'
+    elif 'lem' not in emb_model_file and 'stop' not in emb_model_file:
         res = 'wo_space'
     elif 'lem' in emb_model_file and 'stop' not in emb_model_file:
         res = 'lem'
-    else:
+    elif 'lem' in emb_model_file and 'stop' in emb_model_file:
         res = 'lem_stop'
+    else:
+        res = 'wo_space'
     print('tokenization method detected:', res)
     return res
 
@@ -150,7 +159,7 @@ def sentences2embedding_w2v(sentences, w2v_model, tokenization_type='lem',
     :return: embedded sentences
     """
     if isinstance(w2v_model, str):  # load model if saved in file
-        w2v_model = Word2Vec.load(w2v_model)
+        w2v_model = load_embedding_model(w2v_model, model_type='w2v')
 
     # tokenize the text and further cleans it (needed otherwise it would take 1 token = 1 letter)
     if not isinstance(sentences[0], list):

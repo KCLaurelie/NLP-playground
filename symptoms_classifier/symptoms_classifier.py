@@ -56,7 +56,7 @@ class TextsToClassify:
         print('data loaded')
         return data
 
-    def tokenize_text(self, tokenization_type='lem', update_obj=True, output_file_path=None, remove_contractions=True):
+    def tokenize_text(self, tokenization_type='lem', update_obj=True, output_file_path=None, remove_contractions=False):
         sentences = self.dataset[self.text_col]
         tokenized_text = tokenize_sentences(sentences, tokenization_type=tokenization_type
                                             , output_file_path=output_file_path, remove_contractions=remove_contractions)
@@ -190,7 +190,7 @@ class TextsToClassify:
             try:
                 classifier.fit(x_emb_train, y_train)
             except:
-                return ['classification algo failed for:' + title]
+                return {'model': classifier, 'report': ['classification algo failed for:' + title]}
 
         self.__setattr__('trained_' + str(classifier_model), classifier)
         if save_model_path is not None:

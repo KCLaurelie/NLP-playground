@@ -180,6 +180,14 @@ def preprocess_text(raw_text, remove_stopwords=False, stemmer=None, lemmatizer=N
     return raw_text.replace('', np.nan).dropna()
 
 
+def quick_clean_txt(text, remove_contractions=True):
+    text = str(text)
+    if remove_contractions: text = contractions.fix(text.replace('i', 'I')) # expand contractions (you're -> you are)
+    text = re.sub(r'[^a-z0-9-\'\s]', ' ', text.lower())  # remove non alphanumeric character
+    text = re.sub(r'([^0-9]{1})\1{2,}', r'\1\1', text)  # more than 3 consecutive letters -> 2 (hellooooooooo -> helloo)
+    return text
+
+
 def clean_string(raw_text, remove_punctuation=False):
     """
 

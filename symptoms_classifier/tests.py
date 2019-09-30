@@ -75,9 +75,9 @@ def classifier_test():
 
 
 def w2v_test():
-    w2v_model = Word2Vec.load(
-        r'C:\Users\K1774755\Downloads\phd\early_intervention_services_unigram_size100_window5_mincount5')
-    w2v_model = load_embedding_model(r'C:\Users\K1774755\Downloads\phd\w2v_wiki.model', model_type='w2v')
+    file = r'C:\Users\K1774755\PycharmProjects\toy-models\embeddings\f20_all_docs(15M)_tkns_wo_space_word2vec.dat'
+    w2v_model = Word2Vec.load(file)
+    w2v_model = load_embedding_model(file, model_type='w2v')
     w2v_model.wv['attention']
     w2v_model.wv.similar_by_vector(w2v_model.wv['attention'], topn=10)
     w2v_model.wv.similarity('attention', 'concentration')
