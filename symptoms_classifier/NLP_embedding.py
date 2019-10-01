@@ -73,19 +73,19 @@ def tokenize_sentences(sentences, tokenization_type=None, output_file_path=None,
 
 def detect_tokenization_type(emb_model_file):
     if emb_model_file is None:
-        print('no embedding file or tokenization type provided, using default tokenization method (simple without space)')
-        return 'wo_space'
+        print('no embedding file or tokenization type provided, using default tokenization method (simple with minimal cleaning)')
+        return 'clean'
     emb_model_file = emb_model_file.lower()
     if 'clean' in emb_model_file:
         res = 'clean'
-    elif 'lem' not in emb_model_file and 'stop' not in emb_model_file:
+    elif 'space' in emb_model_file:
         res = 'wo_space'
     elif 'lem' in emb_model_file and 'stop' not in emb_model_file:
         res = 'lem'
     elif 'lem' in emb_model_file and 'stop' in emb_model_file:
         res = 'lem_stop'
     else:
-        res = 'wo_space'
+        res = 'clean'
     print('tokenization method detected:', res)
     return res
 
@@ -215,7 +215,7 @@ def sentences2embedding(tkn_sentences, embedding_model, embedding_algo='w2v', **
     if isinstance(embedding_model, str):
         embedding_model = load_embedding_model(embedding_model, model_type=embedding_algo)
 
-    if 'idf' in embedding_algo and ('sklearn' in embedding_algo or 'gensim' not in embedding_algo): # TFIDF with sklearn
+    if 'idf' in embedding_algo and ('sklearn' in embedding_algo or 'gensim' not in embedding_algo):  # TFIDF with sklearn
         print('embedding using sklearn TfIdf model')
         snt_emb = embedding_model.transform(tkn_sentences).toarray()
     elif 'idf' in embedding_algo and 'gensim' in embedding_algo:  # TFIDF with gensim

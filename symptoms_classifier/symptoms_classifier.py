@@ -96,7 +96,7 @@ class TextsToClassify:
             tokenization_type = detect_tokenization_type(str(embedding_model))
             self.tokenize_text(tokenization_type=tokenization_type, update_obj=True, remove_contractions=remove_contractions)
         else:
-            print('using tokenization previosuly saved:', self.tokenization_type)
+            print('using tokenization previously saved:', self.tokenization_type)
 
         # TODO: extend to other models?
         embedded_text = sentences2embedding(tkn_sentences=self.dataset.tokenized_text,
