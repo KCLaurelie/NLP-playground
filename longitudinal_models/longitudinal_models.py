@@ -19,14 +19,6 @@ import statsmodels.regression.mixed_linear_model as mlm
 # TODO plots for 200 sample in each subgroup: https://stats.idre.ucla.edu/r/faq/how-can-i-visualize-longitudinal-data-in-ggplot2/
 
 
-def run_report(dataset=ds.default_dataset):
-    dataset.file_path = r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_trajectory_data_final6.csv'
-    dataset.cols_to_pivot = ['patient_diagnosis_super_class']
-    dataset.write_report(r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_report_1class.xlsx')
-    dataset.cols_to_pivot = ['patient_diagnosis_super_class', 'patient_diagnosis_class']
-    dataset.write_report(r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_report_2classes.xlsx')
-
-
 def prep_regression_data(dataset=ds.default_dataset,
                          raw_data_path=None):
     if raw_data_path is not None:  # need to prepare data for regression
@@ -46,18 +38,22 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
                timestamps=('score_date_centered',),
                complete_case=False,
                models=('linear_rdn_int', 'linear_rdn_all_no_intercept', 'linear_rdn_all', 'quadratic_rdn_int'),
-               output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression.xlsx'):
+               output_file_path=None):
     if isinstance(model_data, str) and 'xlsx' in model_data:  # load regression data
         model_data = pd.read_excel(model_data, index_col=None)
+    if covariates is not None:  # check covariates actually exist in the model data
+        if not all(elem in model_data.columns for elem in list(covariates)):
+            print('covariates entered do not exist in input data')
+            return pd.DataFrame({'output': 'failure - covariates not in input data'}, index=[0])
     if complete_case:
+        print('all cases:', len(model_data), 'observations, ', len(model_data[key].unique()), 'patients')
         model_data = model_data.replace(
             {'not known': np.nan, 'Not Known': np.nan, 'unknown': np.nan, 'Unknown': np.nan, '[nan-nan]': np.nan})
         model_data = model_data.dropna(subset=list(covariates), how='any')
+        print('only complete cases:', len(model_data), 'observations, ', len(model_data[key].unique()), 'patients')
     if output_file_path is not None:
         st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%Hh%M')
-        tag = '_' + st + ('_cov_' + str(covariates) if covariates is not None else '') \
-              + ('_complete_case' if complete_case else '')
-        writer = pd.ExcelWriter(output_file_path.replace('.xlsx', tag + '.xlsx'), engine='xlsxwriter')
+        writer = pd.ExcelWriter(output_file_path.replace('.xlsx', st + '.xlsx'), engine='xlsxwriter')
 
     res = []
     col_num = 0
@@ -96,8 +92,8 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
 def all_covariates(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx',
                    models='linear_rdn_all',
                    covariates=('gender', 'ethnicity_group', 'first_language', 'marital_status', 'education_bucket_raw',
-                               'smoking_status_baseline', 'imd_bucket_baseline', 'cvd_problem'),
-                   combos_length=None,
+                               'smoking_status_baseline', 'imd_bucket_baseline', 'cvd_problem', 'age_at_score_baseline'),
+                   combos_length=1,
                    **kwargs):
     df = pd.read_excel(model_data, index_col=None)
     df = df.replace({'not known': np.nan, 'Not Known': np.nan, 'unknown': np.nan, 'Unknown': np.nan, '[nan-nan]': np.nan})
@@ -112,63 +108,4 @@ def all_covariates(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mms
     return res
 
 
-def model_playground():
-    df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx',
-                       index_col=None)
-    df_smi = df[df.patient_diagnosis_super_class == 'smi only']
-    df_orga = df[df.patient_diagnosis_super_class == 'organic only']
-    df_smi_orga = df[df.patient_diagnosis_super_class == 'smi+organic']
-    df_to_use = df_orga
 
-    # MODEL 1: basic model (random intercept and fixed slope)
-    model = Lmer('score_combined ~ score_date_centered  + (1|brcid)', data=df_to_use)  # MMSE score by year
-    model = Lmer('score_combined ~ score_date_centered  + gender + (1|brcid)', data=df_to_use)  # adding age at baseline as covariate (is this correct??)
-    to_print = print_r_model_output(model.fit())
-    # MODEL 2: random intercept and random slope
-    model = Lmer('score_combined ~  (score_date_centered  | brcid)', data=df_to_use)  # this removes the intercept?
-    model = Lmer('score_combined ~  (score_date_centered  + gender| brcid)', data=df_to_use)
-
-    model = Lmer("score_combined ~ score_date_centered + (1 + score_date_centered | brcid)", data=df_to_use)  # correct one?
-    model = Lmer('score_combined ~  score_date_centered + gender + (1 + score_date_centered | brcid)', data=df_to_use)
-
-    model = Lmer('score_combined ~  1 + score_date_centered  + (1|brcid) + (0 + score_date_centered  | brcid)',
-                 data=df)  # 2 random effects constrained to be uncorrelated
-
-    # MODEL 3: basic model but quadratic
-    model = Lmer('score_combined ~ score_date_centered  + I(score_date_centered ^2) + (1|brcid)', data=df_to_use)
-
-    print(model.fit())
-
-    #######################################################################################
-    #  PYTHON STUFF
-
-    # MODEL 1: python equivalent
-    model_py = smf.mixedlm("score_combined ~ score_date_centered ", df_to_use, groups=df_to_use['brcid'])
-    result = model_py.fit()
-    print(model_py.fit().summary())
-
-    # random slope and intercept
-    model_py = smf.mixedlm("score_combined ~ score_date_centered", df_to_use, groups=df_to_use['brcid'],
-                           re_formula="~score_date_centered")
-    model_py = sm.MixedLM.from_formula("score_combined ~ score_date_centered "
-                                       , df_to_use
-                                       , re_formula="score_date_centered "
-                                       , groups=df_to_use['brcid'])
-    # random slope only
-    model_py = sm.MixedLM.from_formula("score_combined ~ score_date_centered "
-                                       , df_to_use
-                                       , re_formula="0 + score_date_centered "
-                                       , groups=df_to_use['brcid'])
-
-    # MODEL 2: python equivalent (??)
-    vcf = {"score_date_centered ": "0 + C(score_date_centered )", "brcid": "0 + C(brcid)"}
-    model_py = sm.MixedLM.from_formula("score_combined ~ score_date_centered ", groups=df_to_use['brcid'],
-                                       vc_formula=vcf, re_formula="0", data=df_to_use)
-    print(model_py.fit().summary())
-
-    model3 = mlm.MixedLM(endog=df_to_use['score_combined'],  # dependent variable (1D))
-                         exog=df_to_use[['score_date_centered ', 'intercept']],  # fixed effect covariates (2D)
-                         exog_re=df_to_use['intercept'],  # random effect covariates
-                         groups=df_to_use['brcid'])  # data from different groups are independent
-    result = model3.fit()
-    print(result.summary())
