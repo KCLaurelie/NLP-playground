@@ -1,5 +1,6 @@
 # http://nadbordrozd.github.io/blog/2017/03/05/missing-data-imputation-with-bayesian-networks/
 # https://towardsdatascience.com/6-different-ways-to-compensate-for-missing-values-data-imputation-with-examples-6022d9ca0779
+# https://www.worldscientific.com/doi/pdf/10.1142/9789813207813_0021 (paper for justification???)
 import datawig
 import pandas as pd
 from pandas.api.types import is_string_dtype
@@ -43,7 +44,7 @@ def impute_data(df, output_column, input_columns, num_epochs=50):
     return imputed_df
 
 
-def impute_all_data(df, output_column=None, clean_df=False, **kwargs):
+def impute_all_data(df, output_column=None, input_columns_to_exclude=None, clean_df=False, **kwargs):
     if clean_df:
         df = df.apply(lambda x: x.str.lower() if isinstance(x, str) else x)
         df = df.replace({'not known': np.nan, 'unknown': np.nan, '[nan-nan]': np.nan})
@@ -53,6 +54,8 @@ def impute_all_data(df, output_column=None, clean_df=False, **kwargs):
     for col in output_column:
         print('imputing data for', col)
         input_columns = [x for x in df.columns if x != col]
+        if input_columns_to_exclude is not None:
+            input_columns = [x for x in input_columns if x not in input_columns_to_exclude]
         imputed_df = impute_data(df, output_column=col, input_columns=input_columns, **kwargs)
 
         df[col + '_imputed'] = imputed_df[col + '_imputed'] if (col + '_imputed') in imputed_df else 'imputation failed'
