@@ -9,6 +9,7 @@ from gensim import corpora
 from sklearn.feature_extraction.text import TfidfVectorizer
 import nltk
 from nltk.corpus import stopwords
+import torch
 import spacy
 nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
 spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
@@ -285,6 +286,57 @@ def train_embedding_model(sentences, embedding_algo='w2v', tokenization_type='le
     return w2v
 
 
+def embedding2torch(w2v_model, SEED=0):
+    np.random.seed(SEED)
+    embeddings = []  # A list of embeddings for each word in the word2vec vocab
+
+    # Embeddings is a list, meaning we know that embeddings[1] is a vector for the
+    # word with ID=1, but we don't know what word is that. That is why we need
+    # the id2word and word2id mappings.
+    id2word = {}
+    word2id = {}
+
+    for word in w2v_model.vocab.keys():
+        id = len(embeddings)  # What is the position of this word in the embeddings list?
+        id2word[id] = word  # Add mapping from ID to word
+        word2id[word] = id  # From word 2 id
+        embeddings.append(w2v_model[word])  # Add the embedding for 'word', embeddings are available in the 'model'
+
+    # Add <UNK> and <PAD>
+    word = "<UNK>"
+    id2word[len(embeddings)] = word
+    word2id[word] = len(embeddings)
+    embeddings.append(np.random.rand(len(embeddings[0])))
+
+    word = "<PAD>"  # For the word '<PAD>', embedding is set to all zeros
+    id2word[len(embeddings)] = word
+    word2id[word] = len(embeddings)
+    embeddings.append(np.zeros(len(embeddings[0])))
+
+    # Convert the embeddings list into a tensor of type float32
+    embeddings = torch.tensor(embeddings, dtype=torch.float32)
+    return {'embeddings': embeddings, 'id2word': id2word, 'word2id': word2id}
+
+
+def words2integers(raw_text, word2id, MAX_SEQ_LEN=40, **kwargs):
+    raw_text = tokenize_sentences(raw_text, **kwargs)
+    prim_len = [len(snt) for snt in raw_text] # length of sentences before padding
+    prim_len = np.array([min(MAX_SEQ_LEN, ln) if ln > 0 else 1 for ln in prim_len])
+    pad_id = word2id['<PAD>']
+    x_ind = []
+    for snt in raw_text:
+        ind_tkns = [word2id[tkn] if tkn in word2id else word2id['<UNK>'] for tkn in snt]
+        if len(snt) < MAX_SEQ_LEN:
+            ind_tkns.extend([pad_id] * (MAX_SEQ_LEN - len(snt)))
+        elif len(ind_tkns) > MAX_SEQ_LEN:
+            ind_tkns = ind_tkns[0:MAX_SEQ_LEN]
+        x_ind.append(ind_tkns)
+    return [x_ind, prim_len]
+
+
+####################################################################
+#  TO DELETE???
+####################################################################
 def add_padding(snt_emb, max_len=None):
     if max_len is None:
         max_len = max([len(snt) for snt in snt_emb])
