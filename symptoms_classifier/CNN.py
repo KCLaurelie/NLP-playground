@@ -1,39 +1,17 @@
-from symptoms_classifier.NLP_embedding import *
 import logging
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.model_selection import train_test_split
-from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf
+from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf, prep_nn_dataset
 from code_utils.plot_utils import plot_multi_lists
-
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 
-def test():
-    from symptoms_classifier.symptoms_classifier import TextsToClassify
-    MAX_SEQ_LEN, tokenization_type, test_size, random_state, dropout, n_epochs, debug_mode = [40, None, 0.2, 0, 0.5, 50, False]
-    tweets = TextsToClassify(filepath=r'C:\Users\K1774755\Downloads\phd\Tweets.csv',
-                             class_col='airline_sentiment', text_col='text', binary_main_class='positive')
-    df = tweets.load_data()
-    sentences, y = [df.text, df.airline_sentiment.replace({'neutral':0, 'positive':0, 'negative':1})]
-    w2v = load_embedding_model(r'C:\Users\K1774755\PycharmProjects\toy-models\embeddings\w2v_wiki.model', model_type='w2v')
-
-
 def train_cnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_size=0.2, random_state=0, dropout=0.5, n_epochs=200, debug_mode=False):
-    embeddings_res = embedding2torch(w2v, SEED=0)
-    embeddings = embeddings_res['embeddings']
-    word2id = embeddings_res['word2id']
-    x_ind, prim_len = words2integers(raw_text=sentences, word2id=word2id, tokenization_type=tokenization_type, MAX_SEQ_LEN=MAX_SEQ_LEN)
-    x_train, x_test, y_train, y_test, l_train, l_test = train_test_split(x_ind, y, prim_len, test_size=test_size, random_state=random_state)
 
-    x_train = torch.tensor(x_train, dtype=torch.long)
-    y_train_torch = torch.tensor(y_train.values, dtype=torch.long)
-    l_train = torch.tensor(l_train, dtype=torch.float32).reshape(-1, 1)
-    x_test = torch.tensor(x_test, dtype=torch.long)
-    # y_test = torch.tensor(y_test.values, dtype=torch.long)
-    l_test = torch.tensor(l_test, dtype=torch.float32).reshape(-1, 1)
+    embeddings, word2id, x_train, y_train, y_train_torch, l_train, x_test, y_test, y_test_torch, l_test = \
+        prep_nn_dataset(w2v=w2v, sentences=sentences, y=y,tokenization_type=tokenization_type, test_size=test_size, MAX_SEQ_LEN=MAX_SEQ_LEN, random_state=random_state)
 
     class CNN(nn.Module):
         def __init__(self, embeddings):
@@ -53,7 +31,6 @@ def train_cnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
             self.conv1 = nn.Conv2d(1, n_filters, k1)  # nb of channels always 1 in text
             self.conv2 = nn.Conv2d(1, n_filters, k2)
             self.conv3 = nn.Conv2d(1, n_filters, k3)
-
             # fully connected network: concatenate the 3 conv layers and put through linear layer (size = 3*n_filters)
             self.fc1 = nn.Linear(3 * n_filters, 2)
             self.d1 = nn.Dropout(dropout)
@@ -104,9 +81,9 @@ def train_cnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
     print('Finished Training')
     cnn.eval()
     # logits_test = F.softmax(cnn(x_test), dim=1)
-    outputs_test = torch.max(cnn(x_test), 1)[1]
+    outputs_test = torch.max(cnn(x_test, l_test), 1)[1]
     # logits_train = F.softmax(cnn(x_train), dim=1)
-    outputs_train = torch.max(cnn(x_train), 1)[1]
+    outputs_train = torch.max(cnn(x_train, l_train), 1)[1]
 
     if debug_mode:
         plot_multi_lists({'Bias': bs, 'Weight': ws, 'Loss': losses, 'Accuracy': accs})
@@ -114,13 +91,3 @@ def train_cnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
 
     return [cnn, preds, df_test, df_train]
 
-
-def test_CNN(sentence, w2v, tokenization_type, cnn):
-    embeddings_res = embedding2torch(w2v, SEED=0)
-    word2id = embeddings_res['word2id']
-    x_ind = words2integers(raw_text=sentence, word2id=word2id, tokenization_type=tokenization_type)
-    x_ind = torch.tensor([x_ind], dtype=torch.long)
-    cnn = cnn.eval()
-    res_tmp = cnn(x_ind)  # output of the netweork
-    res = torch.softmax(res_tmp, dim=1)
-    return res

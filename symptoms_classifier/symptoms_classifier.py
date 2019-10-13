@@ -4,6 +4,7 @@ from sklearn.preprocessing import LabelEncoder
 from symptoms_classifier.NLP_embedding import *
 from symptoms_classifier.NN_pytorch import train_nn
 from symptoms_classifier.CNN import train_cnn
+from symptoms_classifier.RNN import train_rnn
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
 import symptoms_classifier.classifiers_utils as cutils
 
@@ -155,6 +156,9 @@ class TextsToClassify:
             net, preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, multi_class=multi_class, dropout=dropout, **kwargs)
         elif nn_type.lower() == 'cnn':
             net, preds, df_test, df_train = train_cnn(w2v=self.embedding_model, sentences=self.dataset[self.text_col], y=self.dataset.class_numeric, dropout=dropout, **kwargs)
+        elif nn_type.lower() == 'rnn':
+            net, preds, df_test, df_train = train_rnn(w2v=self.embedding_model, sentences=self.dataset[self.text_col],
+                                                      y=self.dataset.class_numeric, dropout=dropout, **kwargs)
         else:
             print('model selected has not been implemented')
             return {'model': nn_type, 'report': ['model not implemented']}

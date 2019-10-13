@@ -4,11 +4,12 @@ import datetime
 import time
 import torch
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.externals import joblib
 import xgboost as xgb
 import catboost
-from symptoms_classifier.NLP_embedding import detect_tokenization_type, detect_embedding_model
+from symptoms_classifier.NLP_embedding import *
 
 classifiers = {
     'LightGBM': 'LightGBM',
@@ -97,6 +98,7 @@ def perf_metrics(data_labels, data_preds):
 
 def nn_graph_perf(train_preds, y_train, net, loss, losses=[], accs=[], ws=[], bs=[], multi_class=False):
     train_preds = clean_torch_output(train_preds, multi_class=multi_class)
+    y_train = torch2numpy(y_train)
     losses.append(loss.item())
     accs.append(accuracy_score([round(value) for value in train_preds], y_train))
     ws.append(net.fc1.weight.detach().numpy()[0][0])
@@ -155,9 +157,8 @@ def test_classifier(raw_text, classifier, embedding_model_path, classifier_type,
 
 
 def clean_torch_vectors(train_preds, y_train, test_preds, y_test, multi_class=False):
-    if isinstance(y_train, torch.Tensor): y_train = y_train.numpy()
-    if isinstance(y_test, torch.Tensor): y_test = y_test.numpy()
-
+    y_train = torch2numpy(y_train)
+    y_test = torch2numpy(y_test)
     train_preds = clean_torch_output(train_preds, multi_class=multi_class)
     test_preds = clean_torch_output(test_preds, multi_class=multi_class)
 
@@ -183,3 +184,31 @@ def torch2numpy(vec):
         except:
             vec = vec.detach().numpy()
     return vec
+
+
+def prep_nn_dataset(w2v, sentences, y, tokenization_type, test_size, MAX_SEQ_LEN, random_state):
+    embeddings_res = embedding2torch(w2v, SEED=0)
+    embeddings = embeddings_res['embeddings']
+    word2id = embeddings_res['word2id']
+    x_ind, prim_len = words2integers(raw_text=sentences, word2id=word2id, tokenization_type=tokenization_type, MAX_SEQ_LEN=MAX_SEQ_LEN)
+    x_train, x_test, y_train, y_test, l_train, l_test = train_test_split(x_ind, y, prim_len, test_size=test_size, random_state=random_state)
+
+    x_train = torch.tensor(x_train, dtype=torch.long)
+    y_train_torch = torch.tensor(y_train.values, dtype=torch.long)  # need to keep y_train for indices
+    l_train = torch.tensor(l_train, dtype=torch.float32).reshape(-1, 1)
+    x_test = torch.tensor(x_test, dtype=torch.long)
+    y_test_torch = torch.tensor(y_test.values, dtype=torch.long)
+    l_test = torch.tensor(l_test, dtype=torch.float32).reshape(-1, 1)
+
+    return [embeddings, word2id, x_train, y_train, y_train_torch, l_train, x_test, y_test, y_test_torch, l_test]
+
+
+def test_nn(sentence, w2v, tokenization_type, net):
+    embeddings_res = embedding2torch(w2v, SEED=0)
+    word2id = embeddings_res['word2id']
+    x_ind = words2integers(raw_text=sentence, word2id=word2id, tokenization_type=tokenization_type)
+    x_ind = torch.tensor([x_ind], dtype=torch.long)
+    net = net.eval()
+    res_tmp = net(x_ind)  # output of the netweork
+    res = torch.softmax(res_tmp, dim=1)
+    return res
