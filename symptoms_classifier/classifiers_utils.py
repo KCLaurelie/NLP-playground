@@ -165,14 +165,21 @@ def clean_torch_vectors(train_preds, y_train, test_preds, y_test, multi_class=Fa
 
 
 def clean_torch_output(pred_vec, multi_class=False):
-    if isinstance(pred_vec, torch.Tensor):
-        try:
-            pred_vec = pred_vec.numpy()
-        except:
-            # print('detaching')
-            pred_vec = pred_vec.detach().numpy()
     if multi_class:  # get the index of max for each row
-        pred_vec = pred_vec.argmax(1)
+        pred_vec = torch2numpy(pred_vec).argmax(1)
     else:
-        pred_vec = [1 if x > 0.5 else 0 for x in pred_vec]
+        try:
+            pred_vec = [1 if x > 0.5 else 0 for x in torch2numpy(pred_vec)]
+        except:
+            pred_vec = torch.max(pred_vec, 1)[1]
+            pred_vec = torch2numpy(pred_vec)
     return pred_vec
+
+
+def torch2numpy(vec):
+    if isinstance(vec, torch.Tensor):
+        try:
+            vec = vec.numpy()
+        except:
+            vec = vec.detach().numpy()
+    return vec

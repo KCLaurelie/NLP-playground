@@ -287,6 +287,7 @@ def train_embedding_model(sentences, embedding_algo='w2v', tokenization_type='le
 
 
 def embedding2torch(w2v_model, SEED=0):
+    print('formatting w2v model for pytorch')
     np.random.seed(SEED)
     embeddings = []  # A list of embeddings for each word in the word2vec vocab
 

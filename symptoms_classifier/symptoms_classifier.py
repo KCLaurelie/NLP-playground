@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from symptoms_classifier.NLP_embedding import *
 from symptoms_classifier.NN_pytorch import train_nn
+from symptoms_classifier.CNN import train_cnn
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
 import symptoms_classifier.classifiers_utils as cutils
 
@@ -145,13 +146,18 @@ class TextsToClassify:
         return errors
 
     def run_neural_net(self, binary=None, binary_main_class=None, multi_class=True, dropout=0.5
-                       , output_errors=False, save_model_path=None, timestamp=False, **kwargs):
+                       , output_errors=False, save_model_path=None, timestamp=False, nn_type='ANN', **kwargs):
         title = 'Neural Net' + ('_multiclass' if multi_class else '') + '_dropout=' + str(dropout)
         if binary is None: binary = self.binary
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
 
-        net, preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, multi_class=multi_class, dropout=dropout, **kwargs)
-
+        if nn_type.lower() == 'ann':
+            net, preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, multi_class=multi_class, dropout=dropout, **kwargs)
+        elif nn_type.lower() == 'cnn':
+            net, preds, df_test, df_train = train_cnn(w2v=self.embedding_model, sentences=self.dataset[self.text_col], y=self.dataset.class_numeric, dropout=dropout, **kwargs)
+        else:
+            print('model selected has not been implemented')
+            return {'model': nn_type, 'report': ['model not implemented']}
         self.dataset[['split', 'preds']] = preds[['split', 'preds']]
         errors = self.generate_errors_report(preds_col='preds') if output_errors else 'error report not generated'
         classes = self.dataset[['class_numeric', self.class_col]].drop_duplicates()

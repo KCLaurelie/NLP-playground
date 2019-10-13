@@ -5,15 +5,15 @@ import torch.nn.functional as F
 import torch.nn as nn
 import torch.optim as optim
 from sklearn.model_selection import train_test_split
-import sklearn.metrics
 from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf
+from code_utils.plot_utils import plot_multi_lists
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 
 def test():
-    from symptoms_classifier.symptoms_classifier import *
-    MAX_SEQ_LEN, tokenization_type, test_size, random_state, dropout, n_epochs = [40, None, 0.2, 0, 0.5, 5000]
+    from symptoms_classifier.symptoms_classifier import TextsToClassify
+    MAX_SEQ_LEN, tokenization_type, test_size, random_state, dropout, n_epochs, debug_mode = [40, None, 0.2, 0, 0.5, 50, False]
     tweets = TextsToClassify(filepath=r'C:\Users\K1774755\Downloads\phd\Tweets.csv',
                              class_col='airline_sentiment', text_col='text', binary_main_class='positive')
     df = tweets.load_data()
@@ -21,21 +21,18 @@ def test():
     w2v = load_embedding_model(r'C:\Users\K1774755\PycharmProjects\toy-models\embeddings\w2v_wiki.model', model_type='w2v')
 
 
-def train_cnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_size=0.2, random_state=0, dropout=0.5, n_epochs=5000):
+def train_cnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_size=0.2, random_state=0, dropout=0.5, n_epochs=200, debug_mode=False):
     embeddings_res = embedding2torch(w2v, SEED=0)
     embeddings = embeddings_res['embeddings']
     word2id = embeddings_res['word2id']
     x_ind, prim_len = words2integers(raw_text=sentences, word2id=word2id, tokenization_type=tokenization_type, MAX_SEQ_LEN=MAX_SEQ_LEN)
-    # emb_weights, x_ind, c_ind = embed_text_with_padding(sentences=sentences, w2v=w2v, tokenization_type=tokenization_type, keywords=keywords, ln=ln)
-
-    x_train, x_test, y_train, y_test, l_train, l_test = train_test_split(x_ind, y, prim_len,
-                                                                         test_size=test_size, random_state=random_state)
+    x_train, x_test, y_train, y_test, l_train, l_test = train_test_split(x_ind, y, prim_len, test_size=test_size, random_state=random_state)
 
     x_train = torch.tensor(x_train, dtype=torch.long)
-    y_train = torch.tensor(y_train, dtype=torch.long)
+    y_train_torch = torch.tensor(y_train.values, dtype=torch.long)
     l_train = torch.tensor(l_train, dtype=torch.float32).reshape(-1, 1)
     x_test = torch.tensor(x_test, dtype=torch.long)
-    y_test = torch.tensor(y_test, dtype=torch.long)
+    # y_test = torch.tensor(y_test.values, dtype=torch.long)
     l_test = torch.tensor(l_test, dtype=torch.float32).reshape(-1, 1)
 
     class CNN(nn.Module):
@@ -83,28 +80,36 @@ def train_cnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
     optimizer = optim.Adam(parameters, lr=0.001)
     criterion = nn.CrossEntropyLoss()
 
+    losses, accs, ws, bs = [[], [], [], []]
     for epoch in range(n_epochs):
         cnn.train()
         optimizer.zero_grad()
-        outputs = cnn(x_train, l_train)
-        loss = criterion(outputs, y_train)
+        train_preds = cnn(x_train, l_train)
+        loss = criterion(train_preds, y_train_torch)
         loss.backward()
         optimizer.step()
 
-        if epoch % 500 == 0:
-            cnn.eval()
-            outputs_train = torch.max(cnn(x_train, l_train), 1)[1]
-            outputs_test = torch.max(cnn(x_test, l_test), 1)[1]
-            al = sklearn.metrics.classification_report(outputs_test.detach().numpy(), y_test.detach().numpy())
-            f1 = sklearn.metrics.f1_score(outputs_test.detach().numpy(), y_test.detach().numpy())
-            print(al)
-            print(f1)
+        if debug_mode:  # Track the changes
+            losses, accs, ws, bs = nn_graph_perf(train_preds, y_train, cnn, loss,
+                                                 losses=losses, accs=accs, ws=ws, bs=bs)
 
+        if epoch % 10 == 0:
+            cnn.eval()
+            outputs_train = torch.max(train_preds, 1)[1]
+            outputs_test = torch.max(cnn(x_test, l_test), 1)[1]
+            print("Epoch: {:4} Loss: {:.5f} ".format(epoch, loss.item()))
+            nn_print_perf(train_preds=outputs_train.detach(), y_train=y_train,
+                          test_preds=outputs_test.detach(), y_test=y_test)
+
+    print('Finished Training')
     cnn.eval()
-    logits_test = F.softmax(cnn(x_test), dim=1)
+    # logits_test = F.softmax(cnn(x_test), dim=1)
     outputs_test = torch.max(cnn(x_test), 1)[1]
-    logits_train = F.softmax(cnn(x_train), dim=1)
+    # logits_train = F.softmax(cnn(x_train), dim=1)
     outputs_train = torch.max(cnn(x_train), 1)[1]
+
+    if debug_mode:
+        plot_multi_lists({'Bias': bs, 'Weight': ws, 'Loss': losses, 'Accuracy': accs})
     preds, df_test, df_train = nn_classification_report(y, outputs_train, y_train, outputs_test, y_test)
 
     return [cnn, preds, df_test, df_train]

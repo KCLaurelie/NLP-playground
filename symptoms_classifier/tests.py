@@ -10,19 +10,15 @@ def test_final():
         binary_main_class='positive')
     df = tweets.load_data()
     tkns = tweets.tokenize_text(tokenization_type='lem', update_obj=True)
-    w2v = tweets.train_embedding_model(embedding_algo='w2v', size=300,
-                                       save_model_path=output_path + '\\test_w2v.dat')
+    w2v = load_embedding_model(r'C:\Users\K1774755\PycharmProjects\toy-models\embeddings\w2v_wiki.model', model_type='w2v')
+    tweets.embedding_model = w2v
     emb = tweets.embed_text(update_obj=True, embedding_model=w2v, tokenization_type='lem', embedding_algo='w2v') #, use_weights=True, keywords=['virgin', 'awesome'])
     emb = tweets.embed_text(update_obj=True, embedding_model=r'C:\Users\K1774755\Downloads\phd\w2v_wiki.model'
                             , embedding_algo='w2v') #, w2v_emb_option='words')
-    tfidf = tweets.train_embedding_model(embedding_algo='tfidf', max_features=1000)
-    tweets.embed_text(embedding_model=tfidf, update_obj=True, embedding_algo='tfidf')
     tweets.make_binary_class(binary_main_class='negative')
     res1 = train_nn(x_emb=tweets.embedded_text, y=tweets.dataset.class_numeric, random_state=0, n_epochs=2000, multi_class=False, debug_mode=True)
 
-    res = tweets.run_neural_net(binary=True, binary_main_class='negative', dropout=0.5, multi_class=False, n_epochs=50, debug_mode=True, random_state=42
-                                , save_model_path=None)
-
+    res = tweets.run_neural_net(nn_type='CNN', binary=True, binary_main_class='negative', dropout=0.5, n_epochs=50, debug_mode=True, random_state=42)
 
     res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative', output_errors=False)
 
