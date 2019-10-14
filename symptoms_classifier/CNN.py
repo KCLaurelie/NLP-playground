@@ -11,7 +11,7 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 def train_cnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_size=0.2, random_state=0, dropout=0.5, n_epochs=200, debug_mode=False):
 
     embeddings, word2id, x_train, y_train, y_train_torch, l_train, x_test, y_test, y_test_torch, l_test = \
-        prep_nn_dataset(w2v=w2v, sentences=sentences, y=y,tokenization_type=tokenization_type, test_size=test_size, MAX_SEQ_LEN=MAX_SEQ_LEN, random_state=random_state)
+        prep_nn_dataset(w2v=w2v, sentences=sentences, y=y, tokenization_type=tokenization_type, test_size=test_size, MAX_SEQ_LEN=MAX_SEQ_LEN, random_state=random_state)
 
     class CNN(nn.Module):
         def __init__(self, embeddings):

@@ -12,8 +12,8 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 def test():
     from symptoms_classifier.symptoms_classifier import TextsToClassify
     from symptoms_classifier.NLP_embedding import load_embedding_model
-    MAX_SEQ_LEN, tokenization_type, test_size, random_state, dropout, n_epochs, debug_mode = [40, None, 0.2, 0, 0.5, 50,
-                                                                                              False]
+    MAX_SEQ_LEN, tokenization_type, test_size, random_state, dropout, n_epochs, debug_mode, rnn_type = [40, None, 0.2, 0, 0.5, 50,
+                                                                                              False, 'bla']
     tweets = TextsToClassify(filepath=r'C:\Users\K1774755\Downloads\phd\Tweets.csv',
                              class_col='airline_sentiment', text_col='text', binary_main_class='positive')
     df = tweets.load_data()
@@ -25,7 +25,7 @@ def test():
 def train_rnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_size=0.2, random_state=0, dropout=0.5,
               n_epochs=200, debug_mode=False, rnn_type='RNN'):
     embeddings, word2id, x_train, y_train, y_train_torch, l_train, x_test, y_test, y_test_torch, l_test = \
-        prep_nn_dataset(w2v=w2v, sentences=sentences, y=y,tokenization_type=tokenization_type, test_size=test_size, MAX_SEQ_LEN=MAX_SEQ_LEN, random_state=random_state)
+        prep_nn_dataset(w2v=w2v, sentences=sentences, y=y, tokenization_type=tokenization_type, test_size=test_size, MAX_SEQ_LEN=MAX_SEQ_LEN, random_state=random_state)
 
     class RNN(nn.Module):
         def __init__(self, embeddings, padding_idx):
@@ -51,7 +51,7 @@ def train_rnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
         def forward(self, x, lns):
             x = self.embeddings(x)  # x.shape = batch_size x sequence_length x emb_size
             # Tell RNN to ignore padding and set the batch_first to True (sequence length 1st for historical reasons)
-            x = torch.nn.utils.rnn.pack_padded_sequence(x, lns, batch_first=True)
+            x = torch.nn.utils.rnn.pack_padded_sequence(x, lns, batch_first=True, enforce_sorted=False)
             x, hidden = self.rnn(x)  # run 'x' through the RNN
             x, hidden = torch.nn.utils.rnn.pad_packed_sequence(x, batch_first=True)  # Add the padding again
 

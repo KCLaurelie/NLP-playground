@@ -195,10 +195,10 @@ def prep_nn_dataset(w2v, sentences, y, tokenization_type, test_size, MAX_SEQ_LEN
 
     x_train = torch.tensor(x_train, dtype=torch.long)
     y_train_torch = torch.tensor(y_train.values, dtype=torch.long)  # need to keep y_train for indices
-    l_train = torch.tensor(l_train, dtype=torch.float32).reshape(-1, 1)
+    l_train = torch.tensor(l_train, dtype=torch.int64)  #.reshape(-1, 1)
     x_test = torch.tensor(x_test, dtype=torch.long)
     y_test_torch = torch.tensor(y_test.values, dtype=torch.long)
-    l_test = torch.tensor(l_test, dtype=torch.float32).reshape(-1, 1)
+    l_test = torch.tensor(l_test, dtype=torch.int64)  #.reshape(-1, 1)
 
     return [embeddings, word2id, x_train, y_train, y_train_torch, l_train, x_test, y_test, y_test_torch, l_test]
 
