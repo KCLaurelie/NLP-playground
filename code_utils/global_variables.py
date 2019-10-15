@@ -24,6 +24,6 @@ if 'kraljevic' in os.getcwd().lower():  # if working on azure machine
     spacy_en_path = 'en_core_sci_sm'
 else:  # working on SLaM or normal machine
     spacy_lib = os.path.join(root_path, r'spacy\Lib\site-packages')
-    spacy_en_path = os.path.join(spacy_lib, r'en_core_web_sm\en_core_web_sm-2.1.0')
+    spacy_en_path = os.path.join(spacy_lib, r'en_core_web_sm\en_core_web_sm-2.2.0')
     sys.path.append(spacy_lib)
 
