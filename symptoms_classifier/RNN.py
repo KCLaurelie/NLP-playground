@@ -34,8 +34,8 @@ def train_rnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
             embedding_size = len(embeddings[0])
 
             # Initialize embeddings
-            self.embeddings = nn.Embedding(vocab_size, embedding_size, padding_idx=padding_idx)
-            self.embeddings.load_state_dict({'weight': embeddings})
+            self.embeddings = nn.Embedding(vocab_size, embedding_size, padding_idx=padding_idx)  # Create embeddings
+            self.embeddings.load_state_dict({'weight': embeddings})  # load existing weights
             self.embeddings.weight.requires_grad = False  # Disable training for the embeddings - IMPORTANT
 
             # Create the RNN cell
@@ -71,7 +71,7 @@ def train_rnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
     for epoch in range(n_epochs):
         rnn.train()
         optimizer.zero_grad()
-        train_preds = rnn(x_train, l_train)  # TODO move l train to 1D CPU int64 tensor
+        train_preds = rnn(x_train, l_train)
         loss = criterion(train_preds, y_train_torch)
         loss.backward()
         optimizer.step()

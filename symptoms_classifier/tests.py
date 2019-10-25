@@ -14,7 +14,7 @@ def test_final():
     tweets.embedding_model = w2v
     tweets.make_binary_class(binary_main_class='negative')
 
-    emb = tweets.embed_text(update_obj=True, embedding_model=w2v, tokenization_type='lem', embedding_algo='w2v') #, use_weights=True, keywords=['virgin', 'awesome'])
+    emb = tweets.embed_text(update_obj=True, embedding_model=w2v, tokenization_type='lem', embedding_algo='w2v', context=20, use_weights=True, keywords=['virgin', 'awesome'])
     emb = tweets.embed_text(update_obj=True, embedding_model=r'C:\Users\K1774755\Downloads\phd\w2v_wiki.model', embedding_algo='w2v') #, w2v_emb_option='words')
 
     res1 = train_nn(x_emb=tweets.embedded_text, y=tweets.dataset.class_numeric, random_state=0, n_epochs=2000, multi_class=False, debug_mode=True)

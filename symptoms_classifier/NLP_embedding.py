@@ -13,7 +13,7 @@ import torch
 import spacy
 nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
 spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
-nltk.download('wordnet')
+#nltk.download('wordnet')
 
 
 def lemmatize_words(words_list):
@@ -149,7 +149,7 @@ def truncate_tokens(sentences_tkns, maxlen, truncating='post'):
 
 
 def sentences2embedding_w2v(sentences, w2v_model, tokenization_type='lem',
-                            do_avg=True, use_weights=False, **kwargs):
+                            do_avg=True, use_weights=True, **kwargs):
     """
     convert sentences to embedded sentences using pre-trained Word2Vec model
     :param sentences: pd.Series of sentences to vectorize
@@ -333,66 +333,3 @@ def words2integers(raw_text, word2id, MAX_SEQ_LEN=40, **kwargs):
             ind_tkns = ind_tkns[0:MAX_SEQ_LEN]
         x_ind.append(ind_tkns)
     return [x_ind, prim_len]
-
-
-####################################################################
-#  TO DELETE???
-####################################################################
-def add_padding(snt_emb, max_len=None):
-    if max_len is None:
-        max_len = max([len(snt) for snt in snt_emb])
-    return 0
-
-
-def embed_text_with_padding(sentences, w2v, tokenization_type, keywords, ln=40):
-    EMB_SIZE = w2v.wv.vector_size
-    # tokenize text
-    x = tokenize_sentences(sentences, tokenization_type=tokenization_type)
-
-    # Get embedding weights
-    emb_weights = []
-    tkn_ind = {}
-    for word in w2v.wv.vocab.keys():
-        tkn_ind[word] = len(emb_weights)
-        emb_weights.append(w2v.wv[word])
-
-    # Add the special tokens
-    tkn_ind["<unk>"] = len(emb_weights)
-    emb_weights.append(np.random.rand(EMB_SIZE))
-
-    tkn_ind["<pad>"] = len(emb_weights)
-    emb_weights.append(np.zeros(EMB_SIZE))
-
-    # Convert to numpy
-    emb_weights = np.array(emb_weights)
-
-    ind_tkn = {}
-    for key in tkn_ind.keys():
-        ind_tkn[tkn_ind[key]] = key
-
-    # Remove above 7 from each side
-    new_x = [None] * len(x)
-    for ind, row in enumerate(x):
-        n_row = row[0:ln * 2]
-        for i, word in enumerate(row):
-            if any([x in word for x in keywords]):
-                n_row = x[ind][max(0, i - ln):(i + ln)]
-        new_x[ind] = n_row
-    x = new_x
-
-    c_ind = [-1] * len(x)
-    for ind, row in enumerate(x):
-        for i, word in enumerate(row):
-            if any([x in word for x in keywords]):
-                c_ind[ind] = i
-
-    # Index 'x'
-    x_ind = [[tkn_ind[tkn] if tkn in tkn_ind else tkn_ind['<unk>'] for tkn in tkns] for tkns in x]
-
-    # Pad 'x'
-    MAX_LENGTH = max([len(doc) for doc in x_ind])
-    for i in range(len(x_ind)):
-        while len(x_ind[i]) != MAX_LENGTH:
-            x_ind[i].append(tkn_ind['<pad>'])
-
-    return [emb_weights, x_ind, c_ind]
