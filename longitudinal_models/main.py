@@ -6,11 +6,18 @@ def test(impute=False):
     df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx', sheet_name='combined', index_col=None)
     models = ('linear_rdn_all',)  # ('linear_rdn_int', 'linear_rdn_all_no_intercept', 'linear_rdn_all', 'quadratic_rdn_int')
     socio_dem_imp = ['age_at_score_baseline', 'gender', 'ethnicity_group_imputed', 'marital_status_imputed',
-                     'education_bucket_raw_imputed', 'first_language_imputed', 'imd_bucket_baseline_imputed', 'age_at_first_diag']
+                     'education', 'first_language_imputed', 'imd_bucket_baseline_imputed', 'age_at_first_diag']
     socio_dem = [x.replace('_imputed', '') for x in socio_dem_imp]
     cvd_imp = ['smoking_status_baseline_imputed', 'cvd_problem_imputed']
     cvd = [x.replace('_imputed', '') for x in cvd_imp]
 
+    # df.smoking_status_baseline_imputed = df.smoking_status_baseline_imputed.replace({'current': 'yes', 'past': 'yes'})
+    references = {'ethnicity_group_imputed': 'white', 'ethnicity_group': 'white', 'smoking_status_baseline_imputed': 'no',
+                  'smoking_status_baseline': 'no', 'marital_status_imputed': 'single or separated', 'marital_status': 'single or separated'}
+    for key, val in references.items():
+        if key in df:
+            df[key] = df[key].replace({val: 'aaa_'+val})
+            print('replaced', val)
     if impute:  # if imputed data needs to be generated (this step takes a while)
         df_baseline = df.sort_values(['brcid', 'score_date_upbound']).groupby('brcid').first().reset_index()
         df_imputed = impute_all_data(df_baseline, output_column=None, clean_df=True,
