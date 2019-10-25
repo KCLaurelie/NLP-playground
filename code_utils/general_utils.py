@@ -320,11 +320,17 @@ def convert_num_to_bucket(nb, bucket_size=0.5, convert_to_str=True):
     return res
 
 
+def p_value_sig(p_val):
+    res = cut_with_na(to_bin=p_val,
+                      bins=[-np.inf, 0.001, 0.01, 0.05, np.inf],
+                      labels=['***', '**', '*', ''])
+    return res
+
+
 ##############################################################################
 # DATE FUNCTIONS FOR LONGITUDINAL MODELLING
 ############################################################################## 
 # dates = ["2014-10-10", "2016-01-07"]
-
 def monthlist_short(dates):
     start, end = [datetime.strptime(_, "%Y-%m-%d") for _ in dates]
     return OrderedDict(
