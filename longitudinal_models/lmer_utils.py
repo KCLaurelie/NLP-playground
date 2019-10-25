@@ -2,6 +2,7 @@ from code_utils.global_variables import *
 import pandas as pd
 import numpy as np
 from rpy2.robjects.packages import importr
+import code_utils.general_utils as gutils
 
 
 def check_r_loc():
@@ -58,7 +59,8 @@ def print_r_model_output(model):
     coefs['CI'] = '[' + coefs['2.5_ci'].round(3).astype(str) + ',' + coefs['97.5_ci'].round(3).astype(str) + ']'
     coefs['Estimate (SE)'] = coefs.Estimate.round(3).astype(str) + ' (' + coefs.SE.round(3).astype(str) + ')'
     coefs = coefs[['type', 'Estimate (SE)', 'CI', 'P-val']]
-
+    # coefs['significance'] = gutils.p_value_sig(coefs['P-val'])
+    coefs['Estimate (SE)'] = coefs['Estimate (SE)'] + gutils.p_value_sig(coefs['P-val']).astype(str)
     res = pd.concat([coefs, rnd_eff, stat, various], sort=True)[['type', 'Estimate (SE)', 'CI', 'P-val']]
     return res.set_index(['type', res.index])
 

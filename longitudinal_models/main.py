@@ -4,29 +4,32 @@ from longitudinal_models.imputation import *
 
 def test(impute=False):
     df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx', sheet_name='combined', index_col=None)
-    models = ('linear_rdn_int', 'linear_rdn_all_no_intercept', 'linear_rdn_all', 'quadratic_rdn_int')
-    age_col = 'age_at_score_baseline'  # 'age_at_first_diag'
-    if impute:
+    models = ('linear_rdn_all',)  # ('linear_rdn_int', 'linear_rdn_all_no_intercept', 'linear_rdn_all', 'quadratic_rdn_int')
+    socio_dem_imp = ['age_at_score_baseline', 'gender', 'ethnicity_group_imputed', 'marital_status_imputed',
+                     'education_bucket_raw_imputed', 'first_language_imputed', 'imd_bucket_baseline_imputed', 'age_at_first_diag']
+    socio_dem = [x.replace('_imputed', '') for x in socio_dem_imp]
+    cvd_imp = ['smoking_status_baseline_imputed', 'cvd_problem_imputed']
+    cvd = [x.replace('_imputed', '') for x in cvd_imp]
+
+    if impute:  # if imputed data needs to be generated (this step takes a while)
         df_baseline = df.sort_values(['brcid', 'score_date_upbound']).groupby('brcid').first().reset_index()
         df_imputed = impute_all_data(df_baseline, output_column=None, clean_df=True,
                                      input_columns_to_exclude=['brcid', 'score_combined', 'occur', 'counter', 'score_combined_baseline'])
         df = df.merge(df_imputed[['brcid'] + [x for x in df_imputed.columns if '_final' in x]], on='brcid')
         df = df.reindex(sorted(df_imputed.columns), axis=1)
 
-    res = run_models(model_data=df, complete_case=False, models=models,
-                     covariates=['smoking_status_baseline_imputed', 'imd_bucket_baseline_imputed', 'cvd_problem_imputed'],
+    res = run_models(model_data=df, complete_case=False, models=models, covariates=cvd_imp,
                      output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_health_imputed.xlsx')
-    res = run_models(model_data=df, complete_case=False, models=models,
-                     covariates=['smoking_status_baseline', 'imd_bucket_baseline', 'cvd_problem'],
+    res = run_models(model_data=df, complete_case=False, models=models, covariates=cvd,
                      output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_health_not_imputed.xlsx')
-    res = run_models(model_data=df, complete_case=False, models=models,
-                     covariates=['gender', 'ethnicity_group_imputed', 'first_language_imputed', 'marital_status_imputed', 'education_bucket_raw_imputed',
-                                 'imd_bucket_baseline_imputed', age_col],
+    res = run_models(model_data=df, complete_case=False, models=models, covariates=socio_dem_imp,
                      output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_sociodem_imputed.xlsx')
-    res = run_models(model_data=df, complete_case=False, models=models,
-                     covariates=['gender', 'ethnicity_group', 'first_language', 'marital_status', 'education_bucket_raw',
-                                 'imd_bucket_baseline', age_col],
+    res = run_models(model_data=df, complete_case=False, models=models, covariates=socio_dem,
                      output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_sociodem_not_imputed.xlsx')
+    res = run_models(model_data=df, complete_case=False, models=models, covariates=socio_dem_imp + cvd_imp,
+                     output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_all_imputed.xlsx')
+    res = run_models(model_data=df, complete_case=False, models=models, covariates=socio_dem + cvd,
+                     output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_all_not_imputed.xlsx')
 
 
 def run_report(dataset=ds.default_dataset):
