@@ -1,8 +1,5 @@
-import pandas as pd
-import os
 import datetime
 import time
-import torch
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_score, recall_score
@@ -191,16 +188,24 @@ def prep_nn_dataset(w2v, sentences, y, tokenization_type, test_size, MAX_SEQ_LEN
     embeddings = embeddings_res['embeddings']
     word2id = embeddings_res['word2id']
     x_ind, prim_len = words2integers(raw_text=sentences, word2id=word2id, tokenization_type=tokenization_type, MAX_SEQ_LEN=MAX_SEQ_LEN)
-    x_train, x_test, y_train, y_test, l_train, l_test = train_test_split(x_ind, y, prim_len, test_size=test_size, random_state=random_state)
+    masks = [[1] * min(MAX_SEQ_LEN, doc_len) + [0] * max(0, MAX_SEQ_LEN - doc_len) for doc_len in prim_len]
+    max_len = max([sum(x) for x in masks])
+    print('max len used', max_len)
+    x_train, x_test, y_train, y_test, l_train, l_test, mask_train, mask_test =\
+        train_test_split(x_ind, y, prim_len, masks, test_size=test_size, random_state=random_state)
 
     x_train = torch.tensor(x_train, dtype=torch.long)
     y_train_torch = torch.tensor(y_train.values, dtype=torch.long)  # need to keep y_train for indices
     l_train = torch.tensor(l_train, dtype=torch.int64)  #.reshape(-1, 1)
+    mask_train = torch.tensor(mask_train, dtype=torch.float32)
     x_test = torch.tensor(x_test, dtype=torch.long)
     y_test_torch = torch.tensor(y_test.values, dtype=torch.long)
     l_test = torch.tensor(l_test, dtype=torch.int64)  #.reshape(-1, 1)
+    mask_test = torch.tensor(mask_test, dtype=torch.float32)
 
-    return [embeddings, word2id, x_train, y_train, y_train_torch, l_train, x_test, y_test, y_test_torch, l_test]
+    return [embeddings, word2id,
+            x_train[:, 0:max_len], y_train, y_train_torch, l_train, mask_train[:, 0:max_len],
+            x_test[:, 0:max_len], y_test, y_test_torch, l_test, mask_test[:, 0:max_len]]
 
 
 def test_nn(sentence, w2v, tokenization_type, net):
