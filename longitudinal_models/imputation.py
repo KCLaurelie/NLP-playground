@@ -63,3 +63,15 @@ def impute_all_data(df, output_column=None, input_columns_to_exclude=None, clean
         df[col + '_final'] = imputed_df[col].fillna(df[col + '_imputed'])
 
     return df
+
+
+def impute_with_baseline(df,
+                         key='brcid',
+                         baseline_cols=['brcid', 'score_date_upbound'],
+                         input_columns_to_exclude=['brcid', 'score_combined', 'occur', 'counter', 'score_combined_baseline']):
+    df_baseline = df.sort_values(baseline_cols).groupby(key).first().reset_index()
+    df_imputed = impute_all_data(df_baseline, output_column=None, clean_df=True,
+                                 input_columns_to_exclude=input_columns_to_exclude)
+    df = df.merge(df_imputed[[key] + [x for x in df_imputed.columns if '_final' in x]], on='brcid')
+    df = df.reindex(sorted(df_imputed.columns), axis=1)
+    return df

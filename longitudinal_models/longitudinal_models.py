@@ -13,9 +13,8 @@ import statsmodels.regression.mixed_linear_model as mlm
 ##############################################################################################
 # LONGITUDINAL MODELLING
 ##############################################################################################
-# TODO compare age at baseline vs age a diagnosis
 # https://rpsychologist.com/r-guide-longitudinal-lme-lmer
-# TODO add missing values (impute or complete case??)
+# https://www.statsmodels.org/stable/examples/notebooks/generated/mixed_lm_example.html
 # TODO plots for 200 sample in each subgroup: https://stats.idre.ucla.edu/r/faq/how-can-i-visualize-longitudinal-data-in-ggplot2/
 
 
@@ -35,6 +34,8 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
                to_predict='score_combined',
                key='brcid',
                covariates=None,
+               covariates_slope=False,
+               patients_split_col='patient_diagnosis_super_class',
                timestamps=('score_date_centered',),
                complete_case=False,
                models=('linear_rdn_int', 'linear_rdn_all_no_intercept', 'linear_rdn_all', 'quadratic_rdn_int'),
@@ -57,7 +58,8 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
 
     res = []
     col_num = 0
-    for patient_group in list(model_data.patient_diagnosis_super_class.unique()):
+    patient_groups = list(model_data[patients_split_col].unique()) if patients_split_col is not None else ['all']
+    for patient_group in patient_groups:
         df_tmp = model_data[model_data.patient_diagnosis_super_class == patient_group] \
             if patient_group != 'all' else model_data
         row_num = 0
@@ -65,7 +67,7 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
             for m in models:
                 print('running model:', m, '(patient group:', patient_group, ', timestamp:', ts, ')')
                 formula = lmer_formula(model_type=m, regressor=to_predict, timestamp=ts,
-                                       covariates=covariates, group=key)
+                                       covariates=covariates, covariates_slope=covariates_slope, group=key)
                 print('using formula', formula)
                 model = Lmer(formula, data=df_tmp)
                 try:

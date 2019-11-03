@@ -14,17 +14,19 @@ def lmer_formula(model_type='linear_rdn_int',
                  regressor='score_combined',
                  timestamp='score_date_centered',
                  covariates=None,
+                 covariates_slope=False,
                  group='brcid'):
     # decent explanation of different R models:
     # https://www.statsmodels.org/stable/examples/notebooks/generated/mixed_lm_example.html
 
     # first build covariates string
+    add = ' + ' + timestamp + ' * ' if covariates_slope else ' + '
     if covariates is None:
         str_cov = ''
     elif isinstance(covariates, str):
-        str_cov = ' + ' + covariates
+        str_cov = add + covariates
     else:
-        str_cov = ' + ' + ' + '.join(covariates)
+        str_cov = add + add.join(covariates)
 
     # now build formula
     if model_type == 'linear_rdn_int':  # random intercept only, linear model
