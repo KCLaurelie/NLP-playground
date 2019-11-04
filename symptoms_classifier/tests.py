@@ -9,17 +9,17 @@ def test_final():
         class_col='airline_sentiment', text_col='text',
         binary_main_class='positive')
     df = tweets.load_data()
-    tkns = tweets.tokenize_text(tokenization_type='lem', update_obj=True)
+    # tkns = tweets.tokenize_text(tokenization_type='lem', update_obj=True)
     w2v = load_embedding_model(r'C:\Users\K1774755\PycharmProjects\toy-models\embeddings\w2v_wiki.model', model_type='w2v')
     tweets.embedding_model = w2v
     tweets.make_binary_class(binary_main_class='negative')
 
     emb = tweets.embed_text(update_obj=True, embedding_model=w2v, tokenization_type='lem', embedding_algo='w2v', context=20, use_weights=True, keywords=['virgin', 'awesome'])
-    emb = tweets.embed_text(update_obj=True, embedding_model=r'C:\Users\K1774755\Downloads\phd\w2v_wiki.model', embedding_algo='w2v') #, w2v_emb_option='words')
+    emb = tweets.embed_text(update_obj=True, embedding_model=r'C:\Users\K1774755\PycharmProjects\toy-models\embeddings\w2v_wiki.model', embedding_algo='w2v') #, w2v_emb_option='words')
 
     res1 = train_nn(x_emb=tweets.embedded_text, y=tweets.dataset.class_numeric, random_state=0, n_epochs=2000, multi_class=False, debug_mode=True)
 
-    res = tweets.run_neural_net(nn_type='RNN', binary=True, binary_main_class='negative', dropout=0.5, n_epochs=20, debug_mode=True, random_state=42)
+    res = tweets.run_neural_net(nn_type='RNN', rnn_type='LSTM', binary=True, binary_main_class='negative', dropout=0.5, n_epochs=20, debug_mode=True, random_state=42, bid=True)
 
     res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative', output_errors=False)
 
@@ -29,7 +29,7 @@ def test_final():
 
     res = []
     for model in cutils.classifiers.keys():
-        tmp_res = tweets.run_classifier(classifier_model=model,test_size=0.2, binary=True, binary_main_class='negative',save_model=False)
+        tmp_res = tweets.run_classifier(classifier_model=model, test_size=0.2, binary=True, binary_main_class='negative',save_model=False)
         res += tmp_res['report']
     list_to_excel(res, 'testnew.xlsx', sheet_name=str(tweets.embedding_algo), startrow=0, startcol=0)
     #w2v.wv['you']

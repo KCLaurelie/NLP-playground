@@ -80,7 +80,7 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
                                                  losses=losses, accs=accs, ws=ws, bs=bs, multi_class=multi_class)
 
         # print statistics
-        if epoch % 500 == 0:
+        if epoch % 500 == 0 or epoch >= n_epochs-1:
             net.eval()
             test_preds = net(x_test)
 

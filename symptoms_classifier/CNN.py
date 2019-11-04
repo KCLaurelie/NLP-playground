@@ -70,7 +70,7 @@ def train_cnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
             losses, accs, ws, bs = nn_graph_perf(train_preds, y_train, cnn, loss,
                                                  losses=losses, accs=accs, ws=ws, bs=bs)
 
-        if epoch % 10 == 0:
+        if epoch % 10 == 0 or epoch >= n_epochs-1:
             cnn.eval()
             outputs_train = torch.max(train_preds, 1)[1]
             outputs_test = torch.max(cnn(x_test, l_test), 1)[1]
