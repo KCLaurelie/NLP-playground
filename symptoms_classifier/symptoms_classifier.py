@@ -149,6 +149,9 @@ class TextsToClassify:
     def run_neural_net(self, binary=None, binary_main_class=None, multi_class=True, dropout=0.5
                        , output_errors=False, save_model_path=None, timestamp=False, nn_type='ANN', **kwargs):
         title = 'Neural Net' + ('_multiclass' if multi_class else '') + '_dropout=' + str(dropout)
+        if self.embedding_model is None:
+            print('no embedding model associated to the dataset, please assign one by doing self.embedding_model = ...')
+            return 'error'
         if binary is None: binary = self.binary
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
 
