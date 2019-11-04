@@ -59,6 +59,7 @@ def train_rnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
             if rnn_type.lower() == 'gru':
                 self.rnn = nn.GRU(input_size=embedding_size, hidden_size=hidden_size, num_layers=num_layers, dropout=dropout)
             elif rnn_type.lower() == 'lstm':
+                print('running bidirectional LSTM') if bid else print('running standard LSTM')
                 self.rnn = nn.LSTM(input_size=embedding_size,
                                    hidden_size=hidden_size // (2 if bid else 1),
                                    num_layers=num_layers, dropout=dropout, bidirectional=bid)
@@ -67,17 +68,17 @@ def train_rnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
             self.fc1 = nn.Linear(hidden_size, 2)
 
         def forward(self, x, lns, mask):
-            print('start forward function - x: ', x.shape)
+            if debug_mode: print('start forward function - x: ', x.shape)
             x = self.embeddings(x)  # x.shape = batch_size x sequence_length x emb_size
-            print('after embedding - x: ', x.shape)
+            if debug_mode: print('after embedding - x: ', x.shape)
             # Tell RNN to ignore padding and set the batch_first to True (sequence length 1st for historical reasons)
             x = torch.nn.utils.rnn.pack_padded_sequence(x, mask.sum(1).int(), batch_first=True, enforce_sorted=False)
             x, hidden = self.rnn(x)  # run 'x' through the RNN
             x, hidden = torch.nn.utils.rnn.pad_packed_sequence(x, batch_first=True)  # Add the padding again
 
-            # select the value at the length of that sentence (we are only interested in last output)
+            # select the value at the length of that sentence (we are only interested in last output) or middle if bidirectional
             row_indices = torch.arange(0, x.size(0)).long()
-            x = x[row_indices, lns - 1, :]
+            x = x[row_indices, lns/2, :] if bid else x[row_indices, lns - 1, :]
 
             x = self.fc1(x)
             return x
@@ -100,7 +101,7 @@ def train_rnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
             losses, accs, ws, bs = nn_graph_perf(train_preds, y_train, rnn, loss,
                                                  losses=losses, accs=accs, ws=ws, bs=bs)
 
-        if epoch % 10 == 0:
+        if epoch % 10 == 0 or epoch >= n_epochs-1:
             rnn.eval()
             outputs_train = torch.max(train_preds, 1)[1]
             outputs_test = torch.max(rnn(x_test, l_test, mask_test), 1)[1]
