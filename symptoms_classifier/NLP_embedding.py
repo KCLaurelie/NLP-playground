@@ -149,7 +149,7 @@ def truncate_tokens(sentences_tkns, maxlen, truncating='post'):
 
 
 def sentences2embedding_w2v(sentences, w2v_model, tokenization_type='lem',
-                            do_avg=True, use_weights=True, **kwargs):
+                            do_avg=True, use_weights=False, **kwargs):
     """
     convert sentences to embedded sentences using pre-trained Word2Vec model
     :param sentences: pd.Series of sentences to vectorize
