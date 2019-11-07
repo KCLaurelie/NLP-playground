@@ -2,7 +2,7 @@ import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from symptoms_classifier.NLP_embedding import *
-from symptoms_classifier.NN_pytorch import train_nn
+from symptoms_classifier.ANN import train_nn
 from symptoms_classifier.CNN import train_cnn
 from symptoms_classifier.RNN import train_rnn
 from symptoms_classifier.NLP_text_cleaning import preprocess_text
