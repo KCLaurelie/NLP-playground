@@ -12,18 +12,23 @@ def test():
     from symptoms_classifier.symptoms_classifier import TextsToClassify
     from symptoms_classifier.NLP_embedding import load_embedding_model
     MAX_SEQ_LEN, tokenization_type, test_size, random_state, dropout, n_epochs, debug_mode, rnn_type, lr, bid, num_layers, hidden_size = \
-        [40, None, 0.2, 0, 0.5, 50, False, 'LSTM', 0.001, False, 2, 300]
-    tweets = TextsToClassify(filepath=r'C:\Users\K1774755\Downloads\phd\Tweets.csv',
+        [40, None, 0.2, 0, 0.5, 1, False, 'LSTM', 0.001, False, 2, 300]
+    tweets = TextsToClassify(filepath=r'C:\Users\K1774755\Downloads\phd\Tweets.csv', already_split=False,
                              class_col='airline_sentiment', text_col='text', binary_main_class='positive')
     df = tweets.load_data()
+    idx_train, idx_test = tweets.get_train_test_split()
     sentences, y = [df.text, df.airline_sentiment.replace({'neutral': 0, 'positive': 0, 'negative': 1})]
     w2v = load_embedding_model(r'C:\Users\K1774755\PycharmProjects\toy-models\embeddings\w2v_wiki.model', model_type='w2v')
 
 
-def train_rnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_size=0.2, random_state=0, dropout=0.5,
+def train_rnn(w2v, sentences, y,
+              idx_train=None, idx_test=None, test_size=0.2,
+              tokenization_type=None, MAX_SEQ_LEN=40, random_state=0, dropout=0.5,
               num_layers=2, hidden_size=300, n_epochs=200, lr=0.001, debug_mode=False, rnn_type='RNN', bid=False):
     """
 
+    :param idx_test:
+    :param idx_train:
     :param w2v: pre-trained word2vec embedding model
     :param sentences: pandas Series of sentences to classify (1 row = 1 sentence)
     :param y: corresponding classes
@@ -42,7 +47,8 @@ def train_rnn(w2v, sentences, y, tokenization_type=None, MAX_SEQ_LEN=40, test_si
     :return:
     """
     embeddings, word2id, x_train, y_train, y_train_torch, l_train, mask_train, x_test, y_test, y_test_torch, l_test, mask_test = \
-        prep_nn_dataset(w2v=w2v, sentences=sentences, y=y, tokenization_type=tokenization_type, test_size=test_size, MAX_SEQ_LEN=MAX_SEQ_LEN, random_state=random_state)
+        prep_nn_dataset(w2v=w2v, sentences=sentences, y=y, idx_train=idx_train, idx_test=idx_test, test_size=test_size,
+                        tokenization_type=tokenization_type, MAX_SEQ_LEN=MAX_SEQ_LEN, random_state=random_state)
 
     class RNN(nn.Module):
         def __init__(self, embeddings, padding_idx):

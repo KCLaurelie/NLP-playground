@@ -179,7 +179,7 @@ def sentences2embedding_w2v(sentences, w2v_model, tokenization_type='lem',
         cnt = 0
         if use_weights:
             if i_snt == 0: print('embedding using Word2Vec model (using average sum of tokens)')
-            debug = True if i_snt < 5 else False  # print first 5 sentences to check
+            debug = True if i_snt < 2 else False  # print first 2 sentences to check
             weights = gutils.get_wa(sentence=snt, debug=debug, **kwargs)
         for i_word, word in enumerate(snt):  # Loop over the words of a sentence
             if word in w2v_model.wv:
@@ -195,7 +195,7 @@ def sentences2embedding_w2v(sentences, w2v_model, tokenization_type='lem',
             sentences_emb[i_snt] = sentences_emb[i_snt] / cnt
 
     excluded_words = list(dict.fromkeys(not_in_model))
-    print(len(excluded_words), 'words not in model:', excluded_words)
+    print(len(excluded_words), 'words not in model')  #, excluded_words)
     return sentences_emb
 
 
@@ -297,7 +297,11 @@ def embedding2torch(w2v_model, SEED=0):
     id2word = {}
     word2id = {}
 
-    for word in w2v_model.vocab.keys():
+    try:
+        keys = w2v_model.vocab.keys()
+    except:
+        keys = w2v_model.wv.vocab.keys()
+    for word in keys:
         id = len(embeddings)  # What is the position of this word in the embeddings list?
         id2word[id] = word  # Add mapping from ID to word
         word2id[word] = id  # From word 2 id

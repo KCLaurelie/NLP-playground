@@ -183,16 +183,28 @@ def torch2numpy(vec):
     return vec
 
 
-def prep_nn_dataset(w2v, sentences, y, tokenization_type, test_size, MAX_SEQ_LEN, random_state):
+def prep_nn_dataset(w2v, sentences, y, tokenization_type, test_size, MAX_SEQ_LEN, random_state
+                    , idx_train=None, idx_test=None):
     embeddings_res = embedding2torch(w2v, SEED=0)
     embeddings = embeddings_res['embeddings']
     word2id = embeddings_res['word2id']
-    x_ind, prim_len = words2integers(raw_text=sentences, word2id=word2id, tokenization_type=tokenization_type, MAX_SEQ_LEN=MAX_SEQ_LEN)
-    masks = [[1] * min(MAX_SEQ_LEN, doc_len) + [0] * max(0, MAX_SEQ_LEN - doc_len) for doc_len in prim_len]
-    max_len = max([sum(x) for x in masks])
+    if idx_train is not None and idx_test is not None:
+        print('dataset already split in train/test')
+        y_train, y_test = [y[idx_train], y[idx_test]]
+        x_train, l_train = words2integers(raw_text=sentences[idx_train], word2id=word2id, tokenization_type=tokenization_type, MAX_SEQ_LEN=MAX_SEQ_LEN)
+        x_test, l_test = words2integers(raw_text=sentences[idx_test], word2id=word2id, tokenization_type=tokenization_type, MAX_SEQ_LEN=MAX_SEQ_LEN)
+        mask_train = [[1] * min(MAX_SEQ_LEN, doc_len) + [0] * max(0, MAX_SEQ_LEN - doc_len) for doc_len in l_train]
+        mask_test = [[1] * min(MAX_SEQ_LEN, doc_len) + [0] * max(0, MAX_SEQ_LEN - doc_len) for doc_len in l_test]
+        max_len = max([sum(x) for x in mask_train+mask_test])
+    else:
+        x_ind, prim_len = words2integers(raw_text=sentences, word2id=word2id, tokenization_type=tokenization_type,
+                                         MAX_SEQ_LEN=MAX_SEQ_LEN)
+        masks = [[1] * min(MAX_SEQ_LEN, doc_len) + [0] * max(0, MAX_SEQ_LEN - doc_len) for doc_len in prim_len]
+        max_len = max([sum(x) for x in masks])
+        x_train, x_test, y_train, y_test, l_train, l_test, mask_train, mask_test =\
+            train_test_split(x_ind, y, prim_len, masks, test_size=test_size, random_state=random_state)
+
     print('max len used', max_len)
-    x_train, x_test, y_train, y_test, l_train, l_test, mask_train, mask_test =\
-        train_test_split(x_ind, y, prim_len, masks, test_size=test_size, random_state=random_state)
 
     x_train = torch.tensor(x_train, dtype=torch.long)
     y_train_torch = torch.tensor(y_train.values, dtype=torch.long)  # need to keep y_train for indices

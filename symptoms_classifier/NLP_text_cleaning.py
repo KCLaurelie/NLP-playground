@@ -184,7 +184,8 @@ def quick_clean_txt(text, remove_contractions=True):
     text = str(text)
     if remove_contractions: text = contractions.fix(text.replace('i', 'I')) # expand contractions (you're -> you are)
     text = re.sub(r'[^a-z0-9-\'\s]', ' ', text.lower())  # remove non alphanumeric character
-    text = re.sub(r'([^0-9]{1})\1{2,}', r'\1\1', text)  # more than 3 consecutive letters -> 2 (hellooooooooo -> helloo)
+    # text = re.sub(r'([^0-9]{1})\1{2,}', r'\1\1', text)  # more than 3 consecutive letters -> 2 (hellooooooooo -> helloo)
+    text = text.replace('"', '')
     return text
 
 

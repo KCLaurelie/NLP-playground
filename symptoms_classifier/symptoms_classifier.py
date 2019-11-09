@@ -11,29 +11,39 @@ import symptoms_classifier.classifiers_utils as cutils
 
 class TextsToClassify:
     def __init__(self, filepath=None, dataset=pd.DataFrame(), class_col='class', text_col='text',
-                 embedding_algo='w2v', embedding_model=None, binary=False, binary_main_class=1,
-                 classifier_model='SVM'):
+                 binary=False, binary_main_class=1,
+                 already_split=False, split_col='split', test_val='test', train_val='train',
+                 embedding_algo='w2v', embedding_model=None, embedded_text=None,
+                 classifier_model='SVM', tokenization_type=None):
         """
 
         :param filepath: path to dataset if stored in file
         :param dataset: dataset itself if not stored in file
         :param class_col: column containing annotations
         :param text_col: column containing text
+        :param split_col: column containing train/dev/test split
         :param embedding_algo: algo to use for embedding text (at the moment only word2vec supported)
         :param embedding_model: saved pre-trained embedding model
         :param binary: option to convert multiclasses into 1
         :param binary_main_class: class to keep when converting to binary
         :param classifier_model: classifier algo to use
+        :param tokenization_type: (None, lem, clean, lem_stop)
         """
+        self.tokenization_type = tokenization_type
         self.filepath = filepath
         self.dataset = dataset
         self.class_col = class_col
         self.text_col = text_col
-        self.embedding_algo = embedding_algo
-        self.embedding_model = embedding_model
         self.binary = binary
         self.binary_main_class = binary_main_class
+        self.embedding_algo = embedding_algo
+        self.embedding_model = embedding_model
+        self.embedded_text = embedded_text
         self.classifier_model = classifier_model
+        self.already_split = already_split
+        self.train_val = train_val
+        self.test_val = test_val
+        self.split_col = split_col
 
     def load_data(self):
         if self.filepath is not None:
@@ -42,6 +52,8 @@ class TextsToClassify:
                     data = pd.read_csv(self.filepath, header=0)
                 except:
                     data = pd.read_csv(self.filepath, header=0, engine='python', encoding='ISO-8859-1')
+            elif 'xls' in self.filepath:
+                data = pd.read_excel(self.filepath, header=0)
             elif self.filepath.endswith('.txt'):
                 data = preprocess_text(self.filepath, remove_stopwords=False, stemmer=None, lemmatizer=None,
                                        keywords=None, remove_punctuation=True)
@@ -50,7 +62,7 @@ class TextsToClassify:
                 return 'unknown file format'
         else:
             data = self.dataset
-        cols = [col for col in [self.class_col, self.text_col] if col in data.columns]
+        cols = [col for col in [self.class_col, self.text_col, self.split_col] if col in data.columns]
         data = data[cols]
 
         self.dataset = data
@@ -128,7 +140,15 @@ class TextsToClassify:
             self.dataset['class_numeric'] = lb_make.fit_transform(self.dataset[self.class_col])
         return 0
 
-    # TODO create utils function outside scope
+    def get_train_test_split(self):
+        x = self.dataset[self.text_col]
+        y = self.dataset.class_numeric
+        idx_train = self.dataset[self.dataset[self.split_col] == self.train_val].index
+        idx_test = self.dataset[self.dataset[self.split_col] == self.test_val].index
+        if len(idx_test) <= 1 or len(idx_train) <= 1:
+            print('missing train/test values, check split column of dataset', self.train_val, self.test_val)
+        return [idx_train, idx_test]
+
     def convert_class_2_numeric(self, binary=None, binary_main_class=None):
         # convert annotations to binary class if needed
         if binary:
@@ -154,14 +174,24 @@ class TextsToClassify:
             return 'error'
         if binary is None: binary = self.binary
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
+        if self.already_split and self.split_col in self.dataset.columns:
+            print('dataset already split in train/test')
+            idx_train, idx_test = self.get_train_test_split()
+        else:
+            idx_train, idx_test = [None, None]
+        x_emb = self.embedded_text
+        x = self.dataset[self.text_col]
+        y = self.dataset.class_numeric
 
         if nn_type.lower() == 'ann':
-            net, preds, df_test, df_train = train_nn(x_emb=self.embedded_text, y=self.dataset.class_numeric, multi_class=multi_class, dropout=dropout, **kwargs)
+            net, preds, df_test, df_train = train_nn(x_emb=x_emb, y=y, idx_train=idx_train, idx_test=idx_test,
+                                                     multi_class=multi_class, dropout=dropout, **kwargs)
         elif nn_type.lower() == 'cnn':
-            net, preds, df_test, df_train = train_cnn(w2v=self.embedding_model, sentences=self.dataset[self.text_col], y=self.dataset.class_numeric, dropout=dropout, **kwargs)
+            net, preds, df_test, df_train = train_cnn(w2v=self.embedding_model, sentences=x, y=y,
+                                                      idx_train=idx_train, idx_test=idx_test, dropout=dropout, **kwargs)
         elif nn_type.lower() == 'rnn':
-            net, preds, df_test, df_train = train_rnn(w2v=self.embedding_model, sentences=self.dataset[self.text_col],
-                                                      y=self.dataset.class_numeric, dropout=dropout, **kwargs)
+            net, preds, df_test, df_train = train_rnn(w2v=self.embedding_model, sentences=x, y=y, idx_train=idx_train, idx_test=idx_test,
+                                                      dropout=dropout, **kwargs)
         else:
             print('model selected has not been implemented')
             return {'model': nn_type, 'report': ['model not implemented']}
@@ -182,7 +212,15 @@ class TextsToClassify:
         self.convert_class_2_numeric(binary=binary, binary_main_class=binary_main_class)
         text_class = self.dataset['class_numeric']
 
-        x_emb_train, x_emb_test, y_train, y_test = train_test_split(self.embedded_text, text_class, test_size=test_size, random_state=random_state)
+        if self.already_split:
+            print('dataset already split in train/test')
+            idx_train, idx_test = self.get_train_test_split()
+            x_emb_train = self.embedded_text[idx_train]
+            x_emb_test = self.embedded_text[idx_test]
+            y_train = text_class[idx_train]
+            y_test = text_class[idx_test]
+        else:
+            x_emb_train, x_emb_test, y_train, y_test = train_test_split(self.embedded_text, text_class, test_size=test_size, random_state=random_state)
 
         # train classifier
         classifier = cutils.load_classifier(classifier_model)

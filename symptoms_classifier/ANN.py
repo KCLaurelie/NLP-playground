@@ -26,13 +26,19 @@ class Net(nn.Module):
 # net = Net(first_layer_neurons=100, final_layer_neurons=1, dropout=0.5)
 
 
-def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5, n_epochs=5000,
+def train_nn(x_emb, y, idx_train=None, idx_test=None, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5, n_epochs=5000,
              multi_class=True, debug_mode=True):
     ####################################################################################################################
     # 1. split dataset in train/test
     ####################################################################################################################
     torch.manual_seed(random_state)
-    x_train, x_test, y_train, y_test = train_test_split(x_emb, y, test_size=test_size, random_state=random_state)
+
+    if idx_train is not None and idx_test is not None:
+        x_train, x_test, y_train, y_test = [x_emb[idx_train], x_emb[idx_test], y[idx_train], y[idx_test]]
+        print('x train:', x_train.shape, 'x test:', x_test.shape, 'y train:', y_train.shape, 'y test:', y_test.shape)
+    else:
+        x_train, x_test, y_train, y_test = train_test_split(x_emb, y, test_size=test_size, random_state=random_state)
+        print('x train:', x_train.shape, 'x test:', x_test.shape, 'y train:', y_train.shape, 'y test:', y_test.shape)
 
     final_layer_neurons = y_train.nunique()
     if not multi_class and final_layer_neurons <= 2:  # binary mode
@@ -61,8 +67,9 @@ def train_nn(x_emb, y, test_size=0.2, random_state=0, class_weight='balanced', d
         criterion = nn.CrossEntropyLoss(weight=weight)
     else:
         criterion = nn.BCELoss()  # loss function (binary cross entropy loss or log loss)
-    optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.99)  # TODO: move to Adam?
-
+    # optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.99)  # TODO: move to Adam?
+    parameters = filter(lambda p: p.requires_grad, net.parameters())  # We don't want parameters that don't require a grad in the optimizer
+    optimizer = optim.Adam(parameters, lr=0.001)
     ####################################################################################################################
     # 3. train
     ####################################################################################################################
