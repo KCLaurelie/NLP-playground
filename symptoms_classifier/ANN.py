@@ -27,7 +27,7 @@ class Net(nn.Module):
 
 
 def train_nn(x_emb, y, idx_train=None, idx_test=None, test_size=0.2, random_state=0, class_weight='balanced', dropout=0.5, n_epochs=5000,
-             multi_class=True, debug_mode=True):
+             tokenization_type=None, multi_class=True, debug_mode=True):
     ####################################################################################################################
     # 1. split dataset in train/test
     ####################################################################################################################
