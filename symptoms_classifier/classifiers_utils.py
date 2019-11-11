@@ -106,16 +106,10 @@ def nn_graph_perf(train_preds, y_train, net, loss, losses=[], accs=[], ws=[], bs
     return [losses, accs, ws, bs]
 
 
-def f1_score(y_true, y_preds, multi_class=False, average='weighted'):
-    y_true = torch2numpy(y_true)
-    y_preds = clean_torch_output(y_preds, multi_class=multi_class)
-    res = f1_score(y_true, y_preds, average=average)
-    return res
-
-
 def nn_print_perf(train_preds, y_train, test_preds, y_test, multi_class=False, average='weighted'):
     train_preds, y_train, test_preds, y_test = clean_torch_vectors(train_preds, y_train, test_preds, y_test, multi_class=multi_class)
     # average = 'weighted' if y_train.nunique() <= 2 else 'binary'
+    f1_test = f1_score(test_preds, y_test, average=average)
     print("TRAIN -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}"
           .format(accuracy_score(train_preds, y_train),
                   f1_score(train_preds, y_train, average=average),
@@ -123,9 +117,10 @@ def nn_print_perf(train_preds, y_train, test_preds, y_test, multi_class=False, a
                   recall_score(train_preds, y_train, average=average)))
     print("TEST -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}"
           .format(accuracy_score(test_preds, y_test),
-                  f1_score(test_preds, y_test, average=average),
+                  f1_test,
                   precision_score(test_preds, y_test, average=average),
                   recall_score(test_preds, y_test, average=average)))
+    return f1_test
 
 
 def nn_classification_report(y, train_preds, y_train, test_preds, y_test, multi_class=False):

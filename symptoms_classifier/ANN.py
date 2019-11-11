@@ -1,7 +1,7 @@
 import torch
 import torch.optim as optim
 from torch import nn
-from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf, f1_score
+from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf
 from code_utils.plot_utils import plot_multi_lists
 from sklearn.model_selection import train_test_split
 
@@ -73,7 +73,7 @@ def train_nn(x_emb, y, idx_train=None, idx_test=None, test_size=0.2, random_stat
     ####################################################################################################################
     # 3. train
     ####################################################################################################################
-    losses, accs, ws, bs, best_f1 = [[], [], [], [], 0]
+    losses, accs, ws, bs, best_f1, best_epoch, best_train_preds, best_test_preds = [[], [], [], [], 0, 0, None, None]
     for epoch in range(n_epochs):
         net.train()
         optimizer.zero_grad()  # zero the gradients
@@ -92,18 +92,15 @@ def train_nn(x_emb, y, idx_train=None, idx_test=None, test_size=0.2, random_stat
             test_preds = net(x_test)
 
             print("Epoch: {:4} Loss: {:.5f} ".format(epoch, loss.item()))
-            nn_print_perf(train_preds=train_preds.detach(), y_train=y_train,
-                          test_preds=test_preds.detach(), y_test=y_test, multi_class=multi_class)
-            f1 = f1_score(y_test, test_preds.detach(), average='weighted')
+            f1 = nn_print_perf(train_preds=train_preds.detach(), y_train=y_train,
+                               test_preds=test_preds.detach(), y_test=y_test, multi_class=multi_class)
             if epoch > n_epochs / 2 and f1 > best_f1:
-                best_f1 = f1
-                preds, df_test, df_train = nn_classification_report(y, train_preds, y_train, test_preds, y_test,
-                                                                    multi_class=multi_class)
+                best_f1, best_epoch, best_train_preds, best_test_preds = f1, epoch, train_preds.detach(), test_preds.detach()
 
-    print('Finished Training')
+    print('Finished Training, best F1 obtained on test set:', best_f1, 'at epoch', best_epoch)
     if debug_mode:
         plot_multi_lists({'Bias': bs, 'Weight': ws, 'Loss': losses, 'Accuracy': accs})
 
-    #  preds, df_test, df_train = nn_classification_report(y, train_preds, y_train, test_preds, y_test, multi_class=multi_class)
+    preds, df_test, df_train = nn_classification_report(y, best_train_preds, y_train, best_test_preds, y_test, multi_class=multi_class)
 
     return [net, preds, df_test, df_train]
