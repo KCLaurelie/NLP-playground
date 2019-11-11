@@ -2,7 +2,7 @@ import logging
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf, prep_nn_dataset
+from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf, prep_nn_dataset, f1_score
 from code_utils.plot_utils import plot_multi_lists
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
@@ -46,6 +46,8 @@ def train_rnn(w2v, sentences, y,
     :param bid: (True, False) bidirectional network (only applies to LSTM)
     :return:
     """
+    torch.manual_seed(random_state)
+
     embeddings, word2id, x_train, y_train, y_train_torch, l_train, mask_train, x_test, y_test, y_test_torch, l_test, mask_test = \
         prep_nn_dataset(w2v=w2v, sentences=sentences, y=y, idx_train=idx_train, idx_test=idx_test, test_size=test_size,
                         tokenization_type=tokenization_type, MAX_SEQ_LEN=MAX_SEQ_LEN, random_state=random_state)
@@ -94,7 +96,7 @@ def train_rnn(w2v, sentences, y,
     optimizer = optim.Adam(parameters, lr=lr)
     criterion = nn.CrossEntropyLoss()
 
-    losses, accs, ws, bs = [[], [], [], []]
+    losses, accs, ws, bs, best_f1 = [[], [], [], [], 0]
     for epoch in range(n_epochs):
         rnn.train()
         optimizer.zero_grad()
@@ -107,21 +109,22 @@ def train_rnn(w2v, sentences, y,
             losses, accs, ws, bs = nn_graph_perf(train_preds, y_train, rnn, loss,
                                                  losses=losses, accs=accs, ws=ws, bs=bs)
 
-        if epoch % 10 == 0 or epoch >= n_epochs-1:
+        if epoch % 1 == 0 or epoch >= n_epochs-1:
             rnn.eval()
             outputs_train = torch.max(train_preds, 1)[1]
             outputs_test = torch.max(rnn(x_test, l_test, mask_test), 1)[1]
             print("Epoch: {:4} Loss: {:.5f} ".format(epoch, loss.item()))
             nn_print_perf(train_preds=outputs_train.detach(), y_train=y_train,
                           test_preds=outputs_test.detach(), y_test=y_test)
+            f1 = f1_score(y_test, outputs_test.detach(), average='weighted')
+            if epoch > n_epochs / 2 and f1 > best_f1:
+                best_f1 = f1
+                preds, df_test, df_train = nn_classification_report(y, outputs_train, y_train, outputs_test, y_test)
 
     print('Finished Training')
-    rnn.eval()
-    outputs_test = torch.max(rnn(x_test, l_test, mask_test), 1)[1]
-    outputs_train = torch.max(rnn(x_train, l_train, mask_train), 1)[1]
 
     if debug_mode:
         plot_multi_lists({'Bias': bs, 'Weight': ws, 'Loss': losses, 'Accuracy': accs})
-    preds, df_test, df_train = nn_classification_report(y, outputs_train, y_train, outputs_test, y_test)
+    # preds, df_test, df_train = nn_classification_report(y, outputs_train, y_train, outputs_test, y_test)
 
     return [rnn, preds, df_test, df_train]

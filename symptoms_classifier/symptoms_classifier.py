@@ -168,7 +168,7 @@ class TextsToClassify:
 
     def run_neural_net(self, binary=None, binary_main_class=None, multi_class=True, dropout=0.5
                        , output_errors=False, save_model_path=None, timestamp=False, nn_type='ANN', **kwargs):
-        title = 'Neural Net' + ('_multiclass' if multi_class else '') + '_dropout=' + str(dropout)
+        title = nn_type + ('_multiclass' if multi_class else '') + '_dropout=' + str(dropout)
         if self.embedding_model is None:
             print('no embedding model associated to the dataset, please assign one by doing self.embedding_model = ...')
             return 'error'
@@ -223,7 +223,7 @@ class TextsToClassify:
             x_emb_train, x_emb_test, y_train, y_test = train_test_split(self.embedded_text, text_class, test_size=test_size, random_state=random_state)
 
         # train classifier
-        classifier = cutils.load_classifier(classifier_model)
+        classifier = cutils.load_classifier(classifier_model, random_state=random_state)
         title = str(classifier)
         if classifier == 'LightGBM':
             parameters = {

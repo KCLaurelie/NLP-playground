@@ -3,14 +3,14 @@ import torch
 import torch.nn.functional as F
 import torch.nn as nn
 import torch.optim as optim
-from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf, prep_nn_dataset
+from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf, prep_nn_dataset, f1_score
 from code_utils.plot_utils import plot_multi_lists
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 
 def train_cnn(w2v, sentences, y, idx_train=None, idx_test=None,
               tokenization_type=None, MAX_SEQ_LEN=40, test_size=0.2, random_state=0, dropout=0.5, n_epochs=200, debug_mode=False):
-
+    torch.manual_seed(random_state)
     embeddings, word2id, x_train, y_train, y_train_torch, l_train, mask_train, x_test, y_test, y_test_torch, l_test, mask_test = \
         prep_nn_dataset(w2v=w2v, sentences=sentences, y=y, idx_train=idx_train, idx_test=idx_test, test_size=test_size,
                         tokenization_type=tokenization_type, MAX_SEQ_LEN=MAX_SEQ_LEN, random_state=random_state)
@@ -59,7 +59,7 @@ def train_cnn(w2v, sentences, y, idx_train=None, idx_test=None,
     optimizer = optim.Adam(parameters, lr=0.001)
     criterion = nn.CrossEntropyLoss()
 
-    losses, accs, ws, bs = [[], [], [], []]
+    losses, accs, ws, bs, best_f1 = [[], [], [], [], 0]
     for epoch in range(n_epochs):
         cnn.train()
         optimizer.zero_grad()
@@ -72,24 +72,23 @@ def train_cnn(w2v, sentences, y, idx_train=None, idx_test=None,
             losses, accs, ws, bs = nn_graph_perf(train_preds, y_train, cnn, loss,
                                                  losses=losses, accs=accs, ws=ws, bs=bs)
 
-        if epoch % 10 == 0 or epoch >= n_epochs-1:
+        if epoch % 1 == 0 or epoch >= n_epochs-1:
             cnn.eval()
             outputs_train = torch.max(train_preds, 1)[1]
             outputs_test = torch.max(cnn(x_test, l_test), 1)[1]
             print("Epoch: {:4} Loss: {:.5f} ".format(epoch, loss.item()))
             nn_print_perf(train_preds=outputs_train.detach(), y_train=y_train,
                           test_preds=outputs_test.detach(), y_test=y_test)
+            f1 = f1_score(y_test, outputs_test.detach(), average='weighted')
+            if epoch > n_epochs / 2 and f1 > best_f1:
+                best_f1 = f1
+                preds, df_test, df_train = nn_classification_report(y, train_preds, y_train, outputs_test, y_test)
 
     print('Finished Training')
-    cnn.eval()
-    # logits_test = F.softmax(cnn(x_test), dim=1)
-    outputs_test = torch.max(cnn(x_test, l_test), 1)[1]
-    # logits_train = F.softmax(cnn(x_train), dim=1)
-    outputs_train = torch.max(cnn(x_train, l_train), 1)[1]
 
     if debug_mode:
         plot_multi_lists({'Bias': bs, 'Weight': ws, 'Loss': losses, 'Accuracy': accs})
-    preds, df_test, df_train = nn_classification_report(y, outputs_train, y_train, outputs_test, y_test)
+    # preds, df_test, df_train = nn_classification_report(y, outputs_train, y_train, outputs_test, y_test)
 
     return [cnn, preds, df_test, df_train]
 

@@ -1,7 +1,7 @@
 import torch
 import torch.optim as optim
 from torch import nn
-from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf
+from symptoms_classifier.classifiers_utils import nn_classification_report, nn_print_perf, nn_graph_perf, f1_score
 from code_utils.plot_utils import plot_multi_lists
 from sklearn.model_selection import train_test_split
 
@@ -73,7 +73,7 @@ def train_nn(x_emb, y, idx_train=None, idx_test=None, test_size=0.2, random_stat
     ####################################################################################################################
     # 3. train
     ####################################################################################################################
-    losses, accs, ws, bs = [[], [], [], []]
+    losses, accs, ws, bs, best_f1 = [[], [], [], [], 0]
     for epoch in range(n_epochs):
         net.train()
         optimizer.zero_grad()  # zero the gradients
@@ -82,24 +82,28 @@ def train_nn(x_emb, y, idx_train=None, idx_test=None, test_size=0.2, random_stat
         loss.backward()  # backward
         optimizer.step()  # optimize/Update parameters
 
-        if debug_mode:  # Track the changes - TODO: check tensorboard or similar
+        if debug_mode:  # Track the changes
             losses, accs, ws, bs = nn_graph_perf(train_preds, y_train, net, loss,
                                                  losses=losses, accs=accs, ws=ws, bs=bs, multi_class=multi_class)
 
         # print statistics
-        if epoch % 500 == 0 or epoch >= n_epochs-1:
+        if epoch % 200 == 0 or epoch >= n_epochs-1:
             net.eval()
             test_preds = net(x_test)
 
             print("Epoch: {:4} Loss: {:.5f} ".format(epoch, loss.item()))
             nn_print_perf(train_preds=train_preds.detach(), y_train=y_train,
                           test_preds=test_preds.detach(), y_test=y_test, multi_class=multi_class)
+            f1 = f1_score(y_test, test_preds.detach(), average='weighted')
+            if epoch > n_epochs / 2 and f1 > best_f1:
+                best_f1 = f1
+                preds, df_test, df_train = nn_classification_report(y, train_preds, y_train, test_preds, y_test,
+                                                                    multi_class=multi_class)
 
     print('Finished Training')
-    # net.eval()
     if debug_mode:
         plot_multi_lists({'Bias': bs, 'Weight': ws, 'Loss': losses, 'Accuracy': accs})
 
-    preds, df_test, df_train = nn_classification_report(y, train_preds, y_train, test_preds, y_test, multi_class=multi_class)
+    #  preds, df_test, df_train = nn_classification_report(y, train_preds, y_train, test_preds, y_test, multi_class=multi_class)
 
     return [net, preds, df_test, df_train]

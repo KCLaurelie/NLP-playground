@@ -22,7 +22,7 @@ def test_final():
                                 tokenization_type='clean',  dropout=0.5, n_epochs=1, debug_mode=True, random_state=42)
     res = tweets.run_neural_net(nn_type='ANN', binary=True, binary_main_class='negative', dropout=0.5, n_epochs=2, debug_mode=True)
 
-    res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative', output_errors=False)
+    res = tweets.run_classifier(test_size=0.2, binary=True, binary_main_class='negative', output_errors=False, random_state=42)
 
     model = cutils.load_classifier_from_file(output_path + '\\test_nn_simple.pt', classifier_type='nn')
     cutils.test_classifier('i love virgin america, they are awesome', classifier=model,

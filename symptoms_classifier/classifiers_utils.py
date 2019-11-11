@@ -8,26 +8,29 @@ import xgboost as xgb
 import catboost
 from symptoms_classifier.NLP_embedding import *
 
-classifiers = {
-    'LightGBM': 'LightGBM',
-    'XGBOOST': xgb.XGBRegressor(objective='reg:squarederror', colsample_bytree=0.3, learning_rate=0.1,
-                                max_depth=5, alpha=10, n_estimators=10, random_state=0),
-    'CatBoost': catboost.CatBoostRegressor(iterations=1000, learning_rate=0.1, random_state=0),
-    'Multinomial NB': naive_bayes.MultinomialNB(),
-    'Gaussian NB': naive_bayes.GaussianNB(),
-    'KNN': neighbors.KNeighborsClassifier(n_neighbors=5, n_jobs=-1, weights='distance'),
-    'Decision Tree': tree.DecisionTreeClassifier(class_weight='balanced', random_state=0),
-    'Random Forest': ensemble.RandomForestClassifier(criterion='entropy', n_jobs=10, class_weight='balanced',
-                                                     random_state=0),
-    'Logistic Reg': linear_model.LogisticRegression(C=1e5, solver='lbfgs', multi_class='multinomial'
-                                                    , class_weight='balanced', max_iter=1000, random_state=0),
-    'Logistic Reg CV': linear_model.LogisticRegressionCV(class_weight='balanced', solver='liblinear', random_state=0),
-    'Linear SVM': svm.LinearSVC(multi_class='crammer_singer', class_weight='balanced', random_state=0),
-    'SVM': svm.SVC(gamma='scale', class_weight='balanced', random_state=0),
-    'SVM linear kernel': svm.SVC(kernel='linear', class_weight='balanced', random_state=0),
-    'SVM sigmoid kernel': svm.SVC(kernel='sigmoid', class_weight='balanced', random_state=0),
-    'SVM poly kernel': svm.SVC(kernel='poly', class_weight='balanced', random_state=0)
-}
+
+def get_classifier(model_name, random_state=0):
+    classifiers = {
+        'LightGBM': 'LightGBM',
+        'XGBOOST': xgb.XGBRegressor(objective='reg:squarederror', colsample_bytree=0.3, learning_rate=0.1,
+                                    max_depth=5, alpha=10, n_estimators=10, random_state=random_state),
+        'CatBoost': catboost.CatBoostRegressor(iterations=1000, learning_rate=0.1, random_state=random_state),
+        'Multinomial NB': naive_bayes.MultinomialNB(),
+        'Gaussian NB': naive_bayes.GaussianNB(),
+        'KNN': neighbors.KNeighborsClassifier(n_neighbors=5, n_jobs=-1, weights='distance'),
+        'Decision Tree': tree.DecisionTreeClassifier(class_weight='balanced', random_state=random_state),
+        'Random Forest': ensemble.RandomForestClassifier(criterion='entropy', n_jobs=10, class_weight='balanced',
+                                                         random_state=random_state),
+        'Logistic Reg': linear_model.LogisticRegression(C=1e5, solver='lbfgs', multi_class='multinomial'
+                                                        , class_weight='balanced', max_iter=1000, random_state=random_state),
+        'Logistic Reg CV': linear_model.LogisticRegressionCV(class_weight='balanced', solver='liblinear', random_state=random_state),
+        'Linear SVM': svm.LinearSVC(multi_class='crammer_singer', class_weight='balanced', random_state=random_state),
+        'SVM': svm.SVC(gamma='scale', class_weight='balanced', random_state=random_state),
+        'SVM linear kernel': svm.SVC(kernel='linear', class_weight='balanced', random_state=random_state),
+        'SVM sigmoid kernel': svm.SVC(kernel='sigmoid', class_weight='balanced', random_state=random_state),
+        'SVM poly kernel': svm.SVC(kernel='poly', class_weight='balanced', random_state=random_state)
+    }
+    return classifiers[model_name]
 
 
 def formatted_classification_report(y_test, y_train, test_preds, train_preds):
@@ -59,11 +62,11 @@ def save_classifier_to_file(model, filename, timestamp=False, model_type=None):
     return 0
 
 
-def load_classifier(classifier_model):
+def load_classifier(classifier_model, random_state=0):
     if isinstance(classifier_model, str):  # loading from file / dict
-        if classifier_model in classifiers.keys():
-            classifier = classifiers[classifier_model]
-        else:
+        try:
+            classifier = get_classifier(model_name=classifier_model, random_state=random_state)
+        except:
             classifier = load_classifier_from_file(classifier_model)
     else:  # loading from variable
         classifier = classifier_model
@@ -73,7 +76,7 @@ def load_classifier(classifier_model):
 def load_classifier_from_file(filename, classifier_type=None):  # load the model from disk
     # loaded_model = pickle.load(open(filename, 'rb'))
     if 'neural' in classifier_type.lower() or classifier_type.lower() == 'nn':
-        nn_model=torch.load(filename)
+        nn_model = torch.load(filename)
         nn_model.eval()
         return nn_model
     else:
@@ -101,6 +104,13 @@ def nn_graph_perf(train_preds, y_train, net, loss, losses=[], accs=[], ws=[], bs
     ws.append(net.fc1.weight.detach().numpy()[0][0])
     bs.append(net.fc1.bias.detach().numpy()[0])
     return [losses, accs, ws, bs]
+
+
+def f1_score(y_true, y_preds, multi_class=False, average='weighted'):
+    y_true = torch2numpy(y_true)
+    y_preds = clean_torch_output(y_preds, multi_class=multi_class)
+    res = f1_score(y_true, y_preds, average=average)
+    return res
 
 
 def nn_print_perf(train_preds, y_train, test_preds, y_test, multi_class=False, average='weighted'):
