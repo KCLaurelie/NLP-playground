@@ -1,14 +1,9 @@
-from code_utils.global_variables import *
-from code_utils.general_utils import list_combos
+from code_utils.general_utils import list_combos, to_list
 import longitudinal_models.longitudinal_dataset as ds
 from longitudinal_models.lmer_utils import *
 import datetime
 import time
 from pymer4.models import Lmer  # , Lm
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
-import statsmodels.regression.mixed_linear_model as mlm
-
 
 ##############################################################################################
 # LONGITUDINAL MODELLING
@@ -39,10 +34,29 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
                timestamps=('score_date_centered',),
                complete_case=False,
                models=('linear_rdn_int', 'linear_rdn_all_no_intercept', 'linear_rdn_all', 'quadratic_rdn_int'),
-               output_file_path=None):
+               output_file_path=None,
+               conf_int='Wald',
+               REML=True):
+    """
+
+    :param model_data:
+    :param to_predict:
+    :param key:
+    :param covariates:
+    :param covariates_slope:
+    :param patients_split_col:
+    :param timestamps:
+    :param complete_case:
+    :param models:
+    :param output_file_path:
+    :param conf_int: which method to compute confidence intervals; 'profile', 'Wald' (default), or 'boot' (parametric bootstrap)
+    :param REML (bool): whether to fit using restricted maximum likelihood estimation instead of maximum likelihood estimation; default True
+    :return:
+    """
     if isinstance(model_data, str) and 'xlsx' in model_data:  # load regression data
         model_data = pd.read_excel(model_data, index_col=None)
     if covariates is not None:  # check covariates actually exist in the model data
+        covariates = to_list(covariates)
         if not all(elem in model_data.columns for elem in list(covariates)):
             print('covariates entered do not exist in input data')
             return pd.DataFrame({'output': 'failure - covariates not in input data'}, index=[0])
@@ -56,7 +70,7 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
         st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d-%Hh%M')
         writer = pd.ExcelWriter(output_file_path.replace('.xlsx', st + '.xlsx'), engine='xlsxwriter')
 
-    res = []
+    res = pd.DataFrame()
     col_num = 0
     patient_groups = list(model_data[patients_split_col].unique()) if patients_split_col is not None else ['all']
     for patient_group in patient_groups:
@@ -71,9 +85,9 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
                 print('using formula', formula)
                 model = Lmer(formula, data=df_tmp)
                 try:
-                    model.fit(REML=True)
-                    if model.warnings is not None:  # try unrestricted MLE if convergence failed
-                        model.fit(REML=False)
+                    model.fit(REML=REML, conf_int=conf_int)
+                    if model.warnings is not None:  # try other method if convergence failed
+                        model.fit(REML=(not REML), conf_int=conf_int)
                     to_print = print_r_model_output(model)
                 except:
                     print('something went wrong with model fitting')
