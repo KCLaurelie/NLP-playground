@@ -50,7 +50,7 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
     :param models:
     :param output_file_path:
     :param conf_int: which method to compute confidence intervals; 'profile', 'Wald' (default), or 'boot' (parametric bootstrap)
-    :param REML (bool): whether to fit using restricted maximum likelihood estimation instead of maximum likelihood estimation; default True
+    :param REML: (bool) whether to fit using restricted maximum likelihood estimation instead of maximum likelihood estimation; default True
     :return:
     """
     if isinstance(model_data, str) and 'xlsx' in model_data:  # load regression data

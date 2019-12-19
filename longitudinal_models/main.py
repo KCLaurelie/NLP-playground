@@ -8,16 +8,16 @@ import statsmodels.regression.mixed_linear_model as mlm
 def test(impute=False):
     df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx', sheet_name='combined', index_col=None)
     # df = df.loc[df.age_at_score_baseline >= df.age_at_first_diag]
-    df = df.loc[df.patient_diagnosis_super_class != 'smi only']
-
+    # df = df.loc[df.patient_diagnosis_super_class != 'smi only']
+    df['has_smi'] = np.where(df['patient_diagnosis_super_class'].str.lower().str.contains('smi'), 'yes', 'no')
     models = ('linear_rdn_all', 'linear_rdn_int')  # , 'linear_rdn_all', 'quadratic_rdn_int')
-    ts = ('counter',) #'score_date_centered',)
+    ts = ('score_date_centered',)
     covariates_slope = True
     patients_split_col = None  # 'patient_diagnosis_super_class'
     socio_dem_imp = ['age_at_score_baseline', 'gender', 'ethnicity_group_imputed', 'marital_status_imputed',
                      'education', 'first_language_imputed', 'imd_bucket_baseline_imputed', 'age_at_first_diag']
     cvd_imp = ['smoking_status_baseline_imputed', 'cvd_problem_imputed']
-    references = {'ethnicity_group_imputed': 'white', 'ethnicity_group': 'white', 'smoking_status_baseline_imputed': 'no',
+    references = {'education': 'no', 'ethnicity_group_imputed': 'white', 'ethnicity_group': 'white', 'smoking_status_baseline_imputed': 'no',
                   'smoking_status_baseline': 'no', 'marital_status_imputed': 'single or separated', 'marital_status': 'single or separated'}
 
     if patients_split_col is None:
@@ -34,7 +34,7 @@ def test(impute=False):
         df = impute_with_baseline(df, key='brcid', baseline_cols=['brcid', 'score_date_upbound'],
                                   input_columns_to_exclude=['brcid', 'score_combined', 'occur', 'counter', 'score_combined_baseline'])
 
-    res = run_models(model_data=df, models=('linear_rdn_int',), covariates='patient_diagnosis_super_class', covariates_slope=covariates_slope, patients_split_col=patients_split_col)
+    res = run_models(timestamps=ts, model_data=df, models=('linear_rdn_all',), covariates='patient_diagnosis_super_class', covariates_slope=covariates_slope, patients_split_col=patients_split_col)
     res = run_models(timestamps=ts, model_data=df, models=('linear_rdn_all',), covariates=socio_dem_imp + cvd_imp, covariates_slope=covariates_slope, patients_split_col=patients_split_col)
     res = run_models(model_data=df, models=models, covariates=cvd_imp, covariates_slope=covariates_slope, patients_split_col=patients_split_col,
                      output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_health_all_groups.xlsx')

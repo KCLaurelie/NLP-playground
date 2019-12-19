@@ -20,13 +20,14 @@ def lmer_formula(model_type='linear_rdn_int',
     # https://www.statsmodels.org/stable/examples/notebooks/generated/mixed_lm_example.html
 
     # first build covariates string
-    add = ' + ' + timestamp + ' * ' if covariates_slope else ' + '
     if covariates is None:
         str_cov = ''
-    elif isinstance(covariates, str):
-        str_cov = add + covariates
     else:
-        str_cov = add + add.join(covariates)
+        covariates = gutils.to_list(covariates)
+        str_cov = ' + ' + ' + '.join(covariates)
+        if covariates_slope:
+            add_slope = ' + ' + timestamp + ' * '
+            str_cov += add_slope + add_slope.join(covariates)
 
     # now build formula
     if model_type == 'linear_rdn_int':  # random intercept only, linear model
@@ -58,11 +59,16 @@ def print_r_model_output(model):
                            index=['groups', 'obs', 'warnings', 'formula'])
     coefs = pd.DataFrame(model.coefs)
     coefs['type'] = 'coefs'
+    # get multiplier for slope * covariate
+    coefs.loc[coefs.index.str.contains(':'), 'tmp'] = coefs.loc[coefs.index.str.contains(':')].index.str.split(pat=":").str[0]
+    coefs['mult'] = coefs['tmp'].apply(lambda x: np.sign(coefs.loc[coefs.index == x, 'Estimate'][0]) if x in coefs.index else 1)
+    coefs.Estimate = coefs.Estimate * coefs.mult
+    # compute stats
     coefs['CI'] = '[' + coefs['2.5_ci'].round(3).astype(str) + ',' + coefs['97.5_ci'].round(3).astype(str) + ']'
     coefs['Estimate (SE)'] = coefs.Estimate.round(3).astype(str) + ' (' + coefs.SE.round(3).astype(str) + ')'
-    coefs = coefs[['type', 'Estimate (SE)', 'CI', 'P-val']]
+    coefs = coefs[['type', 'Estimate (SE)', 'CI', 'P-val', 'Sig']]
     # coefs['significance'] = gutils.p_value_sig(coefs['P-val'])
-    coefs['Estimate (SE)'] = coefs['Estimate (SE)'] + gutils.p_value_sig(coefs['P-val']).astype(str)
+    coefs['Estimate (SE)'] = coefs['Estimate (SE)'] + coefs.Sig  # + gutils.p_value_sig(coefs['P-val']).astype(str)
     res = pd.concat([coefs, rnd_eff, stat, various], sort=True)[['type', 'Estimate (SE)', 'CI', 'P-val']]
     return res.set_index(['type', res.index])
 
