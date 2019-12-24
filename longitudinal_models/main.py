@@ -4,16 +4,39 @@ from longitudinal_models.imputation import *
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
+from scipy import stats
+data_file = r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx'
+
+
+def ttest(value='score_combined',
+          group_col='patient_diagnosis_super_class',
+          groups_to_study=['organic only', 'smi+organic'],
+          subgroup_col=None):
+    # value, subgroup_col, group_col, groups_to_study = ['score_combined', 'gender', 'patient_diagnosis_super_class', ['organic only', 'smi+organic']]
+    usecols = [subgroup_col, group_col, value] if subgroup_col is not None else [group_col, value]
+    df = pd.read_excel(data_file, sheet_name='raw', index_col=None, usecols=usecols)
+    subgroups = df[subgroup_col].unique() if subgroup_col is not None else ['whatever']
+
+    res = pd.DataFrame(columns=['t', 'p'])
+    for sub in subgroups:
+        df_tmp = df.loc[df[subgroup_col] == sub] if subgroup_col is not None else df
+        g1 = df_tmp.loc[df_tmp[group_col] == groups_to_study[0], value]
+        g2 = df_tmp.loc[df_tmp[group_col] == groups_to_study[1], value]
+        t, p = stats.ttest_ind(g1, g2, equal_var=False)
+        res.loc[sub] = [t, p]
+        print('group=', sub, 't=', t, 'p=', p)
+    return res
+
 
 def test(impute=False):
-    df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx', sheet_name='combined', index_col=None)
+    df = pd.read_excel(data_file, sheet_name='combined', index_col=None)
     # df = df.loc[df.age_at_score_baseline >= df.age_at_first_diag]
     # df = df.loc[df.patient_diagnosis_super_class != 'smi only']
     df['has_smi'] = np.where(df['patient_diagnosis_super_class'].str.lower().str.contains('smi'), 'yes', 'no')
     models = ('linear_rdn_all', 'linear_rdn_int')  # , 'linear_rdn_all', 'quadratic_rdn_int')
     ts = ('score_date_centered',)
     covariates_slope = True
-    patients_split_col = None  # 'patient_diagnosis_super_class'
+    patients_split_col = 'patient_diagnosis_super_class'
     socio_dem_imp = ['age_at_score_baseline', 'gender', 'ethnicity_group_imputed', 'marital_status_imputed',
                      'education', 'first_language_imputed', 'imd_bucket_baseline_imputed', 'age_at_first_diag']
     cvd_imp = ['smoking_status_baseline_imputed', 'cvd_problem_imputed']

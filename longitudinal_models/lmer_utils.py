@@ -60,8 +60,11 @@ def print_r_model_output(model):
     coefs = pd.DataFrame(model.coefs)
     coefs['type'] = 'coefs'
     # get multiplier for slope * covariate
-    coefs.loc[coefs.index.str.contains(':'), 'tmp'] = coefs.loc[coefs.index.str.contains(':')].index.str.split(pat=":").str[0]
-    coefs['mult'] = coefs['tmp'].apply(lambda x: np.sign(coefs.loc[coefs.index == x, 'Estimate'][0]) if x in coefs.index else 1)
+    if len(coefs.loc[coefs.index.str.contains(':')].index) > 0:
+        coefs.loc[coefs.index.str.contains(':'), 'tmp'] = coefs.loc[coefs.index.str.contains(':')].index.str.split(pat=":").str[0]
+        coefs['mult'] = coefs['tmp'].apply(lambda x: np.sign(coefs.loc[coefs.index == x, 'Estimate'][0]) if x in coefs.index else 1)
+    else:
+        coefs['mult'] = 1
     coefs.Estimate = coefs.Estimate * coefs.mult
     # compute stats
     coefs['CI'] = '[' + coefs['2.5_ci'].round(3).astype(str) + ',' + coefs['97.5_ci'].round(3).astype(str) + ']'
