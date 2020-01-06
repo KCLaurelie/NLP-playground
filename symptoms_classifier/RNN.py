@@ -11,8 +11,8 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 def test():
     from symptoms_classifier.symptoms_classifier import TextsToClassify
     from symptoms_classifier.NLP_embedding import load_embedding_model
-    MAX_SEQ_LEN, tokenization_type, test_size, random_state, dropout, n_epochs, debug_mode, rnn_type, lr, bid, num_layers, hidden_size = \
-        [40, None, 0.2, 0, 0.5, 1, False, 'LSTM', 0.001, False, 2, 300]
+    MAX_SEQ_LEN, tokenization_type, test_size, random_state, dropout, n_epochs, debug_mode, rnn_type, lr, bid, simulate_attn, num_layers, hidden_size = \
+        [40, None, 0.2, 0, 0.5, 1, False, 'LSTM', 0.001, False, False, 2, 300]
     tweets = TextsToClassify(filepath=r'C:\Users\K1774755\Downloads\phd\Tweets.csv', already_split=False,
                              class_col='airline_sentiment', text_col='text', binary_main_class='positive')
     df = tweets.load_data()
@@ -24,14 +24,14 @@ def test():
 def train_rnn(w2v, sentences, y,
               idx_train=None, idx_test=None, test_size=0.2,
               tokenization_type=None, MAX_SEQ_LEN=40, random_state=0, dropout=0.5,
-              num_layers=2, hidden_size=300, n_epochs=200, lr=0.001, debug_mode=False, rnn_type='RNN', bid=False):
+              num_layers=2, hidden_size=300, n_epochs=200, lr=0.001, debug_mode=False, rnn_type='RNN',
+              bid=False, simulate_attn=False):
     """
-
-    :param idx_test:
-    :param idx_train:
     :param w2v: pre-trained word2vec embedding model
     :param sentences: pandas Series of sentences to classify (1 row = 1 sentence)
     :param y: corresponding classes
+    :param idx_test: indices of testing set in case already split
+    :param idx_train: indices of training set in case already split
     :param tokenization_type: (clean, lem, lem_stop, None) preprocessing to apply to text
     :param MAX_SEQ_LEN: max number of words to use
     :param test_size: (float between 0 and 1) proportion of sentences to use for testing
@@ -44,6 +44,7 @@ def train_rnn(w2v, sentences, y,
     :param debug_mode: (True, False): set to True to display intermediate performance stats and graphs
     :param rnn_type: (RNN, LSTM, GRU): type of network to use
     :param bid: (True, False) bidirectional network (only applies to LSTM)
+    :param simulate_attn: simulates attention by stopping bidirectional LSTM halfway
     :return:
     """
     torch.manual_seed(random_state)
@@ -86,8 +87,15 @@ def train_rnn(w2v, sentences, y,
 
             # select the value at the length of that sentence (we are only interested in last output) or middle if bidirectional
             row_indices = torch.arange(0, x.size(0)).long()
-            x = x[row_indices, lns/2, :] if bid else x[row_indices, lns - 1, :]
-
+            print('type and shape of x before output selection', type(x), x.shape)
+            if bid:
+                if simulate_attn:
+                    x = x[row_indices, lns / 2, :]
+                else:
+                    x = torch.cat((x[row_indices, lns - 1, :], x[row_indices, 0, :]), 0)
+            else:
+                x = x[row_indices, lns - 1, :]
+            print('type and shape of x', type(x), x.shape)
             x = self.fc1(x)
             return x
 
