@@ -299,6 +299,7 @@ default_dataset = DatasetMMSE(
 # UTIL FUNCTIONS
 ##############################################################################################
 def my_pivot(df, cols_to_pivot, values, index, aggfunc=pd.Series.nunique):
+    cols_to_pivot = gutils.to_list(cols_to_pivot)
     pv = df.pivot_table(values=values, index=index, columns=cols_to_pivot[0], aggfunc=aggfunc, margins=True).fillna(0)
     # in case we have a second group to use for pivot
     if isinstance(cols_to_pivot, list) and len(cols_to_pivot) > 1:
