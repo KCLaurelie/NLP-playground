@@ -16,7 +16,6 @@ class TextsToClassify:
                  embedding_algo='w2v', embedding_model=None, embedded_text=None,
                  classifier_model='SVM', tokenization_type=None):
         """
-
         :param filepath: path to dataset if stored in file
         :param dataset: dataset itself if not stored in file
         :param class_col: column containing annotations
