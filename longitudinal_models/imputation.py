@@ -72,6 +72,6 @@ def impute_with_baseline(df,
     df_baseline = df.sort_values(baseline_cols).groupby(key).first().reset_index()
     df_imputed = impute_all_data(df_baseline, output_column=None, clean_df=True,
                                  input_columns_to_exclude=input_columns_to_exclude)
-    df = df.merge(df_imputed[[key] + [x for x in df_imputed.columns if '_final' in x]], on='brcid')
+    df = df.merge(df_imputed[[key] + [x for x in df_imputed.columns if '_final' in x]], on=key)
     df = df.reindex(sorted(df_imputed.columns), axis=1)
     return df
