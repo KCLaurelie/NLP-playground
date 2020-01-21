@@ -3,11 +3,20 @@ import numpy as np
 from scipy import stats
 from scipy.stats import mannwhitneyu
 
-data_file = r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx'
-subgroup_cols = ['age_bucket_baseline', 'gender', 'ethnicity_group2', 'marital_status', 'education', 'first_language',
-                 'imd_bucket_baseline2', 'smoking_status_baseline', 'cvd_problem']
-df = pd.read_excel(data_file, sheet_name='combined', index_col=None)
-df = df.loc[(df.age_at_first_diag > 49.5) & (df.age_at_score_baseline >= 50)]
+subgroup_cols = ['age_bucket_baseline', 'gender', 'ethnicity', 'marital_status', 'education', 'first_language',
+                 'imd_bucket', 'smoking_status', 'cvd_problem']
+
+
+def load_data(data_file=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20200119.xlsx',
+              sheet_name='combined'):
+    df = pd.read_excel(data_file, sheet_name=sheet_name, index_col=None)
+    if 'keep' in df.columns: df = df.loc[(df.keep == 'yes') or (df.keep == 1) or (df.keep is True)]
+    df = df.loc[df.patient_diagnosis_super_class != 'smi only']
+    # if 'counter' in df.columns: df = df.loc[df.counter > 2]
+    # df = df.loc[(df.age_at_first_diag > 49.5) & (df.age_at_score >= 50) & (df.age_at_score <= 90)]
+    # df = df.loc[df.age_at_score_baseline >= df.age_at_first_diag]
+    # df['has_smi'] = np.where(df['patient_diagnosis_super_class'].str.lower().str.contains('smi'), 'yes', 'no')
+    return df
 
 
 def ttest(df, value='score_combined',
