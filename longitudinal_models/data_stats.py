@@ -11,7 +11,7 @@ def load_data(data_file=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synt
               sheet_name='combined'):
     df = pd.read_excel(data_file, sheet_name=sheet_name, index_col=None)
     if 'keep' in df.columns: df = df.loc[(df.keep == 'yes') or (df.keep == 1) or (df.keep is True)]
-    df = df.loc[df.patient_diagnosis_super_class != 'smi only']
+    # df = df.loc[df.patient_diagnosis_super_class != 'smi only']
     # if 'counter' in df.columns: df = df.loc[df.counter > 2]
     # df = df.loc[(df.age_at_first_diag > 49.5) & (df.age_at_score >= 50) & (df.age_at_score <= 90)]
     # df = df.loc[df.age_at_score_baseline >= df.age_at_first_diag]
@@ -23,14 +23,13 @@ def ttest(df, value='score_combined',
           group_col='patient_diagnosis_super_class',
           groups_to_study=['organic only', 'smi+organic'],
           subgroup_col='age_bucket_baseline'):
-    usecols = [subgroup_col, group_col, value] if subgroup_col is not None else [group_col, value]
-    #df = pd.read_excel(data_file, sheet_name='combined', index_col=None, usecols=usecols)
-    subgroups = df[subgroup_col].unique() if subgroup_col is not None else ['whatever']
+    if group_col is not None: df = df[df[group_col].isin(groups_to_study)]
+    subgroups = list(df[subgroup_col].unique())+['all'] if subgroup_col is not None else ['all']
     subgroups.sort()
 
     res = pd.DataFrame(columns=['t (ttest)', 'p (ttest)', 'stat (utest)', 'p (utest)'])
     for sub in subgroups:
-        df_tmp = df.loc[df[subgroup_col] == sub] if subgroup_col is not None else df
+        df_tmp = df.loc[df[subgroup_col] == sub] if sub != 'all' else df
         g1 = df_tmp.loc[df_tmp[group_col] == groups_to_study[0], value]
         g2 = df_tmp.loc[df_tmp[group_col] == groups_to_study[1], value]
         t, p = stats.ttest_ind(g1, g2, equal_var=False)
@@ -42,26 +41,24 @@ def ttest(df, value='score_combined',
 
 def chisq(df, value='brcid',
           group_col='patient_diagnosis_super_class',
-          groups_to_study=['organic only', 'smi+organic']):
-    usecols = subgroup_cols + [group_col, value]
-    #df = pd.read_excel(data_file, sheet_name='combined', index_col=None, usecols=usecols)
-    df = df[df[group_col].isin(groups_to_study)]
+          groups_to_study=['organic only', 'smi+organic'],
+          complete_case=True):
+    if group_col is not None: df = df[df[group_col].isin(groups_to_study)]
 
-    res = pd.DataFrame()  # (columns=['g', 'p'])
+    res = pd.DataFrame()
     for sub in subgroup_cols:
-        df_tmp = df.pivot_table(values=value, index=sub, columns=group_col, aggfunc=pd.Series.nunique, margins=False,
-                                fill_value=0)
+        df_to_pivot = df.loc[df[sub] != 'not known'] if complete_case else df
+        df_tmp = df_to_pivot.pivot_table(values=value, index=sub, columns=group_col, aggfunc=pd.Series.nunique, margins=False, fill_value=0)
         chi2, p, dof, ex = stats.chi2_contingency(df_tmp)
         df_tmp['variable'] = sub
         df_tmp['chi2'] = chi2
         df_tmp['p'] = p
+        df_tmp['dof'] = dof
         res = pd.concat([res, df_tmp])
     return res
 
 
 def data_stats(df, group_col='patient_diagnosis_super_class'):
-    #df = pd.read_excel(data_file, sheet_name='combined', index_col=None)
-
     res = pd.DataFrame()
     for sub in subgroup_cols:
         df_countunique = df.pivot_table(values='brcid', index=sub, columns=group_col, aggfunc=pd.Series.nunique, margins=True, fill_value=0)
