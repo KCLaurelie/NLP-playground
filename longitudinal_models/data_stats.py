@@ -11,6 +11,7 @@ def load_data(data_file=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synt
               sheet_name='combined'):
     df = pd.read_excel(data_file, sheet_name=sheet_name, index_col=None)
     if 'keep' in df.columns: df = df.loc[(df.keep == 'yes') or (df.keep == 1) or (df.keep is True)]
+    # df[['smoking_status','smoking_status_imputed']] = df['smoking_status_imputed'].replace({'past': 'no'})
     # df = df.loc[df.patient_diagnosis_super_class != 'smi only']
     # if 'counter' in df.columns: df = df.loc[df.counter > 2]
     # df = df.loc[(df.age_at_first_diag > 49.5) & (df.age_at_score >= 50) & (df.age_at_score <= 90)]

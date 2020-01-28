@@ -24,6 +24,7 @@ def test(df, impute=False):
     socio_dem = [x.replace('_imputed', '') for x in socio_dem_imp]
     cvd = [x.replace('_imputed', '') for x in cvd_imp]
 
+    #df[['smoking_status','smoking_status_imputed']] = df['smoking_status_imputed'].replace({'past': 'no'})
     for key, val in references.items():
         if key in df:
             df[key] = df[key].replace({val: 'aaa_'+val})
