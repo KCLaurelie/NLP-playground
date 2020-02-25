@@ -20,7 +20,8 @@ def generate_sample(patients_file=r'T:\aurelie_mascio\F20 corpus\patients_static
     summary = patients_data.describe(include='all')
     print(summary)
     if documents_file is not None:
-        documents_data = gutils.super_read_csv(documents_file)
+        read_from_SQL_export = True if 'ssis' in documents_file else False
+        documents_data = gutils.super_read_csv(documents_file, read_from_SQL_export=read_from_SQL_export)
         patients_data = patients_data.merge(documents_data, on='brcid')
     sample_ix = patients_data[sample_cols].sample(n=sample_size, random_state=random_state).index
     sample = patients_data.loc[sample_ix, sample_cols + ['cn_doc_id']]
