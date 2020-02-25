@@ -75,6 +75,7 @@ def train_rnn(w2v, sentences, y,
             else:
                 self.rnn = nn.RNN(input_size=embedding_size, hidden_size=hidden_size, num_layers=num_layers, dropout=dropout)
             self.fc1 = nn.Linear(hidden_size, 2)
+            self.d1 = nn.Dropout(0.5)
 
         def forward(self, x, lns, mask):
             if debug_mode: print('start forward function - x: ', x.shape)
@@ -92,10 +93,11 @@ def train_rnn(w2v, sentences, y,
                 if simulate_attn:
                     x = x[row_indices, lns / 2, :]
                 else:
-                    x = torch.cat((x[row_indices, lns - 1, :], x[row_indices, 0, :]), 0)
+                    x = x[row_indices, lns - 1, :] # torch.cat((x[row_indices, lns - 1, :], x[row_indices, 0, :]), 0)
             else:
                 x = x[row_indices, lns - 1, :]
             print('type and shape of x', type(x), x.shape)
+            x = self.d1(x) # dropout
             x = self.fc1(x)
             return x
 
