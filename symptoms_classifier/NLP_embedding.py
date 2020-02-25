@@ -10,7 +10,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import nltk
 from nltk.corpus import stopwords
 import torch
+import scispacy
 import spacy
+from tokenizers import ByteLevelBPETokenizer
+nlp = spacy.load("en_core_sci_md")
 nlp = spacy.load(spacy_en_path, disable=['ner', 'parser'])
 spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
 #nltk.download('wordnet')
@@ -45,8 +48,47 @@ def tokenize_text_series(text_series, **kwargs):
     res = tokenize_sentences(snt, **kwargs)
     return res
 
+def _tokenize_scispacy(sentences, tokenization_type='clean'):
+    tok_snts = []
+    if ('low' in tokenization_type) and ('wos' in tokenization_type):
+        tok_type='low_wos'
+    elif 'wos' in tokenization_type:
+        tok_type='wos'
+    elif 'lem' in tokenization_type:
+        tok_type='lem'
+    else:
+        tok_type='clean'
+    print('tokenizing using: scispacy / ', tok_type)
+    for snt in sentences:
+        tkns = nlp.tokenizer(snt)
+        if tok_type=='low_wos':
+            _tkns = [str(x.text).lower() for x in tkns if not x.is_space]
+        elif tok_type=='wos':
+            _tkns = [str(x.text) for x in tkns if not x.is_space]
+        elif tok_type=='lem':
+            _tkns = [str(x.lemma_).lower() for x in tkns if not x.is_space and not x.is_punct]
+        else: # clean by default
+            _tkns = [str(x.text).lower() for x in tkns if not x.is_space and not x.is_punct]
+        tok_snts.append(_tkns)
+    return tok_snts
 
-def tokenize_sentences(sentences, tokenization_type=None, output_file_path=None, remove_contractions=False):
+def _tokenize_hf(sentences):
+    print('tokenizing using bbpe from hugging face')
+    tokenizer = ByteLevelBPETokenizer(merges_file="/home/ubuntu/data/mimic/bbpe_tokenizer/mimic-merges.txt", vocab_file="/home/ubuntu/data/mimic/bbpe_tokenizer/mimic-vocab.json")
+    tok_snts = []
+    for snt in sentences:
+        tokenized_snt = tokenizer.encode(snt)
+        tok_snts.append(tokenized_snt.tokens)
+    return tok_snts
+
+def  tokenize_sentences(sentences, tokenization_type=None, output_file_path=None, remove_contractions=False):
+    if ('bpe' in tokenization_type) or ('hugging' in tokenization_type):
+        res = _tokenize_hf(sentences)
+    else:
+        res = _tokenize_scispacy(sentences, tokenization_type=tokenization_type)
+    return res
+
+def tokenize_sentences_old(sentences, tokenization_type=None, output_file_path=None, remove_contractions=False):
     if tokenization_type not in ('lem', 'wo_space', 'lem_stop', 'clean'):
         tokenization_type = detect_tokenization_type(tokenization_type)
     print('tokenizing text using', tokenization_type)
