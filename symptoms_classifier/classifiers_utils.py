@@ -1,9 +1,11 @@
 import datetime
 import time
+import pandas as pd
 from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.externals import joblib
+from sklearn.model_selection import KFold
 import xgboost as xgb
 import catboost
 from symptoms_classifier.NLP_embedding import *
@@ -233,4 +235,16 @@ def test_nn(sentence, w2v, tokenization_type, net):
     net = net.eval()
     res_tmp = net(x_ind)  # output of the netweork
     res = torch.softmax(res_tmp, dim=1)
+    return res
+
+
+def k_fold_indices(len_data=1000, n_folds=10, random_state=0):
+    kf = KFold(n_splits=n_folds, shuffle=True, random_state=random_state)
+    X = np.arange(len_data)
+    res = pd.DataFrame(index=X)
+    cpt = 0
+    for train_index, test_index in kf.split(X):
+        cpt += 1
+        #print(test_index)
+        res['split'+str(cpt)]= np.where(res.index.isin(test_index), 'test', 'train')
     return res
