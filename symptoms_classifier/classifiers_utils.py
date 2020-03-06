@@ -246,5 +246,5 @@ def k_fold_indices(len_data=1000, n_folds=10, random_state=0):
     for train_index, test_index in kf.split(X):
         cpt += 1
         #print(test_index)
-        res['split'+str(cpt)]= np.where(res.index.isin(test_index), 'test', 'train')
+        res['split'+str(cpt)] = np.where(res.index.isin(test_index), 'test', 'train')
     return res
