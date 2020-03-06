@@ -94,7 +94,7 @@ def train_nn(x_emb, y, idx_train=None, idx_test=None, test_size=0.2, random_stat
             print("Epoch: {:4} Loss: {:.5f} ".format(epoch, loss.item()))
             f1 = nn_print_perf(train_preds=train_preds.detach(), y_train=y_train,
                                test_preds=test_preds.detach(), y_test=y_test, multi_class=multi_class)
-            if epoch > n_epochs / 2 and f1 > best_f1:
+            if epoch > n_epochs / 3 and f1 > best_f1:
                 best_f1, best_epoch, best_train_preds, best_test_preds = f1, epoch, train_preds.detach(), test_preds.detach()
 
     print('Finished Training, best F1 obtained on test set:', best_f1, 'at epoch', best_epoch)

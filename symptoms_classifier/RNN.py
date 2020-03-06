@@ -126,7 +126,7 @@ def train_rnn(w2v, sentences, y,
             print("Epoch: {:4} Loss: {:.5f} ".format(epoch, loss.item()))
             f1 = nn_print_perf(train_preds=outputs_train.detach(), y_train=y_train,
                                test_preds=outputs_test.detach(), y_test=y_test)
-            if epoch > n_epochs / 2 and f1 > best_f1:
+            if f1 > best_f1:
                 best_f1, best_epoch, best_train_preds, best_test_preds = f1, epoch, outputs_train, outputs_test
 
     print('Finished Training, best F1 obtained on test set:', best_f1, 'at epoch', best_epoch)
