@@ -18,9 +18,9 @@ def list_combos(lst, r=None):
     :return: list of combinations
     """
     lst = list(lst)
-    if r is not None: # list combinations for specific r
+    if r is not None:  # list combinations for specific r
         res = list(combinations(lst, r))
-    else: # list all combinations
+    else:  # list all combinations
         res = []
         for r in range(1, len(lst) + 1):
             res += list(combinations(lst, r))
@@ -69,8 +69,8 @@ def get_wa(sentence, keywords, context=10, fixed_weights=False, debug=False):
     keywords = to_list(keywords)
     # kw_idx = [sentence.index(x) for x in keywords if x in sentence]
     kw_idx = [sentence.index(s) for s in sentence if any(xs in s for xs in keywords)]
-    weights = [0]*len(sentence)
-    context_weights = [0]+[1]*context if fixed_weights else list(np.arange(0, 1 + 1 / context, 1 / context))
+    weights = [0] * len(sentence)
+    context_weights = [0] + [1] * context if fixed_weights else list(np.arange(0, 1 + 1 / context, 1 / context))
     for i in kw_idx:
         left = context_weights[-i:] if i > 0 else []
         right = context_weights[::-1][:len(sentence) - i - 1]
@@ -416,3 +416,40 @@ def convert_to_longitudinal_dates(df,
         map(str, range(int(min_date), int(max_date + 1))))  # [x for x in df.columns if 'stay' in x or key_col in x]
     res = df[res_cols].groupby([key_col], as_index=False).sum().sort_values(by=[key_col])
     return res
+
+
+def bucket_data(df, to_bucket, key='brcid', bucket_min=None, bucket_max=None, interval=None, cols_to_exclude=None,
+                na_values='unknown', min_obs=3, timestamp_cols='score_year'):
+    print("bucketting data (method from parent class)")
+    cols_to_keep = [x for x in df.columns if
+                    x not in to_list(cols_to_exclude)] if cols_to_exclude is not None else df.columns
+    # only use data within bucket boundaries
+    mask_bucket = (df[to_bucket] >= bucket_min) & (df[to_bucket] <= bucket_max)
+    df = df.loc[mask_bucket, cols_to_keep]
+    if na_values is not None: df.fillna(na_values, inplace=True)
+    # transform bool cols to "yes"/"no" so they are not averaged out in the groupby
+    bool_cols = [col for col in df.columns if df[col].value_counts().index.isin([0, 1]).all()]
+    if len(bool_cols) > 0: df[bool_cols] = df[bool_cols].replace({0: 'no', 1: 'yes'})
+    # detect numerical and categorical columns
+    categoric_col = [col for col in df.select_dtypes(include=['object', 'category']).columns if (key not in col)]
+    numeric_col = [col for col in df._get_numeric_data().columns if (col != key)]
+    # group by buckets
+    bucket_col = to_bucket + '_upbound'
+    df[bucket_col] = round_nearest(df[to_bucket], interval, 'up')
+    # we aggregate by average for numeric variables and baseline value for categorical variables
+    keys = categoric_col + numeric_col
+    values = ['first'] * len(categoric_col) + ['mean'] * len(numeric_col)
+    grouping_dict = dict(zip(keys, values))
+
+    df_grouped = df.groupby([key] + [bucket_col], as_index=False).agg(grouping_dict)
+    df_grouped = df_grouped.sort_values([key, to_bucket])
+
+    df_grouped['occur'] = df_grouped.groupby(key)[key].transform('size')
+    df_grouped = df_grouped[(df_grouped['occur'] >= min_obs)]
+    df_grouped['counter'] = df_grouped.groupby(key).cumcount() + 1
+    if timestamp_cols is not None:
+        for x in to_list(timestamp_cols):
+            df_grouped[x + '_upbound'] = round_nearest(df_grouped[x], interval, 'up')
+            df_grouped[x + '_centered'] = df_grouped[x + '_upbound'] - df_grouped[x + '_upbound'].min()
+
+    return df_grouped
