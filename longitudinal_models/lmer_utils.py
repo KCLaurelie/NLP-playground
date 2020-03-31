@@ -67,7 +67,8 @@ def print_r_model_output(model):
         coefs['mult'] = 1
     coefs.Estimate = coefs.Estimate * coefs.mult
     # compute stats
-    coefs['CI'] = '[' + coefs['2.5_ci'].round(3).astype(str) + ',' + coefs['97.5_ci'].round(3).astype(str) + ']'
+    coefs['CI'] = '[' + (coefs['2.5_ci'] * coefs.mult).round(3).astype(str) + ',' \
+                  + (coefs['97.5_ci'] * coefs.mult).round(3).astype(str) + ']'
     coefs['Estimate (SE)'] = coefs.Estimate.round(3).astype(str) + ' (' + coefs.SE.round(3).astype(str) + ')'
     coefs = coefs[['type', 'Estimate (SE)', 'CI', 'P-val', 'Sig']]
     # coefs['significance'] = gutils.p_value_sig(coefs['P-val'])
