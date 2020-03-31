@@ -6,48 +6,63 @@ import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
 
+#df = load_data(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20200119.xlsx')
+df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_trajectory_data_20200321_synthetic.xlsx', index_col=None, sheet_name='combined')
+df = df.loc[df.patient_diagnosis_super_class != 'SMI only']
 
-df = load_data(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20200119.xlsx')
+def test(df, impute=False, bucket_data=False):
 
-def test(df, impute=False):
-    models = ('linear_rdn_all', 'linear_rdn_int')  # , 'linear_rdn_all', 'quadratic_rdn_int')
-    ts = ('score_date_centered',)
-    covariates_slope = True
-    patients_split_col = None
-    socio_dem_imp = ['age_at_score_baseline', 'gender', 'ethnicity_imputed', 'marital_status_imputed',
-                     'education', 'first_language_imputed', 'imd_bucket_imputed', 'age_at_first_diag']
-    cvd_imp = ['smoking_status_imputed', 'cvd_problem_imputed']
-    references = {'education': 'no', 'ethnicity_imputed': 'white', 'ethnicity': 'white', 'smoking_status_imputed': 'no',
-                  'smoking_status': 'no', 'marital_status_imputed': 'single or separated', 'marital_status': 'single or separated'}
+    if bucket_data:
+        df = gutils.bucket_data(df, to_bucket='age_at_score', key='brcid', bucket_min=50, bucket_max=90, interval=0.5
+                                , cols_to_exclude=None, na_values='unknown', min_obs=3, timestamp_cols=['age_at_score', 'score_date'])
+    if impute:  # if imputed data needs to be generated (this step takes a while)
+        df = impute_with_baseline(df, key='brcid', baseline_cols=['brcid', 'score_date'],
+                                  input_columns_to_exclude=['brcid',  'score_combined', 'occur', 'counter', 'score_combined_baseline', 'score_date_centered','score_date', 'age_at_score_centered','age_at_score_baseline'])
 
-    if patients_split_col is None: socio_dem_imp.insert(1, 'patient_diagnosis_super_class')
+
+    socio_dem_imp = ['gender', 'ethnicity_imputed', 'marital_status_imputed',
+                     'education', 'first_language_imputed', 'imd_bucket_baseline_imputed']
+    cvd_imp = ['smoking_status_baseline_imputed', 'cvd_problem_baseline_imputed']
+    med = ['dementia_medication_baseline', 'antipsychotic_medication_baseline']
+    references = {'education': 'no', 'ethnicity_imputed': 'white', 'ethnicity': 'white', 'smoking_status_baseline_imputed': 'no',
+                  'smoking_status_baseline': 'no', 'marital_status_imputed': 'single_separated',
+                  'marital_status': 'single_separated'}
     socio_dem = [x.replace('_imputed', '') for x in socio_dem_imp]
     cvd = [x.replace('_imputed', '') for x in cvd_imp]
 
-    #df[['smoking_status','smoking_status_imputed']] = df['smoking_status_imputed'].replace({'past': 'no'})
     for key, val in references.items():
-        if key in df:
-            df[key] = df[key].replace({val: 'aaa_'+val})
-            print('replaced', val)
-    if impute:  # if imputed data needs to be generated (this step takes a while)
-        df = impute_with_baseline(df, key='brcid', baseline_cols=['brcid', 'score_date_upbound'],
-                                  input_columns_to_exclude=['brcid', 'score_combined', 'occur', 'counter', 'score_combined_baseline'])
+        if key in df: df[key] = df[key].replace({val: 'aaa_' + val})
 
-    res = run_models(timestamps=ts, model_data=df, models=('linear_rdn_all',), covariates='patient_diagnosis_super_class', covariates_slope=covariates_slope, patients_split_col=patients_split_col)
-    res = run_models(timestamps=ts, model_data=df, models=('linear_rdn_all',), covariates=socio_dem_imp + cvd_imp, covariates_slope=covariates_slope, patients_split_col=patients_split_col)
-    res = run_models(model_data=df, models=models, covariates=cvd_imp, covariates_slope=covariates_slope, patients_split_col=patients_split_col,
-                     output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_health_all_groups.xlsx')
-    res = run_models(model_data=df, models=models, covariates=socio_dem_imp, covariates_slope=covariates_slope, patients_split_col=patients_split_col,
-                     output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_sociodem_all_groups.xlsx')
-    if 'patient_diagnosis_super_class' in cvd_imp: cvd_imp.remove('patient_diagnosis_super_class')
-    res = run_models(model_data=df, models=models, covariates=socio_dem_imp + cvd_imp, covariates_slope=covariates_slope, patients_split_col=patients_split_col,
-                     output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_all_all_groups.xlsx')
-    res = run_models(model_data=df, models=models, covariates=cvd, covariates_slope=covariates_slope, patients_split_col=patients_split_col,
-                     output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_health_not_imputed.xlsx')
-    res = run_models(model_data=df, models=models, covariates=socio_dem, covariates_slope=covariates_slope, patients_split_col=patients_split_col,
-                     output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_sociodem_not_imputed.xlsx')
-    res = run_models(model_data=df, models=models, covariates=socio_dem + cvd, covariates_slope=covariates_slope, patients_split_col=patients_split_col,
-                     output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_all_not_imputed.xlsx')
+    covariates = ['age_at_score_baseline', 'age_at_dementia_diag', 'patient_diagnosis_super_class'] + socio_dem_imp + cvd_imp + med
+    res = run_models(timestamps=('score_date_centered',), model_data=df, models=('linear_rdn_all',), covariates=covariates, covariates_slope=True, patients_split_col=None)
+
+    # models = ('linear_rdn_all', 'linear_rdn_int')  # , 'linear_rdn_all', 'quadratic_rdn_int')
+    # ts = ('score_date_centered',)
+    # covariates_slope = True
+    # patients_split_col = None
+    # if patients_split_col is None: socio_dem_imp.insert(1, 'patient_diagnosis_super_class')
+    # res = run_models(timestamps=ts, model_data=df, models=('linear_rdn_all',),
+    #                  covariates='patient_diagnosis_super_class', covariates_slope=covariates_slope,
+    #                  patients_split_col=patients_split_col)
+    # res = run_models(model_data=df, models=models, covariates=cvd_imp, covariates_slope=covariates_slope,
+    #                  patients_split_col=patients_split_col,
+    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_health_all_groups.xlsx')
+    # res = run_models(model_data=df, models=models, covariates=socio_dem_imp, covariates_slope=covariates_slope,
+    #                  patients_split_col=patients_split_col,
+    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_sociodem_all_groups.xlsx')
+    # if 'patient_diagnosis_super_class' in cvd_imp: cvd_imp.remove('patient_diagnosis_super_class')
+    # res = run_models(model_data=df, models=models, covariates=socio_dem_imp + cvd_imp,
+    #                  covariates_slope=covariates_slope, patients_split_col=patients_split_col,
+    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_all_all_groups.xlsx')
+    # res = run_models(model_data=df, models=models, covariates=cvd, covariates_slope=covariates_slope,
+    #                  patients_split_col=patients_split_col,
+    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_health_not_imputed.xlsx')
+    # res = run_models(model_data=df, models=models, covariates=socio_dem, covariates_slope=covariates_slope,
+    #                  patients_split_col=patients_split_col,
+    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_sociodem_not_imputed.xlsx')
+    # res = run_models(model_data=df, models=models, covariates=socio_dem + cvd, covariates_slope=covariates_slope,
+    #                  patients_split_col=patients_split_col,
+    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_all_not_imputed.xlsx')
 
 
 def run_report(dataset=ds.default_dataset):
@@ -68,13 +83,15 @@ def model_playground():
 
     # MODEL 1: basic model (random intercept and fixed slope)
     model = Lmer('score_combined ~ score_date_centered  + (1|brcid)', data=df_to_use)  # MMSE score by year
-    model = Lmer('score_combined ~ score_date_centered  + gender + (1|brcid)', data=df_to_use)  # adding age at baseline as covariate (is this correct??)
+    model = Lmer('score_combined ~ score_date_centered  + gender + (1|brcid)',
+                 data=df_to_use)  # adding age at baseline as covariate (is this correct??)
     to_print = print_r_model_output(model.fit())
     # MODEL 2: random intercept and random slope
     model = Lmer('score_combined ~  (score_date_centered  | brcid)', data=df_to_use)  # this removes the intercept?
     model = Lmer('score_combined ~  (score_date_centered  + gender| brcid)', data=df_to_use)
 
-    model = Lmer("score_combined ~ score_date_centered + (1 + score_date_centered | brcid)", data=df_to_use)  # correct one?
+    model = Lmer("score_combined ~ score_date_centered + (1 + score_date_centered | brcid)",
+                 data=df_to_use)  # correct one?
     model = Lmer('score_combined ~  score_date_centered + gender + (1 + score_date_centered | brcid)', data=df_to_use)
 
     model = Lmer('score_combined ~  1 + score_date_centered  + (1|brcid) + (0 + score_date_centered  | brcid)',

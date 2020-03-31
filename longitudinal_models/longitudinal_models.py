@@ -58,7 +58,7 @@ def run_models(model_data=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_sy
     if covariates is not None:  # check covariates actually exist in the model data
         covariates = to_list(covariates)
         if not all(elem in model_data.columns for elem in list(covariates)):
-            print('covariates entered do not exist in input data')
+            print('covariates entered not in input data:', [x for x in list(covariates) if x not in model_data.columns])
             return pd.DataFrame({'output': 'failure - covariates not in input data'}, index=[0])
     if complete_case:
         print('all cases:', len(model_data), 'observations, ', len(model_data[key].unique()), 'patients')
