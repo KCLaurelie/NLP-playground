@@ -88,12 +88,13 @@ def train_rnn(w2v, sentences, y,
 
             # select the value at the length of that sentence (we are only interested in last output) or middle if bidirectional
             row_indices = torch.arange(0, x.size(0)).long()
-            print('type and shape of x before output selection', type(x), x.shape)
+            #print('type and shape of x before output selection', type(x), x.shape)
             if bid and ('lstm' in rnn_type.lower()):
-                if simulate_attn:
-                    x = x[row_indices, lns / 2, :]
-                else:
-                    x = x[row_indices, lns - 1, :] # torch.cat((x[row_indices, lns - 1, :], x[row_indices, 0, :]), 0)
+                # to fix, should concatenate
+                # torch.cat((x[row_indices, lns - 1, :], x[row_indices, 0, :]), 0)
+                x = x[row_indices, lns - 1, :]
+            elif simulate_attn:
+                x = x[row_indices, lns / 2, :]
             else:
                 x = x[row_indices, lns - 1, :]
             print('type and shape of x', type(x), x.shape)
