@@ -65,9 +65,9 @@ def train_rnn(w2v, sentences, y,
             self.embeddings.weight.requires_grad = False  # Disable training for the embeddings - IMPORTANT
 
             # Create the RNN cell
-            if rnn_type.lower() == 'gru':
+            if 'gru' in rnn_type.lower():
                 self.rnn = nn.GRU(input_size=embedding_size, hidden_size=hidden_size, num_layers=num_layers, dropout=dropout)
-            elif rnn_type.lower() == 'lstm':
+            elif 'lstm' in rnn_type.lower():
                 print('running bidirectional LSTM') if bid else print('running standard LSTM')
                 self.rnn = nn.LSTM(input_size=embedding_size,
                                    hidden_size=hidden_size // (2 if bid else 1),
@@ -89,7 +89,7 @@ def train_rnn(w2v, sentences, y,
             # select the value at the length of that sentence (we are only interested in last output) or middle if bidirectional
             row_indices = torch.arange(0, x.size(0)).long()
             print('type and shape of x before output selection', type(x), x.shape)
-            if bid:
+            if bid and ('lstm' in rnn_type.lower()):
                 if simulate_attn:
                     x = x[row_indices, lns / 2, :]
                 else:
