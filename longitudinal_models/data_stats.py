@@ -2,9 +2,10 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 from scipy.stats import mannwhitneyu
+from code_utils.general_utils import p_value_sig2
 
-subgroup_cols = ['age_bucket_baseline', 'gender', 'ethnicity', 'marital_status', 'education', 'first_language',
-                 'imd_bucket', 'smoking_status', 'cvd_problem']
+subgroup_cols = ('age_bucket_baseline', 'gender', 'ethnicity', 'marital_status', 'education',
+                                'first_language','imd_bucket_baseline', 'smoking_status_baseline', 'cvd_problem_baseline')
 
 
 def load_data(data_file=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20200119.xlsx',
@@ -28,38 +29,44 @@ def ttest(df, value='score_combined',
     subgroups = list(df[subgroup_col].unique())+['all'] if subgroup_col is not None else ['all']
     subgroups.sort()
 
-    res = pd.DataFrame(columns=['t (ttest)', 'p (ttest)', 'stat (utest)', 'p (utest)'])
+    res = pd.DataFrame(columns=['t (ttest)', 'p (ttest)', 'sig (ttest)', 'stat (utest)', 'p (utest)', 'sig (utest)'])
     for sub in subgroups:
         df_tmp = df.loc[df[subgroup_col] == sub] if sub != 'all' else df
         g1 = df_tmp.loc[df_tmp[group_col] == groups_to_study[0], value]
         g2 = df_tmp.loc[df_tmp[group_col] == groups_to_study[1], value]
         t, p = stats.ttest_ind(g1, g2, equal_var=False)
+        p_sig = p_value_sig2(p)
         stat, pu = mannwhitneyu(g1, g2)
-        res.loc[sub] = [t, p, stat, pu]
+        pu_sig = p_value_sig2(pu)
+        res.loc[sub] = [t, p, p_sig, stat, pu, pu_sig]
         print('variable=', sub, 't (ttest)=', t, 'p (ttest)=', p)
     return res
 
 
 def chisq(df, value='brcid',
           group_col='patient_diagnosis_super_class',
-          groups_to_study=['organic only', 'smi+organic'],
+          groups_to_study=['organic only', 'SMI+organic'],
           complete_case=True):
     if group_col is not None: df = df[df[group_col].isin(groups_to_study)]
 
     res = pd.DataFrame()
     for sub in subgroup_cols:
-        df_to_pivot = df.loc[df[sub] != 'not known'] if complete_case else df
+        df_to_pivot = df.loc[(df[sub] != 'not known') & (df[sub] != 'unknown')] if complete_case else df
         df_tmp = df_to_pivot.pivot_table(values=value, index=sub, columns=group_col, aggfunc=pd.Series.nunique, margins=False, fill_value=0)
         chi2, p, dof, ex = stats.chi2_contingency(df_tmp)
         df_tmp['variable'] = sub
         df_tmp['chi2'] = chi2
         df_tmp['p'] = p
         df_tmp['dof'] = dof
+        df_tmp['p_significance'] = p_value_sig2(p)
         res = pd.concat([res, df_tmp])
     return res
 
 
-def data_stats(df, group_col='patient_diagnosis_super_class'):
+def data_stats(df, group_col='patient_diagnosis_super_class'
+               , subgroup_cols=('age_bucket_baseline', 'gender', 'ethnicity', 'marital_status', 'education',
+                                'first_language','imd_bucket_baseline', 'smoking_status_baseline', 'cvd_problem_baseline')
+               ):
     res = pd.DataFrame()
     for sub in subgroup_cols:
         df_countunique = df.pivot_table(values='brcid', index=sub, columns=group_col, aggfunc=pd.Series.nunique, margins=True, fill_value=0)
