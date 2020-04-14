@@ -1,29 +1,33 @@
 from code_utils.global_variables import *
 from longitudinal_models.longitudinal_models import *
 from longitudinal_models.imputation import *
-from longitudinal_models.data_stats import load_data
+from longitudinal_models.data_stats import *
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import statsmodels.regression.mixed_linear_model as mlm
 
-#df = load_data(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20200119.xlsx')
-df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_trajectory_data_20200321_synthetic.xlsx', index_col=None, sheet_name='combined')
+df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_trajectory_data_20200407_synthetic.xlsx', index_col=None, sheet_name='combined')
 df = df.loc[df.patient_diagnosis_super_class != 'SMI only']
+#df = df.loc[df.include == 'yes']
 
-def test(df, impute=False, bucket_data=False):
+def test(df, impute=False, bucket_data=False, calc_stats=False):
 
     if bucket_data:
-        df = gutils.bucket_data(df, to_bucket='age_at_score', key='brcid', bucket_min=50, bucket_max=90, interval=0.5
-                                , cols_to_exclude=None, na_values='unknown', min_obs=3, timestamp_cols=['age_at_score', 'score_date'])
+        df_bucket = gutils.bucket_data(df, to_bucket='age_at_score', key='brcid', bucket_min=50, bucket_max=90, interval=0.5
+                                       , cols_to_exclude=None, na_values='unknown', min_obs=3, timestamp_cols=['age_at_score', 'score_date'])
     if impute:  # if imputed data needs to be generated (this step takes a while)
-        df = impute_with_baseline(df, key='brcid', baseline_cols=['brcid', 'score_date'],
-                                  input_columns_to_exclude=['brcid',  'score_combined', 'occur', 'counter', 'score_combined_baseline', 'score_date_centered','score_date', 'age_at_score_centered','age_at_score_baseline'])
-
+        df_imp = impute_with_baseline(df_bucket, key='brcid', baseline_cols=['brcid', 'score_date'],
+                                      output_column=['gender', 'ethnicity', 'first_language', 'marital_status', 'education', 'imd_bucket_baseline', 'smoking_status_baseline', 'cvd_problem_baseline'],
+                                      input_columns_to_exclude=['brcid', 'age_at_dementia_diag', 'occur', 'counter', 'score_date_centered', 'score_date', 'age_at_score_centered', 'age_at_score_baseline'])
+    if calc_stats:  # NEED TO DO ON RAW DATA
+        stats0 = data_stats(df)
+        stats1 = ttest(df, groups_to_study=['organic only', 'SMI+organic'])
+        stats2 = chisq(df, groups_to_study=['organic only', 'SMI+organic'])
 
     socio_dem_imp = ['gender', 'ethnicity_imputed', 'marital_status_imputed',
                      'education', 'first_language_imputed', 'imd_bucket_baseline_imputed']
     cvd_imp = ['smoking_status_baseline_imputed', 'cvd_problem_baseline_imputed']
-    med = ['dementia_medication_baseline', 'antipsychotic_medication_baseline']
+    med = ['dementia_medication_baseline', 'antipsychotic_medication_baseline','antidepressant_medication_baseline']
     references = {'education': 'no', 'ethnicity_imputed': 'white', 'ethnicity': 'white', 'smoking_status_baseline_imputed': 'no',
                   'smoking_status_baseline': 'no', 'marital_status_imputed': 'single_separated',
                   'marital_status': 'single_separated'}
