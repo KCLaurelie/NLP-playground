@@ -327,6 +327,15 @@ def p_value_sig(p_val):
     return res
 
 
+def p_value_sig2(p_val):
+    p_val = float(p_val)
+    if p_val <= 0.001: res = '***'
+    elif p_val <= 0.01: res = '**'
+    elif p_val <= 0.05:res = '*'
+    else: res = ''
+
+    return res
+
 ##############################################################################
 # DATE FUNCTIONS FOR LONGITUDINAL MODELLING
 ############################################################################## 
