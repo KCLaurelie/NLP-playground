@@ -24,49 +24,29 @@ def test(df, impute=False, bucket_data=False, calc_stats=False):
         stats1 = ttest(df, groups_to_study=['organic only', 'SMI+organic'])
         stats2 = chisq(df, groups_to_study=['organic only', 'SMI+organic'])
 
-    socio_dem_imp = ['gender', 'ethnicity_imputed', 'marital_status_imputed',
-                     'education', 'first_language_imputed', 'imd_bucket_baseline_imputed']
+    socio_dem_imp = ['gender', 'ethnicity_imputed', 'marital_status_imputed', 'education',
+                     'first_language_imputed', 'imd_bucket_baseline_imputed', 'age_at_dementia_diag']
     cvd_imp = ['smoking_status_baseline_imputed', 'cvd_problem_baseline_imputed']
     med = ['dementia_medication_baseline', 'antipsychotic_medication_baseline','antidepressant_medication_baseline']
     references = {'education': 'no', 'ethnicity_imputed': 'white', 'ethnicity': 'white', 'smoking_status_baseline_imputed': 'no',
-                  'smoking_status_baseline': 'no', 'marital_status_imputed': 'single_separated',
-                  'marital_status': 'single_separated'}
+                  'smoking_status_baseline': 'no', 'marital_status_imputed': 'married_cohabitating',
+                  'marital_status': 'married_cohabitating'}
     socio_dem = [x.replace('_imputed', '') for x in socio_dem_imp]
     cvd = [x.replace('_imputed', '') for x in cvd_imp]
 
     for key, val in references.items():
         if key in df: df[key] = df[key].replace({val: 'aaa_' + val})
 
-    covariates = ['age_at_score_baseline', 'age_at_dementia_diag', 'patient_diagnosis_super_class'] + socio_dem_imp + cvd_imp + med
+    covariates = ['age_at_score_baseline', 'patient_diagnosis_super_class'] + socio_dem_imp + cvd_imp + med
     res = run_models(timestamps=('score_date_centered',), model_data=df, models=('linear_rdn_all',), covariates=covariates, covariates_slope=True, patients_split_col=None)
 
-    # models = ('linear_rdn_all', 'linear_rdn_int')  # , 'linear_rdn_all', 'quadratic_rdn_int')
-    # ts = ('score_date_centered',)
+    # models = ('linear_rdn_all', 'linear_rdn_int', 'quadratic_rdn_int')
     # covariates_slope = True
-    # patients_split_col = None
+    # patients_split_col = 'patient_diagnosis_super_class'
     # if patients_split_col is None: socio_dem_imp.insert(1, 'patient_diagnosis_super_class')
-    # res = run_models(timestamps=ts, model_data=df, models=('linear_rdn_all',),
+    # res = run_models(timestamps=('score_date_centered',), model_data=df, models=('linear_rdn_all',),
     #                  covariates='patient_diagnosis_super_class', covariates_slope=covariates_slope,
     #                  patients_split_col=patients_split_col)
-    # res = run_models(model_data=df, models=models, covariates=cvd_imp, covariates_slope=covariates_slope,
-    #                  patients_split_col=patients_split_col,
-    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_health_all_groups.xlsx')
-    # res = run_models(model_data=df, models=models, covariates=socio_dem_imp, covariates_slope=covariates_slope,
-    #                  patients_split_col=patients_split_col,
-    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_sociodem_all_groups.xlsx')
-    # if 'patient_diagnosis_super_class' in cvd_imp: cvd_imp.remove('patient_diagnosis_super_class')
-    # res = run_models(model_data=df, models=models, covariates=socio_dem_imp + cvd_imp,
-    #                  covariates_slope=covariates_slope, patients_split_col=patients_split_col,
-    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_all_all_groups.xlsx')
-    # res = run_models(model_data=df, models=models, covariates=cvd, covariates_slope=covariates_slope,
-    #                  patients_split_col=patients_split_col,
-    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_health_not_imputed.xlsx')
-    # res = run_models(model_data=df, models=models, covariates=socio_dem, covariates_slope=covariates_slope,
-    #                  patients_split_col=patients_split_col,
-    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_sociodem_not_imputed.xlsx')
-    # res = run_models(model_data=df, models=models, covariates=socio_dem + cvd, covariates_slope=covariates_slope,
-    #                  patients_split_col=patients_split_col,
-    #                  output_file_path=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\regression_all_not_imputed.xlsx')
 
 
 def run_report(dataset=ds.default_dataset):

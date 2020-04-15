@@ -4,8 +4,9 @@ from scipy import stats
 from scipy.stats import mannwhitneyu
 from code_utils.general_utils import p_value_sig2
 
-subgroup_cols = ('age_bucket_baseline', 'gender', 'ethnicity', 'marital_status', 'education',
-                                'first_language','imd_bucket_baseline', 'smoking_status_baseline', 'cvd_problem_baseline')
+default_subcols = ('age_bucket_baseline', 'gender', 'ethnicity', 'marital_status', 'education', 'first_language',
+                   'imd_bucket_baseline', 'smoking_status_baseline', 'cvd_problem_baseline',
+                   'dementia_medication_baseline', 'antipsychotic_medication_baseline', 'antidepressant_medication_baseline')
 
 
 def load_data(data_file=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20200119.xlsx',
@@ -46,6 +47,7 @@ def ttest(df, value='score_combined',
 def chisq(df, value='brcid',
           group_col='patient_diagnosis_super_class',
           groups_to_study=['organic only', 'SMI+organic'],
+          subgroup_cols=default_subcols,
           complete_case=True):
     if group_col is not None: df = df[df[group_col].isin(groups_to_study)]
 
@@ -63,9 +65,7 @@ def chisq(df, value='brcid',
     return res
 
 
-def data_stats(df, group_col='patient_diagnosis_super_class'
-               , subgroup_cols=('age_bucket_baseline', 'gender', 'ethnicity', 'marital_status', 'education',
-                                'first_language','imd_bucket_baseline', 'smoking_status_baseline', 'cvd_problem_baseline')
+def data_stats(df, group_col='patient_diagnosis_super_class', subgroup_cols=default_subcols
                ):
     res = pd.DataFrame()
     for sub in subgroup_cols:
