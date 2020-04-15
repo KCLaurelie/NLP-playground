@@ -7,25 +7,42 @@ from transformers import BertTokenizer, BertConfig, BertForSequenceClassificatio
 from tqdm import tqdm, trange
 import pandas as pd
 import io
+import os
 import numpy as np
+import matplotlib.pyplot as plt
 
-def test(annots_file):
-    df = pd.read_csv(annots_file)
-    # BERT_model = 'bert-base-uncased'
-    # BERT_model = 'emilyalsentzer/Bio_ClinicalBERT'
-    BERT_model = 'monologg/biobert_v1.0_pubmed_pmc'
-    test = BERT_KFOLD(sentences=df.clean_text, labels=df.annotation, n_splits=10, BERT_model=BERT_model, epochs=5,
-                      random_state=666)
+annots_path = '/home/ubuntu/data/ACL2020/'
+# % matplotlib inline
 
 
-def prep_BERT_dataset(sentences, labels, BERT_model='bert-base-uncased', debug=True):
+# ## DATASETS
+
+
+annots_mimic_status = annots_path + 'mimic_status_10folds.csv'
+annots_mimic_temporality = annots_path + 'mimic_temporality_10folds.csv'
+annots_clef_neg = annots_path + 'clef_negation_10folds.csv'
+annots_clef_uncertainty = annots_path + 'clef_uncertainty_10folds.csv'
+annots_attention = annots_path + 'attention_10fold.csv'
+
+annots_file = annots_mimic_status
+df = pd.read_csv(annots_file)
+df.head()
+
+
+# ## FUNCTIONS TO PREP DATASET / TRAIN BERT
+
+
+def prep_BERT_dataset(sentences, labels=None, BERT_tokenizer='bert-base-uncased', debug=True):
     # load relevant data and add special tokens for BERT to work properly
     sentences = ["[CLS] " + query + " [SEP]" for query in sentences]
-    labels = labels.replace(-1, 0).astype('category').cat.codes.astype('long')  # convert annotations to integers
+    if labels is not None:
+        labels = labels.replace(-1, 0).astype('category').cat.codes.astype('long')  # convert annotations to integers
+    else:
+        labels = pd.Series([1] * len(sentences))
     if debug: print(sentences[0])
 
     # Tokenize with BERT tokenizer
-    tokenizer = BertTokenizer.from_pretrained(BERT_model, do_lower_case=True)
+    tokenizer = BertTokenizer.from_pretrained(BERT_tokenizer, do_lower_case=True)
     tokenized_texts = [tokenizer.tokenize(sent) for sent in sentences]
     input_ids = [tokenizer.convert_tokens_to_ids(txt) for txt in tokenized_texts]
     if debug:
@@ -68,6 +85,7 @@ def create_BERT_dataloader(train_dataset, val_dataset, batch_size=32):
 
     return [train_dataloader, validation_dataloader]
 
+
 # Function to calculate performance of our predictions vs labels
 def nn_print_perf(preds, labels, average='weighted', debug=False):
     pred_flat = np.argmax(preds, axis=1).flatten()
@@ -77,11 +95,11 @@ def nn_print_perf(preds, labels, average='weighted', debug=False):
     p = precision_score(pred_flat, labels_flat, average=average)
     r = recall_score(pred_flat, labels_flat, average=average)
     if debug:
-        print("PERF -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}".format(acc,f1,p,r))
-    return {'f1':f1, 'acc':acc, 'p':p, 'r':r}
+        print("PERF -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}".format(acc, f1, p, r))
+    return {'f1': f1, 'acc': acc, 'p': p, 'r': r}
 
 
-def run_BERT(model, train_dataloader, validation_dataloader, epochs=4, output_dir=None):
+def run_BERT(model, train_dataloader, validation_dataloader, epochs=5, output_dir=None):
     ###################################################################################
     # BERT fine-tuning parameters
     param_optimizer = list(model.named_parameters())
@@ -182,17 +200,21 @@ def run_BERT(model, train_dataloader, validation_dataloader, epochs=4, output_di
         # plt.show()
 
     # save model with best f1
-    if output_dir is not None:
+    if os.path.isdir(str(output_dir)):
         print('saving model...')
         model_to_save.save_pretrained(output_dir)
+    else:
+        print('model not saved, please enter valid path')
 
     return {'stats': stats_to_save, 'model': model_to_save}
 
 
 # TO RUN K-FOLD VALIDATION
-def BERT_KFOLD(sentences, labels, n_splits=10, BERT_model='bert-base-uncased', random_state=42, epochs=4,
+def BERT_KFOLD(sentences, labels, n_splits=10, BERT_tokenizer='bert-base-uncased', random_state=42, epochs=4,
                output_dir=None):
-    dataset, num_labels = prep_BERT_dataset(sentences=sentences, labels=labels, BERT_model=BERT_model)
+    dataset, num_labels = prep_BERT_dataset(sentences=sentences, labels=labels, BERT_tokenizer=BERT_tokenizer)
+    pretrained_model = BertForSequenceClassification.from_pretrained(BERT_tokenizer, num_labels=num_labels)
+
     kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
     # tracking variables
@@ -206,8 +228,7 @@ def BERT_KFOLD(sentences, labels, n_splits=10, BERT_model='bert-base-uncased', r
         val_dataset = torch.utils.data.Subset(dataset, test_ix)
         print(type(train_dataset), ' train set:', len(train_dataset), ' test set:', len(val_dataset))
         train_dataloader, validation_dataloader = create_BERT_dataloader(train_dataset, val_dataset)
-        pretrained_model = BertForSequenceClassification.from_pretrained(BERT_model, num_labels=num_labels)
-        res = run_BERT(pretrained_model, train_dataloader, validation_dataloader, epochs=epochs)
+        res = run_BERT(pretrained_model, train_dataloader, validation_dataloader, epochs=epochs, output_dir=None)
 
         # store perf metrics and model
         stats_df = stats_df.append(pd.DataFrame([res['stats']]))
@@ -216,9 +237,62 @@ def BERT_KFOLD(sentences, labels, n_splits=10, BERT_model='bert-base-uncased', r
             res_to_save = res
 
     # save model with best f1
-    if output_dir is not None:
+    if os.path.isdir(str(output_dir)):
         print('saving model...')
         res_to_save['model'].save_pretrained(output_dir)
+    else:
+        print('model not saved, please enter valid path')
 
     print('best F1 score obtained across splits: {:.3f}'.format(best_f1))
     return {'stats': stats_df, 'model': res_to_save['model']}
+
+
+# load pre-trained model and classify a new sentence
+def load_and_run_BERT(pretrained_model_dir, sentences, BERT_tokenizer='bert-base-uncased'):
+    model = BertForSequenceClassification.from_pretrained(pretrained_model_dir)
+    sentences_dataset, _ = prep_BERT_dataset(sentences, labels=None, BERT_tokenizer=BERT_tokenizer)
+    dataloader = DataLoader(sentences_dataset)
+    b_input_ids, b_input_mask, b_labels = sentences_dataset.tensors
+    with torch.no_grad():
+        (loss, logits) = model(b_input_ids, token_type_ids=None, attention_mask=b_input_mask, labels=b_labels)
+    preds = logits.detach().numpy()
+
+    # put results in nice format
+    res = pd.DataFrame()
+    res['preds'] = np.argmax(preds, axis=1).flatten()
+    res['sentences'] = sentences
+    return res
+
+
+def tests():
+    BERT_tokenizer = 'bert-base-uncased'
+    # BERT_tokenizer = 'emilyalsentzer/Bio_ClinicalBERT'
+    # BERT_tokenizer = 'monologg/biobert_v1.0_pubmed_pmc'
+
+    # #### RUN ALL IN 1 GO (K-FOLD)
+    test = BERT_KFOLD(sentences=df.clean_text, labels=df.annotation, n_splits=10, BERT_tokenizer=BERT_tokenizer,
+                      epochs=5,
+                      random_state=666)
+    test['model'].save_pretrained('/home/ubuntu/data/ACL2020/bert_models')
+
+    # #### RUN ONLY 1 SIMULATION
+    # prepare data
+    dataset, num_labels = prep_BERT_dataset(sentences=df.clean_text, labels=df.annotation,
+                                            BERT_tokenizer=BERT_tokenizer)
+    # split into train/test
+    test_size = 0.1
+    test_len = int(len(dataset) * test_size)
+    train_len = len(dataset) - test_len
+    print('test set:', test_len, 'train set:', train_len)
+    train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_len, test_len])
+    # Create the DataLoaders for our training and validation sets.
+    train_dataloader, validation_dataloader = create_BERT_dataloader(train_dataset, val_dataset)
+    # Load BertForSequenceClassification, the pretrained BERT model with a single linear classification layer on top.
+    model = BertForSequenceClassification.from_pretrained(BERT_tokenizer, num_labels=num_labels)
+    # train and evaluate BERT
+    res = run_BERT(model, train_dataloader, validation_dataloader,
+                   output_dir='/home/ubuntu/data/ACL2020/bert_models/base')
+
+    # test on new data
+    sentences = df.head(5).clean_text  # put your new sentences here
+    load_and_run_BERT('/home/ubuntu/data/ACL2020/bert_models/base', sentences, BERT_tokenizer='bert-base-uncased')
