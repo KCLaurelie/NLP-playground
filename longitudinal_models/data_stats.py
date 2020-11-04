@@ -22,6 +22,36 @@ def load_data(data_file=r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synt
     return df
 
 
+def cohens_d(df, value='score_combined', group_col='patient_diagnosis_super_class'):
+    groups = df[group_col].value_counts()
+    print('warning, this is a paired ttest, it will use the 2 groups with most data:\n',
+          groups.index[0], groups.index[1])
+    rvs1 = df.loc[df[group_col] == groups.index[0], [value]]
+    rvs2 = df.loc[df[group_col] == groups.index[1], [value]]
+    res = (np.mean(rvs1) - np.mean(rvs2)) / (np.sqrt((np.stdev(rvs1) ** 2 + np.stdev(rvs2) ** 2) / 2))
+    return res
+
+
+def ttest_ind(df, value='score_combined', group_col='patient_diagnosis_super_class', equal_var=False):
+    groups = df[group_col].value_counts()
+    print('warning, this is a paired ttest, it will use the 2 groups with most data:\n',
+          groups.index[0], groups.index[1])
+    rvs1 = df.loc[df[group_col] == groups.index[0], [value]]
+    rvs2 = df.loc[df[group_col] == groups.index[1], [value]]
+    res = stats.ttest_ind(rvs1, rvs2, equal_var=equal_var)
+    return res
+
+
+def mannwhitneyu_ind(df, value='score_combined', group_col='patient_diagnosis_super_class'):
+    groups = df[group_col].value_counts()
+    print('warning, this is a paired, it will use the 2 groups with most data:\n',
+          groups.index[0], groups.index[1])
+    rvs1 = df.loc[df[group_col] == groups.index[0], [value]]
+    rvs2 = df.loc[df[group_col] == groups.index[1], [value]]
+    res = mannwhitneyu(rvs1, rvs2)
+    return res
+
+
 def ttest(df, value='score_combined',
           group_col='patient_diagnosis_super_class',
           groups_to_study=['organic only', 'smi+organic'],
