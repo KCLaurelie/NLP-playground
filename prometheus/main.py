@@ -1,17 +1,12 @@
-########################################################################
-# initializing paths and input data parameters
-########################################################################
-import os
-data_path = '/home/ZKraljevic/data/covid_anxiety/'
-from NLP_utils import *
-from simple_classifiers import *
-from BERT import *
-from NN import *
+from prometheus.simple_classifiers import *
+from prometheus.BERT import *
+from prometheus.NN import *
 
 """# Load data"""
 
-df = pd.read_csv(data_path + annotations_file) if 'csv' in annotations_file else pd.read_excel(data_path + annotations_file)
-# df = load_and_clean_data(filename, text_col, label_col, strip=True, MAX_LEN=20, clean_labels=True, binary=True, pos_col=None, context=15)
+df = pd.read_csv('https://raw.githubusercontent.com/KCLaurelie/NLP-playground/master/prometheus/mimic_status_10folds.csv')
+text_col = 'clean_text'
+label_col = 'annotation'
 df = df[0:100]
 df[text_col] = df[text_col].apply(lambda x: x.strip())
 #df[label_col] = df[label_col].fillna('irrelevant').replace({'irrelevant':0, 'affirmed':1, 'negated':0})
@@ -28,7 +23,7 @@ BERT_tokenizer = 'bert-base-uncased'
 
 n_epochs =1 #5
 res = train_BERT(sentences=df[text_col], labels=df[label_col], BERT_tokenizer=BERT_tokenizer, 
-                 test_size=0.2, n_epochs=n_epochs, output_dir=data_path+'bert_models', MAX_TKN_LEN=511)
+                 test_size=0.2, n_epochs=n_epochs, output_dir=None, MAX_TKN_LEN=511)
 res['stats']
 
 load_and_run_BERT(sentences=['hello my name is link i am in love with princess zelda', 'this is just a test sentence'], trained_bert_model=data_path+'bert_models', BERT_tokenizer='bert-base-uncased')
