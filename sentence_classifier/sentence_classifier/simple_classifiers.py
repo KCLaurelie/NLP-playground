@@ -1,8 +1,8 @@
 import pickle
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn import naive_bayes, svm, tree, ensemble, linear_model, neighbors
-from prometheus.NLP_utils import *
+from sklearn import svm, ensemble, linear_model, neighbors
+from sentence_classifier.sentence_classifier.NLP_utils import *
 
 """# Prepare dataset"""
 
@@ -13,7 +13,7 @@ def prep_classifier_dataset(sentences, labels, emb_model='tfidf', max_features_i
         X_train, X_test, y_train, y_test = train_test_split(sentences, labels, test_size=test_size)
         tfidf_vect = TfidfVectorizer(max_features=max_features_idf, strip_accents='ascii')
         tfidf_vect_fit = tfidf_vect.fit(X_train)
-        tfidf_train = tfidf_vect_fit.transform(X_train)       
+        tfidf_train = tfidf_vect_fit.transform(X_train)
         X_train_vect = pd.DataFrame(tfidf_train.toarray(), columns=tfidf_vect.get_feature_names())
         tfidf_test = tfidf_vect_fit.transform(X_test)
         X_test_vect = pd.DataFrame(tfidf_test.toarray(), columns=tfidf_vect.get_feature_names())
@@ -21,7 +21,7 @@ def prep_classifier_dataset(sentences, labels, emb_model='tfidf', max_features_i
             try:
                 pickle.dump(tfidf_vect, open(output_dir+'_tfidf.pickle', 'wb'))
             except:
-                print('tfidf model not saved, please enter valid path')             
+                print('tfidf model not saved, please enter valid path')
     # classification using word2vec
     else:
         print('classification using word2vec, glove or fasttext')
@@ -41,7 +41,7 @@ def train_classifier(sentences, labels, classifier, emb_model='tfidf', SEED=0, t
     model = classifier.fit(X_train_vect, y_train)
     y_train_pred = model.predict(X_train_vect)
     y_test_pred = model.predict(X_test_vect)
-     # performance metrics   
+     # performance metrics
     tr_perf = perf_metrics(y_train_pred, np.array(y_train), average='weighted')
     tr_perf_classes = perf_metrics_classes(y_train_pred, np.array(y_train))
     eval_perf = perf_metrics(y_test_pred, np.array(y_test), average='weighted')
@@ -67,12 +67,12 @@ def train_classifier(sentences, labels, classifier, emb_model='tfidf', SEED=0, t
 def classifier_KFOLD(sentences, labels, classifier, emb_model='tfidf', max_features_idf=1000,
                      n_splits=10, random_state=42, output_dir=None, **kwargs):
     #labels = convert_to_cat(labels, binary=False)['labels']
-    if 'tfidf' not in str(emb_model).lower(): 
+    if 'tfidf' not in str(emb_model).lower():
         tkn_sentences = tokenize_spacy(sentences)
         emb_sentences = embed_sentences(tkn_sentences, w2v_model=emb_model, **kwargs)
         emb_sentences = pd.DataFrame(emb_sentences)
         print('dimensions of embeddings', emb_sentences.shape)
-            
+
     kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
     # tracking variables
     best_f1, fold_nb = 0, 0
@@ -97,12 +97,12 @@ def classifier_KFOLD(sentences, labels, classifier, emb_model='tfidf', max_featu
             X_train_vect = emb_sentences.iloc[train_ix,:]
             X_test_vect = emb_sentences.iloc[test_ix,:]
         print('size x_train:', X_train_vect.shape, 'size x_test:', X_test_vect.shape)
-        
+
         # run classifier
         model = classifier.fit(X_train_vect, y_train)
         y_train_pred = model.predict(X_train_vect)
         y_test_pred = model.predict(X_test_vect)
-        
+
         # store perf metrics and model
         tr_perf = perf_metrics(y_train_pred, np.array(y_train), average='weighted')
         eval_perf = perf_metrics(y_test_pred, np.array(y_test), average='weighted')
@@ -117,7 +117,7 @@ def classifier_KFOLD(sentences, labels, classifier, emb_model='tfidf', max_featu
         if eval_perf['f1'] >= best_f1:
             best_f1 = eval_perf['f1']
             model_to_save = model
-            
+
     # save model with best f1
     if output_dir is not None:
         try:
@@ -126,14 +126,14 @@ def classifier_KFOLD(sentences, labels, classifier, emb_model='tfidf', max_featu
             stats_classes.to_csv(output_dir+'_stats.csv', header=True)
         except:
             print('model not saved, please enter valid path')
-        
+
     print('best F1 score obtained across splits: {:.3f}'.format(best_f1))
     return {'stats':stats, 'stats_classes':stats_classes, 'model':model_to_save}
 
 """# Function to load saved model and classify new data"""
 
 def load_and_run_classifier(sentences, trained_classifier, emb_model, **kwargs):
-    sentences = pd.Series(sentences)     
+    sentences = pd.Series(sentences)
     if 'tfidf' in str(emb_model).lower():
         print('classification using tfidf')
         if isinstance(emb_model, str):
@@ -144,7 +144,7 @@ def load_and_run_classifier(sentences, trained_classifier, emb_model, **kwargs):
         print('classification using word2vec, glove or fasttext')
         tkn_sentences = tokenize_spacy(sentences)
         emb_sentences = embed_sentences(tkn_sentences, w2v_model=emb_model, **kwargs)
-        emb_sentences = pd.DataFrame(emb_sentences)  
+        emb_sentences = pd.DataFrame(emb_sentences)
     if isinstance(trained_classifier, str):
         print('loading classifier from disk...', trained_classifier)
         trained_classifier = joblib.load(trained_classifier)

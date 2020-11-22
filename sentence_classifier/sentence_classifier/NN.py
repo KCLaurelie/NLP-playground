@@ -4,7 +4,7 @@ import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_sequence
-from prometheus.NLP_utils import *
+from sentence_classifier.sentence_classifier.NLP_utils import *
 
 """# FUNCTIONS TO BUILD NN MODELS"""
 
@@ -60,7 +60,7 @@ class ANN(nn.Module):
         self.embeddings.load_state_dict({'weight': embeddings})
         self.embeddings.weight.requires_grad = False  # disable training for the embeddings
         first_layer_neurons = embedding_size
-        
+
         self.fc1 = nn.Linear(first_layer_neurons, 100)
         self.fc2 = nn.Linear(100, final_layer_neurons)  # 3 categories/classes = 3 final neurons
         if dropout is not None: self.d1 = nn.Dropout(dropout)
@@ -153,7 +153,7 @@ def prep_NN_dataset(emb_model, sentences, labels=None, tokenization_type='clean'
     # pad input sentences and attention mask
     input_ids_padded = pad_sequence([torch.tensor(i) for i in input_ids]).transpose(0,1)
     attention_masks_padded = pad_sequence([torch.tensor(i) for i in attention_masks]).transpose(0,1)
-    print('creating dataset')  
+    print('creating dataset')
     # create dataset
     dataset = TensorDataset(input_ids_padded, torch.tensor(labels), torch.tensor(attention_masks_padded), torch.tensor(lens))
     num_labels = labels.nunique()
@@ -194,7 +194,7 @@ def run_NN(nn_model, train_dataloader, validation_dataloader, output_dir=None, n
             tmp_tr_perf_classes = perf_metrics_classes(to_cpu(train_preds), to_cpu(y_train))
             tr_perf_classes = pd.concat((tr_perf_classes, tmp_tr_perf_classes))
             #print('step:',step, 'perf:', tmp_tr_perf, 'perf tot:', tr_perf)
-        
+
         tr_perf = {k:v/(1+step) for k,v in tr_perf.items()}
         tr_perf_classes=tr_perf_classes.replace(0, np.NaN).groupby(tr_perf_classes.index).agg({'f1-score':'mean','precision':'mean', 'recall':'mean', 'support':'sum'})
         #tr_perf_classes = tr_perf_classes.groupby(tr_perf_classes.index).mean()
@@ -218,7 +218,7 @@ def run_NN(nn_model, train_dataloader, validation_dataloader, output_dir=None, n
                 eval_perf = eval_perf + Counter(tmp_eval_perf)
                 tmp_eval_perf_classes = perf_metrics_classes(to_cpu(test_preds), to_cpu(y_test))
                 eval_perf_classes = pd.concat((eval_perf_classes, tmp_eval_perf_classes))
-                
+
 
             eval_perf = {k:v/(1+step) for k,v in eval_perf.items()}
             eval_perf_classes=eval_perf_classes.replace(0, np.NaN).groupby(eval_perf_classes.index).agg({'f1-score':'mean','precision':'mean', 'recall':'mean', 'support':'sum'})
@@ -246,7 +246,7 @@ def run_NN(nn_model, train_dataloader, validation_dataloader, output_dir=None, n
             stats_classes_to_save.to_csv(output_dir+'_stats.csv', header=True)
         except:
             print('model not saved, please enter valid path')
-        
+
     return {'stats':stats_to_save, 'stats_classes':stats_classes_to_save, 'model':model_to_save}
 
 """# Functions to train/evaluate model"""
@@ -255,7 +255,7 @@ def train_NN(sentences, labels, nn_model, emb_model, tokenization_type='clean', 
     emb_model_torch = embedding2torch(emb_model, SEED=SEED) if type(emb_model) is not dict else emb_model
     res = prep_NN_dataset(emb_model=emb_model_torch, sentences=sentences, labels=labels, tokenization_type=tokenization_type)
     dataset = res['dataset']
-    
+
     print('splitting in train/test sets')
     test_len= int(len(dataset)*test_size)
     train_len = len(dataset) - test_len
@@ -271,7 +271,7 @@ def NN_KFOLD(sentences, labels, nn_model, emb_model, tokenization_type='clean',
     emb_model_torch = embedding2torch(emb_model) if type(emb_model) is not dict else emb_model
     prep_data = prep_NN_dataset(emb_model=emb_model_torch, sentences=sentences, labels=labels, tokenization_type=tokenization_type)
     dataset = prep_data['dataset']
-    
+
     res = run_KFOLD(dataset=dataset, base_model=nn_model, model_trainer=run_NN,
                     n_splits=n_splits, random_state=random_state, n_epochs=n_epochs)
     if output_dir is not None:
@@ -280,7 +280,7 @@ def NN_KFOLD(sentences, labels, nn_model, emb_model, tokenization_type='clean',
             torch.save(res['model'], output_dir)
             res['stats_classes'].to_csv(output_dir+'_stats.csv', header=True)
         except:
-            print('model not saved, please enter valid path')    
+            print('model not saved, please enter valid path')
     return res
 
 """# Function to load saved model and classify new data"""
@@ -288,10 +288,10 @@ def NN_KFOLD(sentences, labels, nn_model, emb_model, tokenization_type='clean',
 # load pre-trained model and classify a new sentence
 def load_and_run_NN(sentences, trained_nn_model, emb_model, tokenization_type='clean'):
     # if user passed input model as file path
-    if isinstance(trained_nn_model, str): 
+    if isinstance(trained_nn_model, str):
         print('loading model from disk...', trained_nn_model)
         trained_nn_model = torch.load(trained_nn_model)
-    
+
     trained_nn_model.eval()
     model_to_cpu(trained_nn_model)
 
@@ -301,7 +301,7 @@ def load_and_run_NN(sentences, trained_nn_model, emb_model, tokenization_type='c
     dataloader = DataLoader(sentences_dataset)
     x, y, mask, l = sentences_dataset.tensors
     preds = trained_nn_model(x, l, mask)
-        
+
     # put results in nice format
     res = pd.DataFrame()
     res['preds'] = np.argmax(preds.detach().numpy(), axis=1).flatten()
@@ -342,14 +342,14 @@ def test():
 
     ####################################################################################
     # 3. Train and evaluate the ANN model
-    #################################################################################### 
-    nn_model=ANN(embeddings=emb_model_torch['embeddings'], final_layer_neurons=df[label_col].nunique(), debug_mode=True) 
+    ####################################################################################
+    nn_model=ANN(embeddings=emb_model_torch['embeddings'], final_layer_neurons=df[label_col].nunique(), debug_mode=True)
     print(nn_model)
     res = train_NN(sentences=df[text_col], labels=df[label_col], nn_model=nn_model, emb_model=emb_model_torch, tokenization_type='clean',
                     SEED=0, test_size=0.2, n_epochs = n_epochs, output_dir=None)
     print(res['stats'])
     ####################################################################################
     # 4. test on new sentences
-    ####################################################################################    
+    ####################################################################################
     load_and_run_NN(sentences=df[text_col][0:10], trained_nn_model=res['model'], emb_model=emb_model_torch)
 

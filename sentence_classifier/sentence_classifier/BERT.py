@@ -3,7 +3,7 @@ from collections import Counter
 from torch.utils.data import TensorDataset
 from torch.nn.utils.rnn import pad_sequence
 from transformers import BertTokenizer, BertForSequenceClassification, AdamW
-from prometheus.NLP_utils import *
+from sentence_classifier.sentence_classifier.NLP_utils import *
 
 """# FUNCTIONS TO PREP DATASET / TRAIN BERT"""
 
@@ -22,7 +22,7 @@ def prep_BERT_dataset(sentences, labels=None, BERT_tokenizer='bert-base-uncased'
     # see https://github.com/huggingface/transformers/issues/2446
     if MAX_TKN_LEN is not None:
         print('cutting the length of tokens to', MAX_TKN_LEN)
-        tokenized_texts = [tokenizer.tokenize(sent)[0:511] for sent in sentences]
+        tokenized_texts = [tokenizer.tokenize(sent)[0:MAX_TKN_LEN] for sent in sentences]
     else:
         tokenized_texts = [tokenizer.tokenize(sent) for sent in sentences]
     input_ids = [tokenizer.convert_tokens_to_ids(txt) for txt in tokenized_texts]
