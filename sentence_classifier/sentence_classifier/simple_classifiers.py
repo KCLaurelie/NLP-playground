@@ -155,33 +155,3 @@ def load_and_run_classifier(sentences, trained_classifier, emb_model, **kwargs):
     res['sentences'] = sentences
     return res
 
-"""# TESTING"""
-
-classifiers = [
-               ensemble.RandomForestClassifier(n_estimators=150, max_depth=None, class_weight='balanced'),
-               svm.LinearSVC(multi_class='crammer_singer', class_weight='balanced'),
-               linear_model.LogisticRegressionCV(class_weight='balanced', solver='liblinear'),
-               neighbors.KNeighborsClassifier(n_neighbors=5, n_jobs=-1, weights='distance')
-               ]
-
-def test():
-    ####################################################################################
-    # 1. Load Dataset
-    ####################################################################################
-    df = pd.read_excel('/home/ZKraljevic/data/covid_anxiety/anxiety_batch_1_riley.xlsx')[0:100]
-    text_col = 'clean_text'
-    label_col = 'status'
-    df[label_col] = convert_to_cat(df[label_col], binary=True)['labels']
-    df.head()
-
-    ####################################################################################
-    # 2. Run model
-    ####################################################################################
-    print('***************************************************\n\n testing model with tfidf')
-    res1 = train_classifier(sentences=df[text_col], labels=df[label_col], emb_model='tfidf', classifier=classifiers[0])
-
-    print('***************************************************\n\n testing model with GloVe')
-    filename = '/home/ZKraljevic/data/F20/embedding_models/wikipedia/clean/glove_wiki.kv'
-    emb_model = KeyedVectors.load(filename)
-    res2 = train_classifier(sentences=df[text_col], labels=df[label_col], emb_model=emb_model, classifier=classifiers[0])
-

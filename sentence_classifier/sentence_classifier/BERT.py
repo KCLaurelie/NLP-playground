@@ -16,7 +16,7 @@ def prep_BERT_dataset(sentences, labels=None, BERT_tokenizer='bert-base-uncased'
     else:
         labels = pd.Series([1] * len(sentences))
     if debug: print(sentences[0])
-    
+
     # Tokenize with BERT tokenizer
     tokenizer = BertTokenizer.from_pretrained(BERT_tokenizer, do_lower_case=True)
     # see https://github.com/huggingface/transformers/issues/2446
@@ -30,18 +30,18 @@ def prep_BERT_dataset(sentences, labels=None, BERT_tokenizer='bert-base-uncased'
         print ("Tokenize the first sentence:")
         print (len(tokenized_texts), len(input_ids), len(input_ids[0]))
         print (tokenized_texts[0], input_ids[0])
-    
+
     # add paddding to input_ids
     input_ids_padded = pad_sequence([torch.tensor(i) for i in input_ids]).transpose(0,1)
     if debug: print(input_ids_padded.size(), len(input_ids_padded))
-    
+
     # Create attention masks
     attention_masks = []
     # Create a mask of 1s for each token followed by 0s for padding
     for seq in input_ids_padded:
         seq_mask = [float(i>0) for i in seq]
         attention_masks.append(seq_mask)
-    
+
     # create dataset
     dataset = TensorDataset(input_ids_padded, torch.tensor(attention_masks), torch.tensor(labels))
     num_labels = labels.nunique()
@@ -74,7 +74,7 @@ def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_
         ## TRAINING
 
         # Set our model to training mode
-        model.train()  
+        model.train()
         # Tracking variables
         tr_loss, tr_perf, tr_perf_classes = 0, Counter({}), pd.DataFrame()
         running_len = 0
@@ -87,7 +87,7 @@ def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_
             optimizer.zero_grad()
             # Forward pass
             loss, logits = model(b_input_ids, token_type_ids=None, attention_mask=b_input_mask, labels=b_labels)
-            train_loss_set.append(loss.item())    
+            train_loss_set.append(loss.item())
             # Backward pass
             loss.backward()
             # Update parameters and take a step using the computed gradient
@@ -100,7 +100,7 @@ def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_
             tr_perf = tr_perf + Counter(tmp_tr_perf)
             tmp_tr_perf_classes = perf_metrics_classes(to_cpu(logits), to_cpu(b_labels))
             tr_perf_classes = pd.concat((tr_perf_classes, tmp_tr_perf_classes))
-        
+
         #print('classes detail \n\n', tr_perf_classes)
         tr_perf = {k:v/running_len for k,v in tr_perf.items()}
         tr_perf_classes[['f1-score', 'precision', 'recall']] = tr_perf_classes[['f1-score', 'precision', 'recall']].multiply(tr_perf_classes['support'], axis="index")
@@ -114,18 +114,18 @@ def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_
 
         # Put model in evaluation mode
         model.eval()
-        # Tracking variables 
+        # Tracking variables
         eval_perf, eval_perf_classes = Counter({}), pd.DataFrame()
         running_len = 0
         # Evaluate data for one epoch
         for step, batch in enumerate(validation_dataloader):
             # Unpack the inputs from our dataloader (and move to GPU if using)
             batch = batch_to_gpu(batch, device)
-            b_input_ids, b_input_mask, b_labels = batch       
+            b_input_ids, b_input_mask, b_labels = batch
             with torch.no_grad(): # Telling the model not to compute or store gradients, saving memory and speeding up validation
                 # Forward pass, calculate logit predictions
-                (loss, logits) = model(b_input_ids, token_type_ids=None, attention_mask=b_input_mask, labels=b_labels)   
-            # Update tracking variables 
+                (loss, logits) = model(b_input_ids, token_type_ids=None, attention_mask=b_input_mask, labels=b_labels)
+            # Update tracking variables
             tmp_eval_perf = perf_metrics(to_cpu(logits), to_cpu(b_labels), average='weighted')
             tmp_eval_perf.update((k,v*len(b_input_ids)) for k,v in tmp_eval_perf.items())
             #print('STEP:', step, 'LEN', len(b_input_ids), tmp_eval_perf)
@@ -133,14 +133,14 @@ def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_
             eval_perf = eval_perf + Counter(tmp_eval_perf)
             tmp_eval_perf_classes = perf_metrics_classes(to_cpu(logits), to_cpu(b_labels))
             eval_perf_classes = pd.concat((eval_perf_classes, tmp_eval_perf_classes))
-        
+
         eval_perf = {k:v/running_len for k,v in eval_perf.items()}  #eval_perf = {k:v/(1+step) for k,v in eval_perf.items()}
         eval_perf_classes[['f1-score', 'precision', 'recall']] = eval_perf_classes[['f1-score', 'precision', 'recall']].multiply(eval_perf_classes['support'], axis="index")
         eval_perf_classes=eval_perf_classes.groupby(eval_perf_classes.index).sum()
         eval_perf_classes[['f1-score','precision', 'recall']] = eval_perf_classes[['f1-score', 'precision', 'recall']].div(eval_perf_classes['support'], axis="index")
         #eval_perf_classes=eval_perf_classes.replace(0, np.NaN).groupby(eval_perf_classes.index).agg({'f1-score':'mean','precision':'mean', 'recall':'mean', 'support':'sum'})
         print('TEST -- F1: {:.3f} Acc: {:.3f} P: {:.3f} R: {:.3f}'.format(eval_perf['f1'], eval_perf['acc'], eval_perf['p'], eval_perf['r']))
-        
+
         # store perf metrics and model
         if eval_perf['f1']>=best_f1:
             best_f1 = eval_perf['f1']
@@ -160,13 +160,13 @@ def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_
             stats_classes_to_save.to_csv(output_dir+'/stats.csv', header=True)
         except:
             print('model not saved, please enter valid path')
-        
+
     return {'stats':stats_to_save, 'stats_classes':stats_classes_to_save, 'model':model_to_save}
 
 """# Functions to train/evaluate model"""
 
 # output_dir='/home/ubuntu/data/ACL2020/bert_models/base')
-def train_BERT(sentences, labels, BERT_tokenizer='bert-base-uncased', test_size=0.1, 
+def train_BERT(sentences, labels, BERT_tokenizer='bert-base-uncased', test_size=0.1,
                n_epochs=5, batch_size=32, output_dir=None, MAX_TKN_LEN=511):
     print('formating dataset')
     prep_data = prep_BERT_dataset(sentences=sentences, labels=labels, BERT_tokenizer=BERT_tokenizer, MAX_TKN_LEN=MAX_TKN_LEN)
@@ -180,7 +180,7 @@ def train_BERT(sentences, labels, BERT_tokenizer='bert-base-uncased', test_size=
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_len, test_len])
     # Create the DataLoaders for our training and validation sets.
     train_dataloader, validation_dataloader = create_dataloader(train_dataset, val_dataset, batch_size = batch_size)
-    # Load BertForSequenceClassification, the pretrained BERT model with a single linear classification layer on top. 
+    # Load BertForSequenceClassification, the pretrained BERT model with a single linear classification layer on top.
     print('loading pre-trained BERT')
     pretrained_model = BertForSequenceClassification.from_pretrained(BERT_tokenizer, num_labels=num_labels)
     # train and evaluate BERT
@@ -202,7 +202,7 @@ def BERT_KFOLD(sentences, labels, BERT_tokenizer='bert-base-uncased',
             res['model'].save_pretrained(output_dir)
             res['stats_classes'].to_csv(output_dir+'/stats.csv', header=True)
         except:
-            print('model not saved, please enter valid path')    
+            print('model not saved, please enter valid path')
     return res
 
 """# Function to load saved model and classify new data"""
@@ -229,54 +229,9 @@ def load_and_run_BERT(sentences, trained_bert_model, BERT_tokenizer='bert-base-u
         preds = preds.append(pd.DataFrame(preds_curr), ignore_index=True)
         probs = np.append(probs, np.max(np.exp(preds_curr)/(1+np.exp(preds_curr)), axis=1))
         preds_class = np.append(preds_class, np.argmax(preds_curr, axis=1).flatten())
-    
+
     # put results in nice format
     preds['sentences'] = sentences
     preds['preds'] = preds_class
     preds['probs'] = probs
     return preds
-
-"""## TESTING"""
-
-def test():
-    ####################################################################################
-    # 0. load pretrained BERT
-    ####################################################################################
-    #BERT_tokenizer = 'bert-base-uncased'
-    #BERT_tokenizer = 'emilyalsentzer/Bio_ClinicalBERT'
-    BERT_tokenizer = 'monologg/biobert_v1.0_pubmed_pmc'
-
-    ####################################################################################
-    # 1. Load Dataset
-    ####################################################################################
-    df = pd.read_csv('gdrive/My Drive/prometheus/datasets/mimic_status_10folds.csv')[0:100]
-    #df = pd.read_csv('/home/ZKraljevic/data/F20/annotations/attention_10fold.csv')
-    #df = pd.read_excel('/home/ZKraljevic/data/covid_anxiety/anxiety_batch_1_riley.xlsx')[0:100]
-    text_col = 'clean_text'
-    label_col = 'annotation'
-    df[label_col] = df[label_col].fillna('irrelevant').replace({'irrelevant':0, 'affirmed':1, 'negated':0})
-    df.head()
-
-    ####################################################################################
-    # 2. To run K-fold
-    ####################################################################################
-    test = BERT_KFOLD(sentences=df[text_col], labels=df[label_col], n_splits=10, BERT_tokenizer=BERT_tokenizer, n_epochs=5, random_state=666)
-    test['model'].save_pretrained('/home/ZKraljevic/data/covid_anxiety/bert_models')
-
-    ####################################################################################
-    # 2b. To run 1 simulation
-    ####################################################################################
-    test = train_BERT(sentences=df[text_col], labels=df[label_col], BERT_tokenizer='bert-base-uncased', test_size=0.1, n_epochs=1)
-    
-    ####################################################################################
-    # 3. To test on new data
-    ####################################################################################
-    sentences = df.head(5)[text_col] # put your new sentences here
-    bert_model_path = 'gdrive/My Drive/Colab Notebooks/prometheus/datasets/bert_models' # '/home/ubuntu/ZKraljevic/covid_anxiety/bert_models/base'
-    load_and_run_BERT(sentences, trained_bert_model=bert_model_path, BERT_tokenizer='bert-base-uncased')
-
-    BERT_tokenizer = 'monologg/biobert_v1.0_pubmed_pmc'
-    df = pd.read_csv('mimic_status_10folds.csv')
-    sentences = df['clean_text'][0:10] # put your new sentences here
-    bert_model_path = 'gdrive/My Drive/prometheus/datasets/bert_models' # '/home/ubuntu/ZKraljevic/covid_anxiety/bert_models/base'
-    res = load_and_run_BERT(sentences, trained_bert_model=bert_model_path, BERT_tokenizer='bert-base-uncased')
