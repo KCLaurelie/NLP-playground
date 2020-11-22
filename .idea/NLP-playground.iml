@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/bmi_bucket_baseline" />
+      <excludeFolder url="file://$MODULE_DIR$/bp_bucket_baseline" />
+      <excludeFolder url="file://$MODULE_DIR$/continent" />
+      <excludeFolder url="file://$MODULE_DIR$/country" />
+      <excludeFolder url="file://$MODULE_DIR$/cvd_problem" />
+      <excludeFolder url="file://$MODULE_DIR$/diabetes_bucket_baseline" />
+      <excludeFolder url="file://$MODULE_DIR$/education_bucket_raw" />
+      <excludeFolder url="file://$MODULE_DIR$/ethnicity_group" />
+      <excludeFolder url="file://$MODULE_DIR$/first_language" />
+      <excludeFolder url="file://$MODULE_DIR$/imd_bucket_baseline" />
+      <excludeFolder url="file://$MODULE_DIR$/marital_status" />
+      <excludeFolder url="file://$MODULE_DIR$/smoking_status_baseline" />
+    </content>
+    <orderEntry type="jdk" jdkName="Python 3.7" jdkType="Python SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="mimic-code" />
+    <orderEntry type="module" module-name="tdy_ehr" />
+  </component>
+  <component name="TestRunnerService">
+    <option name="projectConfiguration" value="pytest" />
+    <option name="PROJECT_TEST_RUNNER" value="pytest" />
+  </component>
+</module>

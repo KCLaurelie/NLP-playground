@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="">
+    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="deleted useless files">
+      <change afterPath="$PROJECT_DIR$/.idea/NLP-playground.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sentence_classifier/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/toy-models.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py" beforeDir="false" afterPath="$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_sagar.py" beforeDir="false" afterPath="$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_sagar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/BERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/BERT.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/NLP_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/NLP_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/NN.py" beforeDir="false" afterPath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/NN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/prometheus/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/simple_classifiers.py" beforeDir="false" afterPath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/simple_classifiers.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,81 +34,8 @@
     <expand />
     <select />
   </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="65" column="8" selection-start-line="65" selection-start-column="8" selection-end-line="65" selection-end-column="8" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/symptoms_classifier/tests.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="17" column="28" lean-forward="true" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
-              <folding>
-                <element signature="e#44#97#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1717">
-              <caret line="17" selection-start-line="17" selection-end-line="17" />
-              <folding>
-                <element signature="e#0#31#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/code_utils/general_utils.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="40" column="37" lean-forward="true" selection-start-line="40" selection-start-column="37" selection-end-line="40" selection-end-column="37" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="10" selection-start-line="10" selection-end-line="10" />
-              <folding>
-                <element signature="e#84#103#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2941">
-              <caret line="182" column="4" selection-start-line="182" selection-start-column="4" selection-end-line="182" selection-end-column="4" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+  <component name="FavoritesManager">
+    <favorites_list name="NLP-playground" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -108,177 +44,54 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>replace</find>
-      <find>clea</find>
-      <find>classifier_</find>
-      <find>classifier_typ</find>
-      <find>lam</find>
-      <find>timestamp</find>
-      <find>age_bucket_report</find>
-      <find>index_to_pivot</find>
-      <find>pyximport</find>
-      <find>where</find>
-      <find>concat</find>
-      <find>half</find>
-      <find>df[['half_year', 'score_time_period', 'score_date']]</find>
-      <find>counter</find>
-      <find>regressors</find>
-      <find>occu</find>
-      <find>occur</find>
-      <find>half_year</find>
-      <find>floor</find>
-      <find>ceil</find>
-      <find>score_date</find>
-      <find>time_per</find>
-      <find>year</find>
-      <find>round_nearest</find>
-      <find>bound</find>
-      <find>brcid</find>
-      <find>timestamp_cols</find>
-      <find>read</find>
-      <find>bucket da</find>
-      <find>stop</find>
-    </findStrings>
-  </component>
   <component name="Git.Settings">
-    <option name="ROOT_SYNC" value="DONT_SYNC" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+    <option name="UPDATE_TYPE" value="MERGE" />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/NLP/playground_pytorch.py" />
-        <option value="$PROJECT_DIR$/NLP/CUSMUMH_spacy_tutorial.py" />
-        <option value="$PROJECT_DIR$/NLP/CUSMUMH-embeddings.py" />
-        <option value="$PROJECT_DIR$/NLP/CUSMUMH-CNN.py" />
-        <option value="$PROJECT_DIR$/NLP/CUSMUMH-lstm.py" />
-        <option value="$PROJECT_DIR$/NLP/CUSMUMH_topic_modelling.py" />
-        <option value="$PROJECT_DIR$/NLP/CUSMUMH_named_entity_recognition.py" />
-        <option value="$PROJECT_DIR$/HVASS/imdb.py" />
-        <option value="$PROJECT_DIR$/NLP/NLP_hvass.py" />
-        <option value="$PROJECT_DIR$/../mimic-code/buildmimic/postgres/postgres_load_data_gz.sql" />
-        <option value="$PROJECT_DIR$/../mimic-code/buildmimic/postgres/postgres_load_data.sql" />
-        <option value="$PROJECT_DIR$/../mimic-code/buildmimic/postgres/postgres_load_data_7zip.sql" />
-        <option value="$PROJECT_DIR$/NLP/symptom_classifier_sagar.py" />
-        <option value="$PROJECT_DIR$/NLP/symptom_classifier.py" />
-        <option value="$PROJECT_DIR$/NLP/sentiment_analysis_scikit.py" />
-        <option value="$PROJECT_DIR$/NLP/ZK_012_neural_networks_intro_COMPLETE.py" />
-        <option value="$PROJECT_DIR$/NLP/ZK_022_sentiment_detection.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/NLP_utils.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/clean_text.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/NLP_spellcheck.py" />
-        <option value="$PROJECT_DIR$/NLP_courses_and_tutorials/ZK_022_sentiment_detection.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/cog_score_trajectories.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/db_utils.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/plot_utils.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/longitudinal_data_prep.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/attention.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/NN_pytorch.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/general_utils.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/NN_pytorch_multiclass.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/spacy_contractions.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/general_utils.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/data_extraction_utils.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/classifiers_utils.py" />
-        <option value="$PROJECT_DIR$/MedCat/medcat_attention.py" />
-        <option value="$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/spacy/Lib/site-packages/medcat/utils/spacy_pipe.py" />
-        <option value="$PROJECT_DIR$/code_utils/global_variables.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/lmer_utils.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/longitudinal_dataset.py" />
-        <option value="$PROJECT_DIR$/longitudinal_models/longitudinal_models.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/tests.py" />
-        <option value="$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py" />
-        <option value="$PROJECT_DIR$/code_utils/general_utils.py" />
-        <option value="$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-1501" />
-    <option name="y" value="244" />
-    <option name="width" value="1292" />
-    <option name="height" value="692" />
-  </component>
+  <component name="JupyterTrust" id="1205829d-399a-4630-966f-ac5823a08d3b" />
+  <component name="ProjectId" id="1QMtzoSLxyWZpdpGiiHDiKsCsyb" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="toy-models" type="b2602c69:ProjectViewProjectNode" />
-              <item name="toy-models" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="toy-models" type="b2602c69:ProjectViewProjectNode" />
-              <item name="toy-models" type="462c0819:PsiDirectoryNode" />
-              <item name="code_utils" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="toy-models" type="b2602c69:ProjectViewProjectNode" />
-              <item name="toy-models" type="462c0819:PsiDirectoryNode" />
-              <item name="courses_tutorials" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="toy-models" type="b2602c69:ProjectViewProjectNode" />
-              <item name="toy-models" type="462c0819:PsiDirectoryNode" />
-              <item name="symptoms_classifier" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-    </panes>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/R/python.exe" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/symptoms_classifier" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="PyConsoleConfigurable.Python Console" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
-      <console-settings module-name="toy-models" is-module-sdk="true">
-        <option name="myUseModuleSdk" value="true" />
-        <option name="myModuleName" value="toy-models" />
+      <console-settings module-name="NLP-playground" sdk-home="C:\Users\K1774755\AppData\Local\Continuum\anaconda3\python.exe">
+        <option name="mySdkHome" value="C:\Users\K1774755\AppData\Local\Continuum\anaconda3\python.exe" />
+        <option name="myModuleName" value="NLP-playground" />
       </console-settings>
     </option>
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\sentence_classifier\sentence_classifier" />
+      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier\files" />
       <recent name="C:\Users\K1774755\PycharmProjects\toy-models\courses_tutorials" />
       <recent name="C:\Users\K1774755\PycharmProjects\toy-models\code_utils" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="longitudinal_models" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="toy-models" />
+      <module name="NLP-playground" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -304,6 +117,23 @@
         <item itemvalue="Python.longitudinal_models" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SshConsoleOptionsProvider">
+    <option name="myEncoding" value="windows-1252" />
+    <option name="myConnectionType" value="DEFAULT_SDK" />
+    <option name="myConnectionId" value="" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -336,356 +166,474 @@
       <workItem from="1564734052725" duration="17745000" />
       <workItem from="1564922627911" duration="4725000" />
       <workItem from="1565079596489" duration="16421000" />
-      <workItem from="1565598249735" duration="1245000" />
+      <workItem from="1565598249735" duration="60049000" />
+      <workItem from="1566203485576" duration="31019000" />
+      <workItem from="1566804997792" duration="24218000" />
+      <workItem from="1567224407550" duration="26203000" />
+      <workItem from="1567591905343" duration="118000" />
+      <workItem from="1567592571024" duration="10721000" />
+      <workItem from="1567679704039" duration="536000" />
+      <workItem from="1567681260141" duration="14108000" />
+      <workItem from="1567852907203" duration="55591000" />
+      <workItem from="1568043041149" duration="27773000" />
+      <workItem from="1568287816545" duration="30942000" />
+      <workItem from="1568881614244" duration="37791000" />
+      <workItem from="1569082240555" duration="718000" />
+      <workItem from="1569083021080" duration="7899000" />
+      <workItem from="1569134218470" duration="17141000" />
+      <workItem from="1569226751887" duration="1897000" />
+      <workItem from="1569651824106" duration="6252000" />
+      <workItem from="1569834206755" duration="9603000" />
+      <workItem from="1570092589246" duration="16966000" />
+      <workItem from="1570364649802" duration="42046000" />
+      <workItem from="1570989519051" duration="4792000" />
+      <workItem from="1571038748489" duration="2551000" />
+      <workItem from="1571043026535" duration="2000000" />
+      <workItem from="1571051736395" duration="1061000" />
+      <workItem from="1571053341248" duration="5446000" />
+      <workItem from="1571060664693" duration="5103000" />
+      <workItem from="1571129555746" duration="741000" />
+      <workItem from="1571133017370" duration="4658000" />
+      <workItem from="1571143109516" duration="3727000" />
+      <workItem from="1571311936900" duration="29738000" />
+      <workItem from="1572594914051" duration="38758000" />
+      <workItem from="1573033387062" duration="26167000" />
+      <workItem from="1573324768984" duration="1637000" />
+      <workItem from="1573372893803" duration="2621000" />
+      <workItem from="1573412867742" duration="14191000" />
+      <workItem from="1574002821834" duration="196000" />
+      <workItem from="1574003087735" duration="83000" />
+      <workItem from="1574003184390" duration="5167000" />
+      <workItem from="1574075954045" duration="1079000" />
+      <workItem from="1574161172742" duration="17676000" />
+      <workItem from="1574609678658" duration="18222000" />
+      <workItem from="1576673036531" duration="24569000" />
+      <workItem from="1577112581506" duration="4428000" />
+      <workItem from="1578298821386" duration="79000" />
+      <workItem from="1578298959261" duration="714000" />
+      <workItem from="1578336108837" duration="770000" />
+      <workItem from="1578338016335" duration="1149000" />
+      <workItem from="1578340036007" duration="41621000" />
+      <workItem from="1579362486161" duration="28511000" />
+      <workItem from="1579610114129" duration="13879000" />
+      <workItem from="1580574774741" duration="742000" />
+      <workItem from="1580813571178" duration="8564000" />
+      <workItem from="1581419754061" duration="4042000" />
+      <workItem from="1581587970094" duration="20156000" />
+      <workItem from="1583077048263" duration="3409000" />
+      <workItem from="1583234705226" duration="1795000" />
+      <workItem from="1583336861254" duration="594000" />
+      <workItem from="1583523058197" duration="7355000" />
+      <workItem from="1583850307729" duration="3113000" />
+      <workItem from="1583859270429" duration="689000" />
+      <workItem from="1583860587922" duration="722000" />
+      <workItem from="1583877167042" duration="1453000" />
+      <workItem from="1583923263847" duration="919000" />
+      <workItem from="1583924287919" duration="567000" />
+      <workItem from="1583925220610" duration="769000" />
+      <workItem from="1583932679001" duration="872000" />
+      <workItem from="1584011344600" duration="711000" />
+      <workItem from="1584013044693" duration="7391000" />
+      <workItem from="1584103831500" duration="832000" />
+      <workItem from="1584113255567" duration="21992000" />
+      <workItem from="1584876025703" duration="8563000" />
+      <workItem from="1585665705834" duration="2420000" />
+      <workItem from="1585747569403" duration="1093000" />
+      <workItem from="1585761019034" duration="2233000" />
+      <workItem from="1585779995475" duration="1001000" />
+      <workItem from="1585828315521" duration="362000" />
+      <workItem from="1586100855835" duration="13000" />
+      <workItem from="1586702862936" duration="14512000" />
+      <workItem from="1586862639728" duration="6118000" />
+      <workItem from="1586886378866" duration="1643000" />
+      <workItem from="1586948221514" duration="292000" />
+      <workItem from="1586948728587" duration="628000" />
+      <workItem from="1586970969970" duration="661000" />
+      <workItem from="1587480071053" duration="625000" />
+      <workItem from="1587482375374" duration="1785000" />
+      <workItem from="1587641883166" duration="10088000" />
+      <workItem from="1587723539510" duration="2154000" />
+      <workItem from="1587894400761" duration="1575000" />
+      <workItem from="1587907605328" duration="3295000" />
+      <workItem from="1587988871395" duration="673000" />
+      <workItem from="1587991854461" duration="2700000" />
+      <workItem from="1588080962240" duration="483000" />
+      <workItem from="1588159038261" duration="6000" />
+      <workItem from="1588246657409" duration="1774000" />
+      <workItem from="1588408565375" duration="2552000" />
+      <workItem from="1588416843485" duration="47000" />
+      <workItem from="1588416956219" duration="60000" />
+      <workItem from="1588771818243" duration="216000" />
+      <workItem from="1588772351553" duration="177000" />
+      <workItem from="1588947501998" duration="889000" />
+      <workItem from="1590067146445" duration="635000" />
+      <workItem from="1590577388406" duration="3405000" />
+      <workItem from="1590666778637" duration="964000" />
+      <workItem from="1591446814942" duration="1517000" />
+      <workItem from="1593507247175" duration="295000" />
+      <workItem from="1593507787885" duration="488000" />
+      <workItem from="1593509155216" duration="3424000" />
+      <workItem from="1594242079985" duration="1010000" />
+      <workItem from="1594929368764" duration="5696000" />
+      <workItem from="1595002756538" duration="3133000" />
+      <workItem from="1596470651319" duration="4543000" />
+      <workItem from="1596706895023" duration="7455000" />
+      <workItem from="1597237315328" duration="10000" />
+      <workItem from="1597662848197" duration="461000" />
+      <workItem from="1602230764196" duration="4942000" />
+      <workItem from="1602858941777" duration="739000" />
+      <workItem from="1603808783403" duration="3796000" />
+      <workItem from="1603819682570" duration="7913000" />
+      <workItem from="1603898632046" duration="15371000" />
+      <workItem from="1604500902670" duration="366000" />
+      <workItem from="1604501404876" duration="597000" />
+      <workItem from="1605954927689" duration="2138000" />
     </task>
-    <task id="LOCAL-00037" summary="minor changes">
-      <created>1561749944433</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
+    <task id="LOCAL-00158" summary="minor fixes/refactoring">
+      <created>1572003550971</created>
+      <option name="number" value="00158" />
+      <option name="presentableId" value="LOCAL-00158" />
       <option name="project" value="LOCAL" />
-      <updated>1561749944434</updated>
+      <updated>1572003550971</updated>
     </task>
-    <task id="LOCAL-00038" summary="minor changes">
-      <created>1561750831321</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
+    <task id="LOCAL-00159" summary="added references tweak">
+      <created>1572013803825</created>
+      <option name="number" value="00159" />
+      <option name="presentableId" value="LOCAL-00159" />
       <option name="project" value="LOCAL" />
-      <updated>1561750831321</updated>
+      <updated>1572013803825</updated>
     </task>
-    <task id="LOCAL-00039" summary="reformatted code">
-      <created>1561809870207</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
+    <task id="LOCAL-00160" summary="added slope*covariates option&#10;general cleanup">
+      <created>1572782216902</created>
+      <option name="number" value="00160" />
+      <option name="presentableId" value="LOCAL-00160" />
       <option name="project" value="LOCAL" />
-      <updated>1561809870207</updated>
+      <updated>1572782216902</updated>
     </task>
-    <task id="LOCAL-00040" summary="minor changes">
-      <created>1561813347512</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
+    <task id="LOCAL-00161" summary="added mask in prep_nn function">
+      <created>1572802777169</created>
+      <option name="number" value="00161" />
+      <option name="presentableId" value="LOCAL-00161" />
       <option name="project" value="LOCAL" />
-      <updated>1561813347512</updated>
+      <updated>1572802777169</updated>
     </task>
-    <task id="LOCAL-00041" summary="minor changes">
-      <created>1562011794904</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
+    <task id="LOCAL-00162" summary="added mask output from nn_prep (unused but needs to be aligned with new version of function)">
+      <created>1572802836269</created>
+      <option name="number" value="00162" />
+      <option name="presentableId" value="LOCAL-00162" />
       <option name="project" value="LOCAL" />
-      <updated>1562011794904</updated>
+      <updated>1572802836269</updated>
     </task>
-    <task id="LOCAL-00042" summary="minor changes">
-      <created>1562191411339</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
+    <task id="LOCAL-00163" summary="added bidirectional lstm and refactored code">
+      <created>1572802989822</created>
+      <option name="number" value="00163" />
+      <option name="presentableId" value="LOCAL-00163" />
       <option name="project" value="LOCAL" />
-      <updated>1562191411339</updated>
+      <updated>1572802989822</updated>
     </task>
-    <task id="LOCAL-00043" summary="reformatted">
-      <created>1562236253544</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
+    <task id="LOCAL-00164" summary="error return if no embedding provided">
+      <created>1572882536680</created>
+      <option name="number" value="00164" />
+      <option name="presentableId" value="LOCAL-00164" />
       <option name="project" value="LOCAL" />
-      <updated>1562236253544</updated>
+      <updated>1572882536680</updated>
     </task>
-    <task id="LOCAL-00044" summary="minor changes">
-      <created>1562321381433</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
+    <task id="LOCAL-00165" summary="set use of weights default to false">
+      <created>1572904720771</created>
+      <option name="number" value="00165" />
+      <option name="presentableId" value="LOCAL-00165" />
       <option name="project" value="LOCAL" />
-      <updated>1562321381433</updated>
+      <updated>1572904720771</updated>
     </task>
-    <task id="LOCAL-00045" summary="refactored to OO">
-      <created>1562350660436</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
+    <task id="LOCAL-00166" summary="fixed bidirectional (return middle output instead of end)">
+      <created>1572904819625</created>
+      <option name="number" value="00166" />
+      <option name="presentableId" value="LOCAL-00166" />
       <option name="project" value="LOCAL" />
-      <updated>1562350660436</updated>
+      <updated>1572904819625</updated>
     </task>
-    <task id="LOCAL-00046" summary="added normalization function">
-      <created>1562437265851</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
+    <task id="LOCAL-00167" summary="fixed to print last epoch">
+      <created>1572904855283</created>
+      <option name="number" value="00167" />
+      <option name="presentableId" value="LOCAL-00167" />
       <option name="project" value="LOCAL" />
-      <updated>1562437265851</updated>
+      <updated>1572904855287</updated>
     </task>
-    <task id="LOCAL-00047" summary="refactored code to use MMSE subclass">
-      <created>1562515915927</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
+    <task id="LOCAL-00168" summary="renamed NN_pytorch to ANN">
+      <created>1573133767903</created>
+      <option name="number" value="00168" />
+      <option name="presentableId" value="LOCAL-00168" />
       <option name="project" value="LOCAL" />
-      <updated>1562515915927</updated>
+      <updated>1573133767903</updated>
     </task>
-    <task id="LOCAL-00048" summary="encapsulated data in dataset object">
-      <created>1562525220934</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
+    <task id="LOCAL-00169" summary="added option to allow already split dataset">
+      <created>1573325020047</created>
+      <option name="number" value="00169" />
+      <option name="presentableId" value="LOCAL-00169" />
       <option name="project" value="LOCAL" />
-      <updated>1562525220934</updated>
+      <updated>1573325020048</updated>
     </task>
-    <task id="LOCAL-00049" summary="corrected prep_data_for_model that was overriding original dataset">
-      <created>1562574334684</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
+    <task id="LOCAL-00170" summary="change spacy en path for azure">
+      <created>1573325071186</created>
+      <option name="number" value="00170" />
+      <option name="presentableId" value="LOCAL-00170" />
       <option name="project" value="LOCAL" />
-      <updated>1562574334685</updated>
+      <updated>1573325071186</updated>
     </task>
-    <task id="LOCAL-00050" summary="corrected prep_data_for_model">
-      <created>1562576210576</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
+    <task id="LOCAL-00171" summary="changed to using best f1 (instead of latest run)">
+      <created>1573486739302</created>
+      <option name="number" value="00171" />
+      <option name="presentableId" value="LOCAL-00171" />
       <option name="project" value="LOCAL" />
-      <updated>1562576210576</updated>
+      <updated>1573486739302</updated>
     </task>
-    <task id="LOCAL-00051" summary="added timestamp and refactored code">
-      <created>1562596014006</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
+    <task id="LOCAL-00172" summary="final model picked by best f1 score instead of last epoch">
+      <created>1573487850812</created>
+      <option name="number" value="00172" />
+      <option name="presentableId" value="LOCAL-00172" />
       <option name="project" value="LOCAL" />
-      <updated>1562596014006</updated>
+      <updated>1573487850812</updated>
     </task>
-    <task id="LOCAL-00052" summary="fixed bugs with bucketing (was ignoring last bucket)">
-      <created>1562599102095</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
+    <task id="LOCAL-00173" summary="aligned input params to rnn/cnn">
+      <created>1573488569243</created>
+      <option name="number" value="00173" />
+      <option name="presentableId" value="LOCAL-00173" />
       <option name="project" value="LOCAL" />
-      <updated>1562599102095</updated>
+      <updated>1573488569243</updated>
     </task>
-    <task id="LOCAL-00053" summary="minor changes">
-      <created>1563298408417</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
+    <task id="LOCAL-00174" summary="minor changes">
+      <created>1574938906645</created>
+      <option name="number" value="00174" />
+      <option name="presentableId" value="LOCAL-00174" />
       <option name="project" value="LOCAL" />
-      <updated>1563298408418</updated>
+      <updated>1574938906645</updated>
     </task>
-    <task id="LOCAL-00054" summary="refactoring">
-      <created>1563300931904</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
+    <task id="LOCAL-00175" summary="updated lmer formula building">
+      <created>1576740223209</created>
+      <option name="number" value="00175" />
+      <option name="presentableId" value="LOCAL-00175" />
       <option name="project" value="LOCAL" />
-      <updated>1563300931904</updated>
+      <updated>1576740223209</updated>
     </task>
-    <task id="LOCAL-00055" summary="added">
-      <created>1563642624927</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
+    <task id="LOCAL-00176" summary="fixed bug to format model output for slopes">
+      <created>1577181887262</created>
+      <option name="number" value="00176" />
+      <option name="presentableId" value="LOCAL-00176" />
       <option name="project" value="LOCAL" />
-      <updated>1563642624927</updated>
+      <updated>1577181887262</updated>
     </task>
-    <task id="LOCAL-00056" summary="added punctuation removal as option">
-      <created>1563642685587</created>
-      <option name="number" value="00056" />
-      <option name="presentableId" value="LOCAL-00056" />
+    <task id="LOCAL-00177" summary="added bidirectional lstm without simulated attention">
+      <created>1578348564172</created>
+      <option name="number" value="00177" />
+      <option name="presentableId" value="LOCAL-00177" />
       <option name="project" value="LOCAL" />
-      <updated>1563642685587</updated>
+      <updated>1578348564172</updated>
     </task>
-    <task id="LOCAL-00057" summary="minor changes / reformatting">
-      <created>1563642853601</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
+    <task id="LOCAL-00178" summary="added">
+      <created>1579348574698</created>
+      <option name="number" value="00178" />
+      <option name="presentableId" value="LOCAL-00178" />
       <option name="project" value="LOCAL" />
-      <updated>1563642853601</updated>
+      <updated>1579348574698</updated>
     </task>
-    <task id="LOCAL-00058" summary="reformatting / removed .cpu()">
-      <created>1563644269320</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
+    <task id="LOCAL-00179" summary="improved my_pivot to deal with single columns grouping">
+      <created>1579348650004</created>
+      <option name="number" value="00179" />
+      <option name="presentableId" value="LOCAL-00179" />
       <option name="project" value="LOCAL" />
-      <updated>1563644269320</updated>
+      <updated>1579348650004</updated>
     </task>
-    <task id="LOCAL-00059" summary="added path for spacy env">
-      <created>1563710135238</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
+    <task id="LOCAL-00180" summary="general cleaning / added load_data function">
+      <created>1579619359976</created>
+      <option name="number" value="00180" />
+      <option name="presentableId" value="LOCAL-00180" />
       <option name="project" value="LOCAL" />
-      <updated>1563710135239</updated>
+      <updated>1579619359977</updated>
     </task>
-    <task id="LOCAL-00060" summary="minor changes">
-      <created>1563715692998</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
+    <task id="LOCAL-00181" summary="fixed final merging (was picking up brcid instead of key)">
+      <created>1579619416124</created>
+      <option name="number" value="00181" />
+      <option name="presentableId" value="LOCAL-00181" />
       <option name="project" value="LOCAL" />
-      <updated>1563715692998</updated>
+      <updated>1579619416124</updated>
     </task>
-    <task id="LOCAL-00061" summary="minor changes">
-      <created>1563728643740</created>
-      <option name="number" value="00061" />
-      <option name="presentableId" value="LOCAL-00061" />
+    <task id="LOCAL-00182" summary="cleanup / changed covariates">
+      <created>1579619449722</created>
+      <option name="number" value="00182" />
+      <option name="presentableId" value="LOCAL-00182" />
       <option name="project" value="LOCAL" />
-      <updated>1563728643740</updated>
+      <updated>1579619449722</updated>
     </task>
-    <task id="LOCAL-00062" summary="modified Texts class structure&#10;added classifier and metrics functions">
-      <created>1563824094649</created>
-      <option name="number" value="00062" />
-      <option name="presentableId" value="LOCAL-00062" />
+    <task id="LOCAL-00183" summary="cleanup">
+      <created>1579619488935</created>
+      <option name="number" value="00183" />
+      <option name="presentableId" value="LOCAL-00183" />
       <option name="project" value="LOCAL" />
-      <updated>1563824094650</updated>
+      <updated>1579619488935</updated>
     </task>
-    <task id="LOCAL-00063" summary="update generate_sample function">
-      <created>1563882082897</created>
-      <option name="number" value="00063" />
-      <option name="presentableId" value="LOCAL-00063" />
+    <task id="LOCAL-00184" summary="added totals and excluded unknowns for ttest and chisq">
+      <created>1579785363076</created>
+      <option name="number" value="00184" />
+      <option name="presentableId" value="LOCAL-00184" />
       <option name="project" value="LOCAL" />
-      <updated>1563882082898</updated>
+      <updated>1579785363076</updated>
     </task>
-    <task id="LOCAL-00064" summary="moved classifier functions to classifiers_utils&#10;refactored several functions&#10;added classifiers&#10;added classification results to self.dataset">
-      <created>1563911713474</created>
-      <option name="number" value="00064" />
-      <option name="presentableId" value="LOCAL-00064" />
+    <task id="LOCAL-00185" summary="minor fixes">
+      <created>1580228863173</created>
+      <option name="number" value="00185" />
+      <option name="presentableId" value="LOCAL-00185" />
       <option name="project" value="LOCAL" />
-      <updated>1563911713474</updated>
+      <updated>1580228863173</updated>
     </task>
-    <task id="LOCAL-00065" summary="removed variable to store self.embedded_text">
-      <created>1563912017023</created>
-      <option name="number" value="00065" />
-      <option name="presentableId" value="LOCAL-00065" />
+    <task id="LOCAL-00186" summary="added dropout">
+      <created>1582632723373</created>
+      <option name="number" value="00186" />
+      <option name="presentableId" value="LOCAL-00186" />
       <option name="project" value="LOCAL" />
-      <updated>1563912017023</updated>
+      <updated>1582632723374</updated>
     </task>
-    <task id="LOCAL-00066" summary="reorganized folder with code_utils&#10;&#10;moved path variables to file global_variables">
-      <created>1563994991316</created>
-      <option name="number" value="00066" />
-      <option name="presentableId" value="LOCAL-00066" />
+    <task id="LOCAL-00187" summary="replaced tokenizer function with scispacy/huggingface">
+      <created>1582632781249</created>
+      <option name="number" value="00187" />
+      <option name="presentableId" value="LOCAL-00187" />
       <option name="project" value="LOCAL" />
-      <updated>1563994991317</updated>
+      <updated>1582632781249</updated>
     </task>
-    <task id="LOCAL-00067" summary="fixed references to global variables to work both on SLaM and normal machine">
-      <created>1564051857140</created>
-      <option name="number" value="00067" />
-      <option name="presentableId" value="LOCAL-00067" />
+    <task id="LOCAL-00188" summary="fixed super_read_csv function">
+      <created>1582656623852</created>
+      <option name="number" value="00188" />
+      <option name="presentableId" value="LOCAL-00188" />
       <option name="project" value="LOCAL" />
-      <updated>1564051857141</updated>
+      <updated>1582656623852</updated>
     </task>
-    <task id="LOCAL-00068" summary="fixed report to have only 1 patient class and take out patients with exclusion criteria&#10;(also some refactoring, moved all data preparation functions inside class)">
-      <created>1564154706162</created>
-      <option name="number" value="00068" />
-      <option name="presentableId" value="LOCAL-00068" />
+    <task id="LOCAL-00189" summary="added function to generate k-fold indices">
+      <created>1583537551017</created>
+      <option name="number" value="00189" />
+      <option name="presentableId" value="LOCAL-00189" />
       <option name="project" value="LOCAL" />
-      <updated>1564154706162</updated>
+      <updated>1583537551017</updated>
     </task>
-    <task id="LOCAL-00069" summary="fixed counter and date period">
-      <created>1564213253929</created>
-      <option name="number" value="00069" />
-      <option name="presentableId" value="LOCAL-00069" />
+    <task id="LOCAL-00190" summary="formatting">
+      <created>1583537584354</created>
+      <option name="number" value="00190" />
+      <option name="presentableId" value="LOCAL-00190" />
       <option name="project" value="LOCAL" />
-      <updated>1564213253929</updated>
+      <updated>1583537584354</updated>
     </task>
-    <task id="LOCAL-00070" summary="fixed reporting issues, added measures tab">
-      <created>1564230430601</created>
-      <option name="number" value="00070" />
-      <option name="presentableId" value="LOCAL-00070" />
+    <task id="LOCAL-00191" summary="removed restriction on num epochs for best score">
+      <created>1583537625236</created>
+      <option name="number" value="00191" />
+      <option name="presentableId" value="LOCAL-00191" />
       <option name="project" value="LOCAL" />
-      <updated>1564230430601</updated>
+      <updated>1583537625236</updated>
     </task>
-    <task id="LOCAL-00071" summary="changed to_list to deal with None input">
-      <created>1564230470492</created>
-      <option name="number" value="00071" />
-      <option name="presentableId" value="LOCAL-00071" />
+    <task id="LOCAL-00192" summary="added bucket_data function">
+      <created>1585665938119</created>
+      <option name="number" value="00192" />
+      <option name="presentableId" value="LOCAL-00192" />
       <option name="project" value="LOCAL" />
-      <updated>1564230470492</updated>
+      <updated>1585665938119</updated>
     </task>
-    <task id="LOCAL-00072" summary="cleaned dates/buckets columns">
-      <created>1564249167300</created>
-      <option name="number" value="00072" />
-      <option name="presentableId" value="LOCAL-00072" />
+    <task id="LOCAL-00193" summary="fixed bug for CI display">
+      <created>1585675388349</created>
+      <option name="number" value="00193" />
+      <option name="presentableId" value="LOCAL-00193" />
       <option name="project" value="LOCAL" />
-      <updated>1564249167300</updated>
+      <updated>1585675388349</updated>
     </task>
-    <task id="LOCAL-00073" summary="added dates and rounding functions">
-      <created>1564249224913</created>
-      <option name="number" value="00073" />
-      <option name="presentableId" value="LOCAL-00073" />
+    <task id="LOCAL-00194" summary="minor changes">
+      <created>1585675415231</created>
+      <option name="number" value="00194" />
+      <option name="presentableId" value="LOCAL-00194" />
       <option name="project" value="LOCAL" />
-      <updated>1564249224913</updated>
+      <updated>1585675415232</updated>
     </task>
-    <task id="LOCAL-00074" summary="added function to create dataset with missing data">
-      <created>1564568458732</created>
-      <option name="number" value="00074" />
-      <option name="presentableId" value="LOCAL-00074" />
+    <task id="LOCAL-00195" summary="changed how different rnn models are dealt with (and restricted bidirectional to lstm)">
+      <created>1585747686631</created>
+      <option name="number" value="00195" />
+      <option name="presentableId" value="LOCAL-00195" />
       <option name="project" value="LOCAL" />
-      <updated>1564568458733</updated>
+      <updated>1585747686631</updated>
     </task>
-    <task id="LOCAL-00075" summary="added path for CRIS use">
-      <created>1564663323954</created>
-      <option name="number" value="00075" />
-      <option name="presentableId" value="LOCAL-00075" />
+    <task id="LOCAL-00196" summary="added simulated attention for gru/rnn">
+      <created>1585784268310</created>
+      <option name="number" value="00196" />
+      <option name="presentableId" value="LOCAL-00196" />
       <option name="project" value="LOCAL" />
-      <updated>1564663323954</updated>
+      <updated>1585784268310</updated>
     </task>
-    <task id="LOCAL-00076" summary="added 'Not Known' in unknown category">
-      <created>1564663375842</created>
-      <option name="number" value="00076" />
-      <option name="presentableId" value="LOCAL-00076" />
+    <task id="LOCAL-00197" summary="added input columns as input">
+      <created>1586864532378</created>
+      <option name="number" value="00197" />
+      <option name="presentableId" value="LOCAL-00197" />
       <option name="project" value="LOCAL" />
-      <updated>1564663375842</updated>
+      <updated>1586864532378</updated>
     </task>
-    <task id="LOCAL-00077" summary="loaded changes from CRIS PC (reformatted code to generate report automatically)">
-      <created>1564663433220</created>
-      <option name="number" value="00077" />
-      <option name="presentableId" value="LOCAL-00077" />
+    <task id="LOCAL-00198" summary="reordered confidence intervals">
+      <created>1586864565761</created>
+      <option name="number" value="00198" />
+      <option name="presentableId" value="LOCAL-00198" />
       <option name="project" value="LOCAL" />
-      <updated>1564663433221</updated>
+      <updated>1586864565761</updated>
     </task>
-    <task id="LOCAL-00078" summary="reformatted code with lmer_utils">
-      <created>1564693371655</created>
-      <option name="number" value="00078" />
-      <option name="presentableId" value="LOCAL-00078" />
+    <task id="LOCAL-00199" summary="minor fixes on ttest and chisq functions">
+      <created>1586864604617</created>
+      <option name="number" value="00199" />
+      <option name="presentableId" value="LOCAL-00199" />
       <option name="project" value="LOCAL" />
-      <updated>1564693371655</updated>
+      <updated>1586864604617</updated>
     </task>
-    <task id="LOCAL-00079" summary="minor fixes">
-      <created>1564695466092</created>
-      <option name="number" value="00079" />
-      <option name="presentableId" value="LOCAL-00079" />
+    <task id="LOCAL-00200" summary="added stats computations to main function">
+      <created>1586864659457</created>
+      <option name="number" value="00200" />
+      <option name="presentableId" value="LOCAL-00200" />
       <option name="project" value="LOCAL" />
-      <updated>1564695466092</updated>
+      <updated>1586864659457</updated>
     </task>
-    <task id="LOCAL-00080" summary="fixed default regressor to use">
-      <created>1564758621083</created>
-      <option name="number" value="00080" />
-      <option name="presentableId" value="LOCAL-00080" />
+    <task id="LOCAL-00201" summary="added">
+      <created>1586865163331</created>
+      <option name="number" value="00201" />
+      <option name="presentableId" value="LOCAL-00201" />
       <option name="project" value="LOCAL" />
-      <updated>1564758621083</updated>
+      <updated>1586865163331</updated>
     </task>
-    <task id="LOCAL-00081" summary="moved courses to separate folder">
-      <created>1564758810183</created>
-      <option name="number" value="00081" />
-      <option name="presentableId" value="LOCAL-00081" />
+    <task id="LOCAL-00202" summary="minor improvements">
+      <created>1586948062419</created>
+      <option name="number" value="00202" />
+      <option name="presentableId" value="LOCAL-00202" />
       <option name="project" value="LOCAL" />
-      <updated>1564758810183</updated>
+      <updated>1586948062419</updated>
     </task>
-    <task id="LOCAL-00082" summary="moved courses to separate folder">
-      <created>1564773048425</created>
-      <option name="number" value="00082" />
-      <option name="presentableId" value="LOCAL-00082" />
+    <task id="LOCAL-00203" summary="added function to compute p_value significance">
+      <created>1586948114191</created>
+      <option name="number" value="00203" />
+      <option name="presentableId" value="LOCAL-00203" />
       <option name="project" value="LOCAL" />
-      <updated>1564773048425</updated>
+      <updated>1586948114191</updated>
     </task>
-    <task id="LOCAL-00083" summary="1st attempt at weighted avg function">
-      <created>1564856463399</created>
-      <option name="number" value="00083" />
-      <option name="presentableId" value="LOCAL-00083" />
+    <task id="LOCAL-00204" summary="added functions to save/load model">
+      <created>1586948489305</created>
+      <option name="number" value="00204" />
+      <option name="presentableId" value="LOCAL-00204" />
       <option name="project" value="LOCAL" />
-      <updated>1564856463399</updated>
+      <updated>1586948489305</updated>
     </task>
-    <task id="LOCAL-00084" summary="corrected wa function and moved to utils">
-      <created>1565100446566</created>
-      <option name="number" value="00084" />
-      <option name="presentableId" value="LOCAL-00084" />
+    <task id="LOCAL-00205" summary="added cohens_d function">
+      <created>1604500946280</created>
+      <option name="number" value="00205" />
+      <option name="presentableId" value="LOCAL-00205" />
       <option name="project" value="LOCAL" />
-      <updated>1565100446566</updated>
+      <updated>1604500946280</updated>
     </task>
-    <task id="LOCAL-00085" summary="minor fixes/reformatting">
-      <created>1565102743948</created>
-      <option name="number" value="00085" />
-      <option name="presentableId" value="LOCAL-00085" />
+    <task id="LOCAL-00206" summary="more tests for resubmission">
+      <created>1604501064729</created>
+      <option name="number" value="00206" />
+      <option name="presentableId" value="LOCAL-00206" />
       <option name="project" value="LOCAL" />
-      <updated>1565102743948</updated>
+      <updated>1604501064729</updated>
     </task>
-    <option name="localTasksCounter" value="86" />
+    <option name="localTasksCounter" value="207" />
     <servers />
-  </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="245557000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -696,473 +644,96 @@
       <is-autoscroll-to-source value="true" />
     </todo-panel>
   </component>
-  <component name="ToolWindowManager">
-    <frame x="-1928" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
-    <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49822694" visible="true" weight="0.102345414" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3261105" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" weight="0.32978722" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.5248227" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50146973" side_tool="true" weight="0.22617681" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="10" sideWeight="0.50177306" visible="true" weight="0.18634886" />
-      <window_info anchor="bottom" id="Docker" order="11" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" order="12" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="0" width="273" height="492" id="Documentation" order="3" sideWeight="0.21038616" side_tool="true" visible="true" weight="0.1684435" />
-      <window_info anchor="right" id="Database" order="4" weight="0.32928804" />
-      <window_info anchor="right" id="SciView" order="5" sideWeight="0.78961384" visible="true" weight="0.1684435" />
-    </layout>
-  </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="added path for spacy env" />
-    <MESSAGE value="minor changes" />
-    <MESSAGE value="modified Texts class structure&#10;added classifier and metrics functions" />
-    <MESSAGE value="update generate_sample function" />
-    <MESSAGE value="moved classifier functions to classifiers_utils&#10;refactored several functions&#10;added classifiers&#10;added classification results to self.dataset" />
-    <MESSAGE value="removed variable to store self.embedded_text" />
-    <MESSAGE value="reorganized folder with code_utils&#10;&#10;moved path variables to file global_variables" />
-    <MESSAGE value="fixed references to global variables to work both on SLaM and normal machine" />
-    <MESSAGE value="fixed report to have only 1 patient class and take out patients with exclusion criteria&#10;(also some refactoring, moved all data preparation functions inside class)" />
-    <MESSAGE value="fixed counter and date period" />
-    <MESSAGE value="fixed reporting issues, added measures tab" />
-    <MESSAGE value="changed to_list to deal with None input" />
-    <MESSAGE value="cleaned dates/buckets columns" />
-    <MESSAGE value="added dates and rounding functions" />
-    <MESSAGE value="added function to create dataset with missing data" />
-    <MESSAGE value="added path for CRIS use" />
-    <MESSAGE value="added 'Not Known' in unknown category" />
-    <MESSAGE value="loaded changes from CRIS PC (reformatted code to generate report automatically)" />
-    <MESSAGE value="reformatted code with lmer_utils" />
-    <MESSAGE value="minor fixes" />
-    <MESSAGE value="fixed default regressor to use" />
-    <MESSAGE value="moved courses to separate folder" />
-    <MESSAGE value="1st attempt at weighted avg function" />
-    <MESSAGE value="corrected wa function and moved to utils" />
-    <MESSAGE value="minor fixes/reformatting" />
-    <option name="LAST_COMMIT_MESSAGE" value="minor fixes/reformatting" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../mimic-code/buildmimic/postgres/postgres_create_tables.sql" />
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/NLP_Utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/CUSMUMH_topic_modelling.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="92">
-          <caret line="55" column="18" selection-start-line="55" selection-start-column="18" selection-end-line="55" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/CUSMUMH_nltk_tutorial.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-27">
-          <caret line="97" column="13" lean-forward="true" selection-start-line="97" selection-start-column="13" selection-end-line="97" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/CUSMUMH-embeddings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="265">
-          <caret line="35" column="59" selection-start-line="35" selection-start-column="59" selection-end-line="35" selection-end-column="59" />
-          <folding>
-            <element signature="e#0#34#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/CUSMUMH_named_entity_recognition.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="92">
-          <caret line="27" column="51" selection-start-line="27" selection-start-column="47" selection-end-line="27" selection-end-column="51" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/CUSMUMH_spacy_tutorial.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="21" selection-start-line="7" selection-start-column="21" selection-end-line="7" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/brcphd-master/Big+Data+-+BRC+PhD+Teaching_withOutput.ipynb">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/brcphd-master/Big+Data+-+BRC+PhD+Teaching_no+output.ipynb">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/sklearn/model_selection/_validation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10710">
-          <caret line="652" column="4" selection-start-line="652" selection-start-column="4" selection-end-line="652" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/sklearn/feature_extraction/text.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="25126">
-          <caret line="1500" column="8" selection-start-line="1500" selection-start-column="8" selection-end-line="1500" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/CUSMUMH-CNN.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1785">
-          <caret line="121" column="36" selection-start-line="121" selection-start-column="36" selection-end-line="121" selection-end-column="36" />
-          <folding>
-            <element signature="e#441#481#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/ZK_012_neural_networks_intro_COMPLETE.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="239" column="12" selection-start-line="239" selection-start-column="12" selection-end-line="239" selection-end-column="12" />
-          <folding>
-            <element signature="e#249#267#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/torch/nn/modules/module.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="281">
-          <caret line="76" column="8" selection-start-line="76" selection-start-column="8" selection-end-line="76" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/ZK_022_sentiment_detection.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1054">
-          <caret line="77" column="27" selection-start-line="77" selection-start-column="27" selection-end-line="77" selection-end-column="27" />
-          <folding>
-            <element signature="e#211#230#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/rpy2-2.9.4-py3.7-win-amd64.egg/rpy2/robjects/pandas2ri.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="66" selection-start-line="66" selection-end-line="66" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/code_utils/db_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="21" column="56" selection-start-line="21" selection-start-column="56" selection-end-line="21" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/spacy/Lib/pickle.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1067">
-          <caret line="1616" column="17" selection-start-line="1616" selection-start-column="17" selection-end-line="1616" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/spacy/Lib/site-packages/medcat/cdb.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="261">
-          <caret line="394" column="42" lean-forward="true" selection-start-line="393" selection-start-column="8" selection-end-line="394" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_bundle/pydev_import_hook.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NN_pytorch.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/spacy_contractions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="12" selection-start-line="6" selection-start-column="12" selection-end-line="6" selection-end-column="12" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/pandas/core/internals/managers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="116">
-          <caret line="1690" selection-start-line="1690" selection-end-line="1690" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/code_utils/data_extraction_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="62" column="18" selection-start-line="62" selection-start-column="18" selection-end-line="62" selection-end-column="18" />
-          <folding>
-            <element signature="e#86#95#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/rpy2-2.9.4-py3.7-win-amd64.egg/rpy2/rinterface/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="29" selection-start-line="29" selection-end-line="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/ctypes/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-959">
-          <caret line="355" selection-start-line="355" selection-end-line="355" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/spacy/Lib/site-packages/spacy/util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="138" selection-start-line="138" selection-end-line="138" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/spacy/Lib/site-packages/medcat/prepare_cdb.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="32" selection-start-line="32" selection-end-line="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/spacy/Lib/site-packages/medcat/cat.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="47">
-          <caret line="34" selection-start-line="34" selection-end-line="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/spacy/Lib/site-packages/medcat/utils/spacy_pipe.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="26">
-          <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
-          <folding>
-            <element signature="e#0#57#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MedCat/medcat_attention.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="731">
-          <caret line="43" selection-start-line="43" selection-end-line="43" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/envs/R/Lib/site-packages/pandas/core/reshape/pivot.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="24" column="76" lean-forward="true" selection-start-line="24" selection-start-column="76" selection-end-line="24" selection-end-column="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/code_utils/plot_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="24" column="34" selection-start-line="24" selection-start-column="34" selection-end-line="24" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#36#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/longitudinal_models/lmer_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="8" column="24" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/longitudinal_models/longitudinal_models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="29" column="40" selection-start-line="29" selection-start-column="40" selection-end-line="29" selection-end-column="40" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/code_utils/global_variables.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="36" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/longitudinal_models/longitudinal_dataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="41" lean-forward="true" selection-start-line="2" selection-end-line="2" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NN_pytorch_multiclass.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-116">
-          <caret line="21" selection-start-line="21" selection-end-line="21" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_spellcheck.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/classifiers_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-967">
-          <caret line="2" column="11" selection-start-line="2" selection-start-column="11" selection-end-line="2" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/tensorflow/python/keras/layers/embeddings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="91" column="6" selection-start-line="91" selection-start-column="6" selection-end-line="91" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/NLP_hvass.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="77" column="15" lean-forward="true" selection-start-line="77" selection-start-column="15" selection-end-line="77" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_sagar.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="135" column="10" selection-start-line="135" selection-end-line="135" selection-end-column="10" />
-          <folding>
-            <element signature="e#54#65#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Continuum/anaconda3/Lib/site-packages/sklearn/naive_bayes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="129">
-          <caret line="565" column="8" selection-start-line="565" selection-start-column="8" selection-end-line="565" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_text_cleaning.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2941">
-          <caret line="182" column="4" selection-start-line="182" selection-start-column="4" selection-end-line="182" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/code_utils/general_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="40" column="37" lean-forward="true" selection-start-line="40" selection-start-column="37" selection-end-line="40" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/tests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="17" column="28" lean-forward="true" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
-          <folding>
-            <element signature="e#44#97#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1717">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/symptoms_classifier/symptoms_classifier.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="65" column="8" selection-start-line="65" selection-start-column="8" selection-end-line="65" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_scikit.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" selection-start-line="10" selection-end-line="10" />
-          <folding>
-            <element signature="e#84#103#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="cleanup / changed covariates" />
+    <MESSAGE value="cleanup" />
+    <MESSAGE value="added totals and excluded unknowns for ttest and chisq" />
+    <MESSAGE value="minor fixes" />
+    <MESSAGE value="added dropout" />
+    <MESSAGE value="replaced tokenizer function with scispacy/huggingface" />
+    <MESSAGE value="fixed super_read_csv function" />
+    <MESSAGE value="added function to generate k-fold indices" />
+    <MESSAGE value="formatting" />
+    <MESSAGE value="removed restriction on num epochs for best score" />
+    <MESSAGE value="added bucket_data function" />
+    <MESSAGE value="fixed bug for CI display" />
+    <MESSAGE value="minor changes" />
+    <MESSAGE value="changed how different rnn models are dealt with (and restricted bidirectional to lstm)" />
+    <MESSAGE value="added simulated attention for gru/rnn" />
+    <MESSAGE value="added input columns as input" />
+    <MESSAGE value="reordered confidence intervals" />
+    <MESSAGE value="minor fixes on ttest and chisq functions" />
+    <MESSAGE value="added stats computations to main function" />
+    <MESSAGE value="added" />
+    <MESSAGE value="minor improvements" />
+    <MESSAGE value="added function to compute p_value significance" />
+    <MESSAGE value="added functions to save/load model" />
+    <MESSAGE value="added cohens_d function" />
+    <MESSAGE value="more tests for resubmission" />
+    <option name="LAST_COMMIT_MESSAGE" value="more tests for resubmission" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="234" y="0" key="#Notifications" timestamp="1606065540981">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="234" y="0" key="#Notifications/0.0.1280.680@0.0.1280.680" timestamp="1606065540981" />
+    <state x="210" y="0" key="CommitChangelistDialog2" timestamp="1606065501156">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="265" y="0" key="CommitChangelistDialog2/0.0.1280.680/-1920.494.1920.1040@0.0.1280.680" timestamp="1604501063421" />
+    <state x="210" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1606065501156" />
+    <state x="234" y="79" key="Vcs.Push.Dialog.v2" timestamp="1606065508688">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="234" y="79" key="Vcs.Push.Dialog.v2/0.0.1280.680/-1920.494.1920.1040@0.0.1280.680" timestamp="1604501067063" />
+    <state x="234" y="79" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1606065508688" />
+    <state x="448" y="263" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605955093381">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="448" y="263" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1280.680@0.0.1280.680" timestamp="1605955093381" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/symptoms_classifier/NLP_embedding.py</url>
+          <line>159</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/NLP_playground$longitudinal_models.coverage" NAME="longitudinal_models Coverage Results" MODIFIED="1567945239052" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/longitudinal_models" />
   </component>
 </project>

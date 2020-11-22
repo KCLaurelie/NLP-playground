@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/toy-models.iml" filepath="$PROJECT_DIR$/.idea/toy-models.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/NLP-playground.iml" filepath="$PROJECT_DIR$/.idea/NLP-playground.iml" />
     </modules>
   </component>
 </project>

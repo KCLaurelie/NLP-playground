@@ -1,6 +1,6 @@
-from prometheus.simple_classifiers import *
-from prometheus.BERT import *
-from prometheus.NN import *
+from sentence_classifier.sentence_classifier.simple_classifiers import *
+from sentence_classifier.sentence_classifier.BERT import *
+from sentence_classifier.sentence_classifier.NN import *
 
 """# Load data"""
 
