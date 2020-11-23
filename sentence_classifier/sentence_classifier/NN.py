@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 from collections import Counter
-import torch.optim as optim
+
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
 from torch.nn.utils.rnn import pad_sequence
+
 from sentence_classifier.sentence_classifier.NLP_utils import *
 
 """# FUNCTIONS TO BUILD NN MODELS"""
 
+
 class RNN(nn.Module):
-    def __init__(self, embeddings, padding_idx=0, hidden_size=300, num_layers=2, dropout=0.5, bid=True, simulate_attn=False, rnn_type='default', debug_mode=False):
+    def __init__(self, embeddings, padding_idx=0, hidden_size=300, num_layers=2, dropout=0.5, bid=True,
+                 simulate_attn=False, rnn_type='default', debug_mode=False):
         super(RNN, self).__init__()
         self.debug_mode = debug_mode
         self.dropout = dropout
@@ -23,12 +27,14 @@ class RNN(nn.Module):
 
         # Create the RNN cell
         if 'gru' in rnn_type.lower():
-            self.rnn = nn.GRU(input_size=embedding_size, hidden_size=hidden_size, num_layers=num_layers, dropout=dropout)
+            self.rnn = nn.GRU(input_size=embedding_size, hidden_size=hidden_size, num_layers=num_layers,
+                              dropout=dropout)
         elif 'lstm' in rnn_type.lower():
             self.rnn = nn.LSTM(input_size=embedding_size, num_layers=num_layers, dropout=dropout, bidirectional=bid,
-                            hidden_size=hidden_size // (2 if bid else 1))
+                               hidden_size=hidden_size // (2 if bid else 1))
         else:
-            self.rnn = nn.RNN(input_size=embedding_size, hidden_size=hidden_size, num_layers=num_layers, dropout=dropout)
+            self.rnn = nn.RNN(input_size=embedding_size, hidden_size=hidden_size, num_layers=num_layers,
+                              dropout=dropout)
         self.fc1 = nn.Linear(hidden_size, 2)
         if dropout is not None: self.d1 = nn.Dropout(dropout)
 
@@ -47,6 +53,7 @@ class RNN(nn.Module):
         if self.dropout is not None: x = self.d1(x)
         x = self.fc1(x)
         return x
+
 
 class ANN(nn.Module):
     def __init__(self, embeddings, padding_idx=0, final_layer_neurons=1, dropout=0.5, debug_mode=False):
@@ -70,12 +77,13 @@ class ANN(nn.Module):
         x = self.embeddings(x)
         if self.debug_mode: print('after embedding - x: ', x.shape)
         # this does not work to check
-        x = torch.mean(x, dim=1) # to sum over all columns
+        x = torch.mean(x, dim=1)  # to sum over all columns
         if self.debug_mode: print('x after average', x.size())
         x = torch.relu(self.fc1(x))  # torch.sigmoid(self.fc1(x))
         if self.dropout is not None: x = self.d1(x)
         x = torch.sigmoid(self.fc2(x))
         return x
+
 
 class CNN(nn.Module):
     def __init__(self, embeddings, dropout=0.5, debug_mode=False):
@@ -118,7 +126,9 @@ class CNN(nn.Module):
         logits = self.fc1(x_all)  # run through fc1
         return logits
 
+
 """# FUNCTIONS TO PREP DATASET / TRAIN THE MODEL"""
+
 
 def prep_NN_dataset(emb_model, sentences, labels=None, tokenization_type='clean'):
     # The dataset is prepared in the following way
@@ -144,29 +154,32 @@ def prep_NN_dataset(emb_model, sentences, labels=None, tokenization_type='clean'
     print('converting sentences to tokens and creating attention mask')
     for snt in sentences:
         ind_snt = [word2id[tkn] if tkn in word2id else word2id['<UNK>'] for tkn in snt]
-        mask_snt = [1]*len(snt)
+        mask_snt = [1] * len(snt)
         len_snt = len(snt)
         input_ids.append(ind_snt)
         attention_masks.append(mask_snt)
         lens.append(len_snt)
     print('padding')
     # pad input sentences and attention mask
-    input_ids_padded = pad_sequence([torch.tensor(i) for i in input_ids]).transpose(0,1)
-    attention_masks_padded = pad_sequence([torch.tensor(i) for i in attention_masks]).transpose(0,1)
+    input_ids_padded = pad_sequence([torch.tensor(i) for i in input_ids]).transpose(0, 1)
+    attention_masks_padded = pad_sequence([torch.tensor(i) for i in attention_masks]).transpose(0, 1)
     print('creating dataset')
     # create dataset
-    dataset = TensorDataset(input_ids_padded, torch.tensor(labels), torch.tensor(attention_masks_padded), torch.tensor(lens))
+    dataset = TensorDataset(input_ids_padded, torch.tensor(labels), torch.tensor(attention_masks_padded),
+                            torch.tensor(lens))
     num_labels = labels.nunique()
     return {'embeddings': embeddings, 'word2id': word2id, 'dataset': dataset, 'num_labels': num_labels}
 
-def run_NN(nn_model, train_dataloader, validation_dataloader, output_dir=None, n_epochs = 50):
+
+def run_NN(nn_model, train_dataloader, validation_dataloader, output_dir=None, n_epochs=50):
     device = get_device()
     try:
         nn_model.cuda()
     except:
         device = None
         print('using CPU, this will be slow!')
-    parameters = filter(lambda p: p.requires_grad, nn_model.parameters())  # We don't want parameters that don't require a grad in the optimizer
+    parameters = filter(lambda p: p.requires_grad,
+                        nn_model.parameters())  # We don't want parameters that don't require a grad in the optimizer
     optimizer = optim.Adam(parameters, lr=2e-5)
     criterion = nn.CrossEntropyLoss()
     best_f1, best_epoch = [0, 0]
@@ -183,7 +196,7 @@ def run_NN(nn_model, train_dataloader, validation_dataloader, output_dir=None, n
             batch = batch_to_gpu(batch, device)
             x_train, y_train, mask_train, l_train = batch
             train_preds = nn_model(x_train, l_train, mask_train)
-            #train_preds_flat = torch.max(train_preds, 1)[1]
+            # train_preds_flat = torch.max(train_preds, 1)[1]
             loss = criterion(train_preds, y_train)
             loss.backward()
             optimizer.step()
@@ -193,15 +206,18 @@ def run_NN(nn_model, train_dataloader, validation_dataloader, output_dir=None, n
             tr_perf = tr_perf + Counter(tmp_tr_perf)
             tmp_tr_perf_classes = perf_metrics_classes(to_cpu(train_preds), to_cpu(y_train))
             tr_perf_classes = pd.concat((tr_perf_classes, tmp_tr_perf_classes))
-            #print('step:',step, 'perf:', tmp_tr_perf, 'perf tot:', tr_perf)
+            # print('step:',step, 'perf:', tmp_tr_perf, 'perf tot:', tr_perf)
 
-        tr_perf = {k:v/(1+step) for k,v in tr_perf.items()}
-        tr_perf_classes=tr_perf_classes.replace(0, np.NaN).groupby(tr_perf_classes.index).agg({'f1-score':'mean','precision':'mean', 'recall':'mean', 'support':'sum'})
-        #tr_perf_classes = tr_perf_classes.groupby(tr_perf_classes.index).mean()
-        #tr_perf_classes['support'] = np.round((1+step) * tr_perf_classes['support'])
-        print("TRAIN - Loss: {:.3f} - F1: {:.3f} Acc: {:.3f} P: {:.3f} R: {:.3f}".format(tr_loss/(1+step), tr_perf['f1'], tr_perf['acc'], tr_perf['p'], tr_perf['r']))
+        tr_perf = {k: v / (1 + step) for k, v in tr_perf.items()}
+        tr_perf_classes = tr_perf_classes.replace(0, np.NaN).groupby(tr_perf_classes.index).agg(
+            {'f1-score': 'mean', 'precision': 'mean', 'recall': 'mean', 'support': 'sum'})
+        # tr_perf_classes = tr_perf_classes.groupby(tr_perf_classes.index).mean()
+        # tr_perf_classes['support'] = np.round((1+step) * tr_perf_classes['support'])
+        print("TRAIN - Loss: {:.3f} - F1: {:.3f} Acc: {:.3f} P: {:.3f} R: {:.3f}".format(tr_loss / (1 + step),
+                                                                                         tr_perf['f1'], tr_perf['acc'],
+                                                                                         tr_perf['p'], tr_perf['r']))
 
-        if (epoch % 5 == 0) or (epoch >= n_epochs-1):
+        if (epoch % 5 == 0) or (epoch >= n_epochs - 1):
             ###################################################################################
             ## TESTING
             nn_model.eval()
@@ -212,22 +228,23 @@ def run_NN(nn_model, train_dataloader, validation_dataloader, output_dir=None, n
                 batch = batch_to_gpu(batch, device)
                 x_test, y_test, mask_test, l_test = batch
                 test_preds = nn_model(x_test, l_test, mask_test)
-                #test_preds_flat = torch.max(test_preds, 1)[1]
+                # test_preds_flat = torch.max(test_preds, 1)[1]
                 # Update tracking variables
                 tmp_eval_perf = perf_metrics(to_cpu(test_preds), to_cpu(y_test), average='weighted')
                 eval_perf = eval_perf + Counter(tmp_eval_perf)
                 tmp_eval_perf_classes = perf_metrics_classes(to_cpu(test_preds), to_cpu(y_test))
                 eval_perf_classes = pd.concat((eval_perf_classes, tmp_eval_perf_classes))
 
-
-            eval_perf = {k:v/(1+step) for k,v in eval_perf.items()}
-            eval_perf_classes=eval_perf_classes.replace(0, np.NaN).groupby(eval_perf_classes.index).agg({'f1-score':'mean','precision':'mean', 'recall':'mean', 'support':'sum'})
-            #eval_perf_classes = eval_perf_classes.groupby(eval_perf_classes.index).mean()
-            #eval_perf_classes['support'] = np.round((1+step) * eval_perf_classes['support'])
-            print("TEST -- F1: {:.3f} Acc: {:.3f} P: {:.3f} R: {:.3f}".format(eval_perf['f1'], eval_perf['acc'], eval_perf['p'], eval_perf['r']))
+            eval_perf = {k: v / (1 + step) for k, v in eval_perf.items()}
+            eval_perf_classes = eval_perf_classes.replace(0, np.NaN).groupby(eval_perf_classes.index).agg(
+                {'f1-score': 'mean', 'precision': 'mean', 'recall': 'mean', 'support': 'sum'})
+            # eval_perf_classes = eval_perf_classes.groupby(eval_perf_classes.index).mean()
+            # eval_perf_classes['support'] = np.round((1+step) * eval_perf_classes['support'])
+            print("TEST -- F1: {:.3f} Acc: {:.3f} P: {:.3f} R: {:.3f}".format(eval_perf['f1'], eval_perf['acc'],
+                                                                              eval_perf['p'], eval_perf['r']))
 
             # store perf metrics and model
-            if eval_perf['f1']>=best_f1:
+            if eval_perf['f1'] >= best_f1:
                 best_f1 = eval_perf['f1']
                 best_epoch = epoch + 1
                 stats_to_save = eval_perf
@@ -243,21 +260,25 @@ def run_NN(nn_model, train_dataloader, validation_dataloader, output_dir=None, n
         try:
             print('saving model in:', output_dir)
             torch.save(model_to_save, output_dir)
-            stats_classes_to_save.to_csv(output_dir+'_stats.csv', header=True)
+            stats_classes_to_save.to_csv(output_dir + '_stats.csv', header=True)
         except:
             print('model not saved, please enter valid path')
 
-    return {'stats':stats_to_save, 'stats_classes':stats_classes_to_save, 'model':model_to_save}
+    return {'stats': stats_to_save, 'stats_classes': stats_classes_to_save, 'model': model_to_save}
+
 
 """# Functions to train/evaluate model"""
 
-def train_NN(sentences, labels, nn_model, emb_model, tokenization_type='clean', SEED=0, test_size=0.2, n_epochs = 20, output_dir=None):
+
+def train_NN(sentences, labels, nn_model, emb_model, tokenization_type='clean', SEED=0, test_size=0.2, n_epochs=20,
+             output_dir=None):
     emb_model_torch = embedding2torch(emb_model, SEED=SEED) if type(emb_model) is not dict else emb_model
-    res = prep_NN_dataset(emb_model=emb_model_torch, sentences=sentences, labels=labels, tokenization_type=tokenization_type)
+    res = prep_NN_dataset(emb_model=emb_model_torch, sentences=sentences, labels=labels,
+                          tokenization_type=tokenization_type)
     dataset = res['dataset']
 
     print('splitting in train/test sets')
-    test_len= int(len(dataset)*test_size)
+    test_len = int(len(dataset) * test_size)
     train_len = len(dataset) - test_len
     print('test set:', test_len, 'train set:', train_len)
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_len, test_len])
@@ -266,10 +287,12 @@ def train_NN(sentences, labels, nn_model, emb_model, tokenization_type='clean', 
 
     return res
 
+
 def NN_KFOLD(sentences, labels, nn_model, emb_model, tokenization_type='clean',
              n_splits=10, random_state=42, n_epochs=5, output_dir=None):
     emb_model_torch = embedding2torch(emb_model) if type(emb_model) is not dict else emb_model
-    prep_data = prep_NN_dataset(emb_model=emb_model_torch, sentences=sentences, labels=labels, tokenization_type=tokenization_type)
+    prep_data = prep_NN_dataset(emb_model=emb_model_torch, sentences=sentences, labels=labels,
+                                tokenization_type=tokenization_type)
     dataset = prep_data['dataset']
 
     res = run_KFOLD(dataset=dataset, base_model=nn_model, model_trainer=run_NN,
@@ -278,12 +301,14 @@ def NN_KFOLD(sentences, labels, nn_model, emb_model, tokenization_type='clean',
         try:
             print('saving model in:', output_dir)
             torch.save(res['model'], output_dir)
-            res['stats_classes'].to_csv(output_dir+'_stats.csv', header=True)
+            res['stats_classes'].to_csv(output_dir + '_stats.csv', header=True)
         except:
             print('model not saved, please enter valid path')
     return res
 
+
 """# Function to load saved model and classify new data"""
+
 
 # load pre-trained model and classify a new sentence
 def load_and_run_NN(sentences, trained_nn_model, emb_model, tokenization_type='clean'):

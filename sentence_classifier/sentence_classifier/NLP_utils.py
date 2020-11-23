@@ -1,8 +1,9 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+from nltk.stem.porter import *
 # for tokenization
 from tokenizers import ByteLevelBPETokenizer
-from nltk.stem.porter import *
+
 stemmer = PorterStemmer()
 # for modelling
 from gensim.models import KeyedVectors
@@ -11,9 +12,11 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler, Sequentia
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report
 from sklearn.model_selection import StratifiedKFold
 import spacy
+
 nlp = spacy.load('en')
 
 """# Functions to tokenize text"""
+
 
 def center_text(sentences, pos, context=15):
     sentences = pd.Series(sentences)
@@ -22,11 +25,13 @@ def center_text(sentences, pos, context=15):
     for i, snt in enumerate(sentences):
         snt1 = snt[0:pos[i]].split()
         snt2 = snt[pos[i]:].split()
-        snt_new = snt1[-context:]+snt2[0:(1+context)]
+        snt_new = snt1[-context:] + snt2[0:(1 + context)]
         res.append(snt_new)
     return res
 
-def load_and_clean_data(filename, text_col, label_col, strip=False, MAX_LEN=None, clean_labels=False, binary=False, pos_col=None, context=15):
+
+def load_and_clean_data(filename, text_col, label_col, strip=False, MAX_LEN=None, clean_labels=False, binary=False,
+                        pos_col=None, context=15):
     df = pd.read_csv(filename) if 'csv' in filename else pd.read_excel(filename)
     if strip:
         df[text_col] = df[text_col].apply(lambda x: x.strip())
@@ -36,8 +41,9 @@ def load_and_clean_data(filename, text_col, label_col, strip=False, MAX_LEN=None
         df[text_col] = df[text_col].apply(lambda x: x.split()[0:MAX_LEN])
     if clean_labels:
         df[label_col] = convert_to_cat(df[label_col], binary=binary)['labels']
-    
+
     return df
+
 
 def tokenize_spacy(df, text_col=None, tokenization_type='clean', outfile=None):
     tok_snts = []
@@ -53,28 +59,31 @@ def tokenize_spacy(df, text_col=None, tokenization_type='clean', outfile=None):
             _tkns = [str(x.lemma_).lower() for x in tkns if not x.is_space and not x.is_punct]
         elif 'stem' in tokenization_type:
             _tkns = [stemmer.stem(str(x.text).lower()) for x in tkns if not x.is_space and not x.is_punct]
-        else: # clean by default
+        else:  # clean by default
             _tkns = [str(x.text).lower() for x in tkns if not x.is_space and not x.is_punct]
-        
-        if outfile is not None: # flush to file if option selected
+
+        if outfile is not None:  # flush to file if option selected
             f.write("{}\n".format("\t".join(_tkns)))
-        else: # otherwise save in variable
+        else:  # otherwise save in variable
             tok_snts.append(_tkns)
 
     return tok_snts
 
+
 def tokenize_hf(df, text_col='text', outfile=None):
-    tokenizer = ByteLevelBPETokenizer(merges_file="/home/ubuntu/data/mimic/bbpe_tokenizer/mimic-merges.txt", vocab_file="/home/ubuntu/data/mimic/bbpe_tokenizer/mimic-vocab.json")    
+    tokenizer = ByteLevelBPETokenizer(merges_file="/home/ubuntu/data/mimic/bbpe_tokenizer/mimic-merges.txt",
+                                      vocab_file="/home/ubuntu/data/mimic/bbpe_tokenizer/mimic-vocab.json")
     tok_snts = []
     if outfile is not None: f = open(outfile, 'w', encoding='utf8')
     data = df if text_col is None else df[text_col]
     for snt in data:
         tokenized_snt = tokenizer.encode(snt)
-        if outfile is not None: 
+        if outfile is not None:
             f.write("{}\n".format("\t".join(_tkns)))
         else:
             tok_snts.append(tokenized_snt.tokens)
     return tok_snts
+
 
 def tokenize_df(df, tokenization_type, text_col='text', outfile=None):
     if 'bpe' in tokenization_type:
@@ -83,44 +92,48 @@ def tokenize_df(df, tokenization_type, text_col='text', outfile=None):
         res = tokenize_spacy(df, text_col=text_col, tokenization_type=tokenization_type, outfile=outfile)
     return res
 
+
 """# Functions to format dataset for models"""
+
 
 # Create the DataLoaders for our training and validation sets.
 # For fine-tuning BERT on a specific task, the authors recommend a batch size of 16 or 32.
-def create_dataloader(train_dataset, val_dataset, batch_size = 32):
-    # We'll take training samples in random order. 
+def create_dataloader(train_dataset, val_dataset, batch_size=32):
+    # We'll take training samples in random order.
     train_dataloader = DataLoader(
-                train_dataset,  # The training samples.
-                sampler = RandomSampler(train_dataset), # Select batches randomly
-                batch_size = batch_size # Trains with this batch size.
-            )
+        train_dataset,  # The training samples.
+        sampler=RandomSampler(train_dataset),  # Select batches randomly
+        batch_size=batch_size  # Trains with this batch size.
+    )
     # For validation the order doesn't matter, so we'll just read them sequentially.
     validation_dataloader = DataLoader(
-                val_dataset, # The validation samples.
-                sampler = SequentialSampler(val_dataset), # Pull out batches sequentially.
-                batch_size = batch_size # Evaluate with this batch size.
-            )
-    
+        val_dataset,  # The validation samples.
+        sampler=SequentialSampler(val_dataset),  # Pull out batches sequentially.
+        batch_size=batch_size  # Evaluate with this batch size.
+    )
+
     return [train_dataloader, validation_dataloader]
+
 
 def convert_to_cat(labels, binary=False):
     if not isinstance(labels, pd.Series):
         labels = pd.Series(labels)
     if binary:
         main_val = labels.mode()[0]
-        other_val = [x for x in labels.unique() if x!= main_val]
-        labels = np.where(labels!=main_val,1,0)
+        other_val = [x for x in labels.unique() if x != main_val]
+        labels = np.where(labels != main_val, 1, 0)
         corresp = pd.DataFrame([main_val, 'other'], columns=['old_label'])
     elif np.issubdtype(labels.dtype, np.number) and (labels.min() >= 0):
         print('labels already in a good format')
-        return {'labels':labels, 'categories':pd.DataFrame(labels.unique())}
+        return {'labels': labels, 'categories': pd.DataFrame(labels.unique())}
     else:
         cats = labels.astype('category').cat
-        labels = cats.codes.astype('long') # convert annotations to integers
+        labels = cats.codes.astype('long')  # convert annotations to integers
         corresp = pd.DataFrame(cats.categories, columns=['old_label'])
     corresp.index.rename('new_label', inplace=True)
     print('labels have been transformed for the model:\n\n', corresp)
-    return {'labels':labels, 'categories':corresp}
+    return {'labels': labels, 'categories': corresp}
+
 
 def to_list(x):
     """
@@ -138,6 +151,7 @@ def to_list(x):
         res = list(x)
     return res
 
+
 def extract_sentences(docs, keywords, num_chars=200, num_words=None):
     res = []
     keywords = [keywords] if isinstance(keywords, str) else list(keywords)
@@ -145,19 +159,21 @@ def extract_sentences(docs, keywords, num_chars=200, num_words=None):
         doc = doc.lower()
         kw_idx = [doc.find(kw) for kw in keywords]
         kw_idx = [value for value in kw_idx if value != -1]
-        if len(kw_idx)>0:
+        if len(kw_idx) > 0:
             for i in kw_idx:
                 if num_words is not None:
                     snt1 = doc[0:i].split()
                     snt2 = doc[i:].split()
-                    snt = snt1[-num_words:]+snt2[0:(1+num_words)]
+                    snt = snt1[-num_words:] + snt2[0:(1 + num_words)]
                     snt = ' '.join(snt)
                 else:
-                    snt = doc[np.maximum(0, i-num_chars):np.maximum(0, 10+i+num_chars)]
+                    snt = doc[np.maximum(0, i - num_chars):np.maximum(0, 10 + i + num_chars)]
                 res.append(snt)
     return pd.Series(res)
 
+
 """# Embedding utils"""
+
 
 def embedding2torch(w2v_model, SEED=0):
     if isinstance(w2v_model, str):
@@ -168,8 +184,8 @@ def embedding2torch(w2v_model, SEED=0):
     # Embeddings is a list, meaning we know that embeddings[1] is a vector for the word with ID=1, but we don't know what word this is.
     # That is why we need the id2word and word2id mappings.
     embeddings = []  # A list of embeddings for each word (represented by their idin the word2vec vocab
-    id2word = {} # gives coresspondence id <-> word
-    word2id = {} # gives coresspondence word <-> id
+    id2word = {}  # gives coresspondence id <-> word
+    word2id = {}  # gives coresspondence word <-> id
     len_vec = w2v_model.wv.vectors.shape[1]
     # First add <PAD> and <UNK>. we want PAD first so it corresponds to ID=0 and works out with pad_sequence function
     # For the word '<PAD>', embedding is set to all zeros
@@ -193,8 +209,9 @@ def embedding2torch(w2v_model, SEED=0):
         embeddings.append(w2v_model[word])  # Add the embedding for 'word', embeddings are available in the 'model'
 
     # Convert the embeddings list into a tensor of type float32
-    #embeddings = torch.tensor(embeddings, dtype=torch.float32)
+    # embeddings = torch.tensor(embeddings, dtype=torch.float32)
     return {'embeddings': torch.tensor(embeddings, dtype=torch.float32), 'id2word': id2word, 'word2id': word2id}
+
 
 def get_wa(sentence, keywords, context=10, fixed_weights=False, debug=False):
     """
@@ -223,6 +240,7 @@ def get_wa(sentence, keywords, context=10, fixed_weights=False, debug=False):
     if debug: print(sentence, weights)
     return weights
 
+
 def embed_sentences(tkn_sentences, w2v_model, do_avg=True, use_weights=False, **kwargs):
     """
     convert sentences to embedded sentences using pre-trained Word2Vec model
@@ -234,7 +252,7 @@ def embed_sentences(tkn_sentences, w2v_model, do_avg=True, use_weights=False, **
     """
 
     # initialize array to store embedded sentences
-    if isinstance(w2v_model, str): # load model from disk if needed 
+    if isinstance(w2v_model, str):  # load model from disk if needed
         print('loading embedding model from disk')
         w2v_model = KeyedVectors.load(w2v_model)
     emb_size = w2v_model.wv.vector_size
@@ -256,23 +274,25 @@ def embed_sentences(tkn_sentences, w2v_model, do_avg=True, use_weights=False, **
                     sentences_emb[i_snt] += word_emb
                     cnt += 1
                 else:
-                    sentences_emb[i_snt, (i_word*emb_size):((i_word+1)*emb_size)] = word_emb
+                    sentences_emb[i_snt, (i_word * emb_size):((i_word + 1) * emb_size)] = word_emb
             else:
                 not_in_model.append(word)
         if cnt > 0 and not use_weights:
             sentences_emb[i_snt] = sentences_emb[i_snt] / cnt
 
     excluded_words = list(dict.fromkeys(not_in_model))
-    print(len(excluded_words), 'words not in model')  #, excluded_words)
+    print(len(excluded_words), 'words not in model')  # , excluded_words)
     return sentences_emb
 
+
 """# Functions to evaluate models"""
+
 
 # Function to calculate performance of our predictions vs labels
 def perf_metrics(preds, labels, average='weighted', debug=False):
     try:
         pred_flat = np.argmax(preds, axis=1).flatten()
-        #pred_flat = torch.max(pred_vec, 1)[1]
+        # pred_flat = torch.max(pred_vec, 1)[1]
     except:
         print('only 1 dimension in labels prediction, no need for argmax')
         pred_flat = preds.flatten()
@@ -282,8 +302,9 @@ def perf_metrics(preds, labels, average='weighted', debug=False):
     p = precision_score(labels_flat, pred_flat, average=average)
     r = recall_score(labels_flat, pred_flat, average=average)
     if debug:
-        print("PERF -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}".format(acc,f1,p,r))
-    return {'f1':f1, 'acc':acc, 'p':p, 'r':r}
+        print("PERF -- Acc: {:.3f} F1: {:.3f} Precision: {:.3f} Recall: {:.3f}".format(acc, f1, p, r))
+    return {'f1': f1, 'acc': acc, 'p': p, 'r': r}
+
 
 def perf_metrics_classes(preds, labels):
     try:
@@ -294,14 +315,14 @@ def perf_metrics_classes(preds, labels):
     labels_flat = labels.flatten()
     report = classification_report(labels_flat, pred_flat, output_dict=True)
     df = pd.DataFrame(report).sort_index().transpose()
-    #df['accuracy'] = accuracy_score(labels, preds)
+    # df['accuracy'] = accuracy_score(labels, preds)
 
     return df
 
+
 # TO RUN K-FOLD VALIDATION
 def run_KFOLD(dataset, base_model, model_trainer, base_model_loader=None,
-             n_splits=10, random_state=42, n_epochs=5, **kwargs):
-      
+              n_splits=10, random_state=42, n_epochs=5, **kwargs):
     kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
     labels = pd.Series([1] * len(dataset))
     # tracking variables
@@ -309,7 +330,7 @@ def run_KFOLD(dataset, base_model, model_trainer, base_model_loader=None,
     stats, stats_classes = pd.DataFrame(), pd.DataFrame()
     # run k fold
     for train_ix, test_ix in kfold.split(labels, labels):
-        fold_nb +=1
+        fold_nb += 1
         # need to load each time otherwise remembers training from previous fold
         if base_model_loader is not None:
             base_model_tmp = base_model_loader(base_model, **kwargs)
@@ -318,13 +339,13 @@ def run_KFOLD(dataset, base_model, model_trainer, base_model_loader=None,
         print('####################### RUNNING FOLD:', fold_nb)
         train_dataset = torch.utils.data.Subset(dataset, train_ix)
         val_dataset = torch.utils.data.Subset(dataset, test_ix)
-        print(type(train_dataset), ' train set:', len(train_dataset), ' test set:',len(val_dataset))
+        print(type(train_dataset), ' train set:', len(train_dataset), ' test set:', len(val_dataset))
         train_dataloader, validation_dataloader = create_dataloader(train_dataset, val_dataset)
         print('training and evaluating model')
         res = model_trainer(base_model_tmp, train_dataloader, validation_dataloader, n_epochs=n_epochs, output_dir=None)
         del base_model_tmp
         # store perf metrics and model
-        stats_tmp = pd.DataFrame.from_dict(res['stats'],orient='index', columns=['value'])
+        stats_tmp = pd.DataFrame.from_dict(res['stats'], orient='index', columns=['value'])
         stats_tmp['fold'] = fold_nb
         stats = pd.concat([stats, stats_tmp])
         res['stats_classes']['fold'] = fold_nb
@@ -332,12 +353,13 @@ def run_KFOLD(dataset, base_model, model_trainer, base_model_loader=None,
         if res['stats']['f1'] >= best_f1:
             best_f1 = res['stats']['f1']
             res_to_save = res
-            
-        
+
     print('best F1 score obtained across splits: {:.3f}'.format(best_f1))
-    return {'stats':stats, 'stats_classes':stats_classes, 'model':res_to_save['model']}
+    return {'stats': stats, 'stats_classes': stats_classes, 'model': res_to_save['model']}
+
 
 """# Functions to handle devices"""
+
 
 def to_cpu(vec, detach=True):
     try:
@@ -346,32 +368,36 @@ def to_cpu(vec, detach=True):
         vec = vec.detach().numpy() if detach else vec.numpy()
     return vec
 
+
 def model_to_cpu(model):
     try:
         model.to("cpu")
     except:
         pass
 
+
 def batch_to_gpu(batch, device=None):
     if device is None:
         return batch
-    try: # we're using a GPU
+    try:  # we're using a GPU
         batch = tuple(t.to(device) for t in batch)
     except:
         batch = tuple(t for t in batch)
     return batch
+
 
 def get_device():
     # specify GPU device
     try:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if device != 'cpu':
-            print('number GPUs used:',torch.cuda.device_count())
+            print('number GPUs used:', torch.cuda.device_count())
             print('device name:', torch.cuda.get_device_name(0))
     except:
         device = None
         print('no CUDA capable device detected')
     return device
+
 
 # specify GPU device
 device = get_device()
