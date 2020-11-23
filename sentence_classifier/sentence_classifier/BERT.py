@@ -1,11 +1,14 @@
-from tqdm import trange
 from collections import Counter
-from torch.utils.data import TensorDataset
+
 from torch.nn.utils.rnn import pad_sequence
+from torch.utils.data import TensorDataset
+from tqdm import trange
 from transformers import BertTokenizer, BertForSequenceClassification, AdamW
+
 from sentence_classifier.sentence_classifier.NLP_utils import *
 
 """# FUNCTIONS TO PREP DATASET / TRAIN BERT"""
+
 
 def prep_BERT_dataset(sentences, labels=None, BERT_tokenizer='bert-base-uncased', MAX_TKN_LEN=511, debug=False):
     sentences = pd.Series(sentences)
@@ -27,25 +30,26 @@ def prep_BERT_dataset(sentences, labels=None, BERT_tokenizer='bert-base-uncased'
         tokenized_texts = [tokenizer.tokenize(sent) for sent in sentences]
     input_ids = [tokenizer.convert_tokens_to_ids(txt) for txt in tokenized_texts]
     if debug:
-        print ("Tokenize the first sentence:")
-        print (len(tokenized_texts), len(input_ids), len(input_ids[0]))
-        print (tokenized_texts[0], input_ids[0])
+        print("Tokenize the first sentence:")
+        print(len(tokenized_texts), len(input_ids), len(input_ids[0]))
+        print(tokenized_texts[0], input_ids[0])
 
     # add paddding to input_ids
-    input_ids_padded = pad_sequence([torch.tensor(i) for i in input_ids]).transpose(0,1)
+    input_ids_padded = pad_sequence([torch.tensor(i) for i in input_ids]).transpose(0, 1)
     if debug: print(input_ids_padded.size(), len(input_ids_padded))
 
     # Create attention masks
     attention_masks = []
     # Create a mask of 1s for each token followed by 0s for padding
     for seq in input_ids_padded:
-        seq_mask = [float(i>0) for i in seq]
+        seq_mask = [float(i > 0) for i in seq]
         attention_masks.append(seq_mask)
 
     # create dataset
     dataset = TensorDataset(input_ids_padded, torch.tensor(attention_masks), torch.tensor(labels))
     num_labels = labels.nunique()
     return {'dataset': dataset, 'num_labels': num_labels}
+
 
 def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_dir=None):
     ###################################################################################
@@ -59,12 +63,12 @@ def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_
     param_optimizer = list(model.named_parameters())
     no_decay = ['bias', 'gamma', 'beta']
     optimizer_grouped_parameters = [
-                                    {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
-                                    'weight_decay_rate': 0.01},
-                                    {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)],
-                                    'weight_decay_rate': 0.0}
-                                    ]
-    optimizer = AdamW(optimizer_grouped_parameters, lr=2e-5, eps = 1e-8)
+        {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
+         'weight_decay_rate': 0.01},
+        {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)],
+         'weight_decay_rate': 0.0}
+    ]
+    optimizer = AdamW(optimizer_grouped_parameters, lr=2e-5, eps=1e-8)
 
     # BERT training loop
     train_loss_set = []
@@ -95,19 +99,23 @@ def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_
             # Update tracking variables
             tr_loss += loss.item()
             tmp_tr_perf = perf_metrics(to_cpu(logits), to_cpu(b_labels), average='weighted')
-            tmp_tr_perf.update((k,v*len(b_input_ids)) for k,v in tmp_tr_perf.items())
-            running_len +=len(b_input_ids)
+            tmp_tr_perf.update((k, v * len(b_input_ids)) for k, v in tmp_tr_perf.items())
+            running_len += len(b_input_ids)
             tr_perf = tr_perf + Counter(tmp_tr_perf)
             tmp_tr_perf_classes = perf_metrics_classes(to_cpu(logits), to_cpu(b_labels))
             tr_perf_classes = pd.concat((tr_perf_classes, tmp_tr_perf_classes))
 
-        #print('classes detail \n\n', tr_perf_classes)
-        tr_perf = {k:v/running_len for k,v in tr_perf.items()}
-        tr_perf_classes[['f1-score', 'precision', 'recall']] = tr_perf_classes[['f1-score', 'precision', 'recall']].multiply(tr_perf_classes['support'], axis="index")
-        tr_perf_classes=tr_perf_classes.groupby(tr_perf_classes.index).sum()
-        tr_perf_classes[['f1-score','precision', 'recall']] = tr_perf_classes[['f1-score', 'precision', 'recall']].div(tr_perf_classes['support'], axis="index")
-        #tr_perf_classes=tr_perf_classes.replace(0, np.NaN).groupby(tr_perf_classes.index).agg({'f1-score':'mean','precision':'mean', 'recall':'mean', 'support':'sum'})
-        print('TRAIN - Loss: {:.3f} - F1: {:.3f} Acc: {:.3f} P: {:.3f} R: {:.3f}'.format(tr_loss/(1+step), tr_perf['f1'], tr_perf['acc'], tr_perf['p'], tr_perf['r']))
+        # print('classes detail \n\n', tr_perf_classes)
+        tr_perf = {k: v / running_len for k, v in tr_perf.items()}
+        tr_perf_classes[['f1-score', 'precision', 'recall']] = tr_perf_classes[
+            ['f1-score', 'precision', 'recall']].multiply(tr_perf_classes['support'], axis="index")
+        tr_perf_classes = tr_perf_classes.groupby(tr_perf_classes.index).sum()
+        tr_perf_classes[['f1-score', 'precision', 'recall']] = tr_perf_classes[['f1-score', 'precision', 'recall']].div(
+            tr_perf_classes['support'], axis="index")
+        # tr_perf_classes=tr_perf_classes.replace(0, np.NaN).groupby(tr_perf_classes.index).agg({'f1-score':'mean','precision':'mean', 'recall':'mean', 'support':'sum'})
+        print('TRAIN - Loss: {:.3f} - F1: {:.3f} Acc: {:.3f} P: {:.3f} R: {:.3f}'.format(tr_loss / (1 + step),
+                                                                                         tr_perf['f1'], tr_perf['acc'],
+                                                                                         tr_perf['p'], tr_perf['r']))
 
         ###################################################################################
         ## VALIDATION
@@ -122,27 +130,31 @@ def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_
             # Unpack the inputs from our dataloader (and move to GPU if using)
             batch = batch_to_gpu(batch, device)
             b_input_ids, b_input_mask, b_labels = batch
-            with torch.no_grad(): # Telling the model not to compute or store gradients, saving memory and speeding up validation
+            with torch.no_grad():  # Telling the model not to compute or store gradients, saving memory and speeding up validation
                 # Forward pass, calculate logit predictions
                 (loss, logits) = model(b_input_ids, token_type_ids=None, attention_mask=b_input_mask, labels=b_labels)
             # Update tracking variables
             tmp_eval_perf = perf_metrics(to_cpu(logits), to_cpu(b_labels), average='weighted')
-            tmp_eval_perf.update((k,v*len(b_input_ids)) for k,v in tmp_eval_perf.items())
-            #print('STEP:', step, 'LEN', len(b_input_ids), tmp_eval_perf)
+            tmp_eval_perf.update((k, v * len(b_input_ids)) for k, v in tmp_eval_perf.items())
+            # print('STEP:', step, 'LEN', len(b_input_ids), tmp_eval_perf)
             running_len += len(b_input_ids)
             eval_perf = eval_perf + Counter(tmp_eval_perf)
             tmp_eval_perf_classes = perf_metrics_classes(to_cpu(logits), to_cpu(b_labels))
             eval_perf_classes = pd.concat((eval_perf_classes, tmp_eval_perf_classes))
 
-        eval_perf = {k:v/running_len for k,v in eval_perf.items()}  #eval_perf = {k:v/(1+step) for k,v in eval_perf.items()}
-        eval_perf_classes[['f1-score', 'precision', 'recall']] = eval_perf_classes[['f1-score', 'precision', 'recall']].multiply(eval_perf_classes['support'], axis="index")
-        eval_perf_classes=eval_perf_classes.groupby(eval_perf_classes.index).sum()
-        eval_perf_classes[['f1-score','precision', 'recall']] = eval_perf_classes[['f1-score', 'precision', 'recall']].div(eval_perf_classes['support'], axis="index")
-        #eval_perf_classes=eval_perf_classes.replace(0, np.NaN).groupby(eval_perf_classes.index).agg({'f1-score':'mean','precision':'mean', 'recall':'mean', 'support':'sum'})
-        print('TEST -- F1: {:.3f} Acc: {:.3f} P: {:.3f} R: {:.3f}'.format(eval_perf['f1'], eval_perf['acc'], eval_perf['p'], eval_perf['r']))
+        eval_perf = {k: v / running_len for k, v in
+                     eval_perf.items()}  # eval_perf = {k:v/(1+step) for k,v in eval_perf.items()}
+        eval_perf_classes[['f1-score', 'precision', 'recall']] = eval_perf_classes[
+            ['f1-score', 'precision', 'recall']].multiply(eval_perf_classes['support'], axis="index")
+        eval_perf_classes = eval_perf_classes.groupby(eval_perf_classes.index).sum()
+        eval_perf_classes[['f1-score', 'precision', 'recall']] = eval_perf_classes[
+            ['f1-score', 'precision', 'recall']].div(eval_perf_classes['support'], axis="index")
+        # eval_perf_classes=eval_perf_classes.replace(0, np.NaN).groupby(eval_perf_classes.index).agg({'f1-score':'mean','precision':'mean', 'recall':'mean', 'support':'sum'})
+        print('TEST -- F1: {:.3f} Acc: {:.3f} P: {:.3f} R: {:.3f}'.format(eval_perf['f1'], eval_perf['acc'],
+                                                                          eval_perf['p'], eval_perf['r']))
 
         # store perf metrics and model
-        if eval_perf['f1']>=best_f1:
+        if eval_perf['f1'] >= best_f1:
             best_f1 = eval_perf['f1']
             best_epoch = _ + 1
             stats_to_save = eval_perf
@@ -157,29 +169,32 @@ def run_BERT(model, train_dataloader, validation_dataloader, n_epochs=5, output_
         try:
             print('saving model...')
             model_to_save.save_pretrained(output_dir)
-            stats_classes_to_save.to_csv(output_dir+'/stats.csv', header=True)
+            stats_classes_to_save.to_csv(output_dir + '/stats.csv', header=True)
         except:
             print('model not saved, please enter valid path')
 
-    return {'stats':stats_to_save, 'stats_classes':stats_classes_to_save, 'model':model_to_save}
+    return {'stats': stats_to_save, 'stats_classes': stats_classes_to_save, 'model': model_to_save}
+
 
 """# Functions to train/evaluate model"""
+
 
 # output_dir='/home/ubuntu/data/ACL2020/bert_models/base')
 def train_BERT(sentences, labels, BERT_tokenizer='bert-base-uncased', test_size=0.1,
                n_epochs=5, batch_size=32, output_dir=None, MAX_TKN_LEN=511):
     print('formating dataset')
-    prep_data = prep_BERT_dataset(sentences=sentences, labels=labels, BERT_tokenizer=BERT_tokenizer, MAX_TKN_LEN=MAX_TKN_LEN)
+    prep_data = prep_BERT_dataset(sentences=sentences, labels=labels, BERT_tokenizer=BERT_tokenizer,
+                                  MAX_TKN_LEN=MAX_TKN_LEN)
     dataset = prep_data['dataset']
     num_labels = prep_data['num_labels']
     # split into train/test
     print('splitting in train/test sets')
-    test_len= int(len(dataset)*test_size)
+    test_len = int(len(dataset) * test_size)
     train_len = len(dataset) - test_len
     print('test set:', test_len, 'train set:', train_len)
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_len, test_len])
     # Create the DataLoaders for our training and validation sets.
-    train_dataloader, validation_dataloader = create_dataloader(train_dataset, val_dataset, batch_size = batch_size)
+    train_dataloader, validation_dataloader = create_dataloader(train_dataset, val_dataset, batch_size=batch_size)
     # Load BertForSequenceClassification, the pretrained BERT model with a single linear classification layer on top.
     print('loading pre-trained BERT')
     pretrained_model = BertForSequenceClassification.from_pretrained(BERT_tokenizer, num_labels=num_labels)
@@ -188,46 +203,54 @@ def train_BERT(sentences, labels, BERT_tokenizer='bert-base-uncased', test_size=
     res = run_BERT(pretrained_model, train_dataloader, validation_dataloader, n_epochs=n_epochs, output_dir=output_dir)
     return res
 
+
 def BERT_KFOLD(sentences, labels, BERT_tokenizer='bert-base-uncased',
                n_splits=10, random_state=42, n_epochs=5, output_dir=None, MAX_TKN_LEN=511):
-    prep_data = prep_BERT_dataset(sentences=sentences, labels=labels, BERT_tokenizer=BERT_tokenizer, MAX_TKN_LEN=MAX_TKN_LEN)
+    prep_data = prep_BERT_dataset(sentences=sentences, labels=labels, BERT_tokenizer=BERT_tokenizer,
+                                  MAX_TKN_LEN=MAX_TKN_LEN)
     dataset = prep_data['dataset']
-    num_labels = prep_data['num_labels']
-    pretrained_model = BertForSequenceClassification.from_pretrained(BERT_tokenizer, num_labels=num_labels)
-    res = run_KFOLD(dataset=dataset, base_model=BERT_tokenizer, model_trainer=run_BERT, base_model_loader= BertForSequenceClassification.from_pretrained,
+    res = run_KFOLD(dataset=dataset, base_model=BERT_tokenizer, model_trainer=run_BERT,
+                    base_model_loader=BertForSequenceClassification.from_pretrained,
                     n_splits=n_splits, random_state=random_state, n_epochs=n_epochs, num_labels=prep_data['num_labels'])
     if output_dir is not None:
         try:
             print('saving model in:', output_dir)
             res['model'].save_pretrained(output_dir)
-            res['stats_classes'].to_csv(output_dir+'/stats.csv', header=True)
+            res['stats_classes'].to_csv(output_dir + '/stats.csv', header=True)
         except:
             print('model not saved, please enter valid path')
     return res
 
+
 """# Function to load saved model and classify new data"""
+
 
 def load_BERT_components(trained_bert_model, BERT_tokenizer='bert-base-uncased', do_lower_case=True):
     tokenizer = BertTokenizer.from_pretrained(BERT_tokenizer, do_lower_case=do_lower_case)
     trained_bert_model = BertForSequenceClassification.from_pretrained(trained_bert_model)
-    return {'tokenizer':tokenizer, 'model':trained_bert_model}
+    return {'tokenizer': tokenizer, 'model': trained_bert_model}
+
 
 # load pre-trained model and classify a new sentence
-def load_and_run_BERT(sentences, trained_bert_model, BERT_tokenizer='bert-base-uncased', MAX_TKN_LEN=511, batch_size=32):
-    if isinstance(BERT_tokenizer, str): # load BERT base model if needed
+def load_and_run_BERT(sentences, trained_bert_model, BERT_tokenizer='bert-base-uncased', MAX_TKN_LEN=511,
+                      batch_size=32):
+    if isinstance(trained_bert_model, str):  # load trained BERT model if needed
         trained_bert_model = BertForSequenceClassification.from_pretrained(trained_bert_model)
     preds_class, probs, preds = [], [], pd.DataFrame()
     sentences = pd.Series(sentences)
-    sentences_dataset = prep_BERT_dataset(sentences, labels=None, BERT_tokenizer=BERT_tokenizer, MAX_TKN_LEN=MAX_TKN_LEN)['dataset']
+    sentences_dataset = \
+    prep_BERT_dataset(sentences, labels=None, BERT_tokenizer=BERT_tokenizer, MAX_TKN_LEN=MAX_TKN_LEN)['dataset']
     # b_input_ids, b_input_mask, b_labels = sentences_dataset.tensors
-    validation_dataloader = DataLoader(sentences_dataset, sampler=SequentialSampler(sentences_dataset), batch_size=batch_size)
+    validation_dataloader = DataLoader(sentences_dataset, sampler=SequentialSampler(sentences_dataset),
+                                       batch_size=batch_size)
     for step, batch in enumerate(validation_dataloader):
         b_input_ids, b_input_mask, b_labels = batch
         with torch.no_grad():
-            (loss, logits) = trained_bert_model(b_input_ids, token_type_ids=None, attention_mask=b_input_mask, labels=b_labels)
+            (loss, logits) = trained_bert_model(b_input_ids, token_type_ids=None, attention_mask=b_input_mask,
+                                                labels=b_labels)
         preds_curr = logits.detach().numpy()
         preds = preds.append(pd.DataFrame(preds_curr), ignore_index=True)
-        probs = np.append(probs, np.max(np.exp(preds_curr)/(1+np.exp(preds_curr)), axis=1))
+        probs = np.append(probs, np.max(np.exp(preds_curr) / (1 + np.exp(preds_curr)), axis=1))
         preds_class = np.append(preds_class, np.argmax(preds_curr, axis=1).flatten())
 
     # put results in nice format
