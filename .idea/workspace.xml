@@ -1,19 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="deleted useless files">
-      <change afterPath="$PROJECT_DIR$/.idea/NLP-playground.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sentence_classifier/__init__.py" afterDir="false" />
+    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="reformatted code and added tests to main">
+      <change beforePath="$PROJECT_DIR$/.idea/NLP-playground.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/NLP-playground.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/toy-models.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_sagar.py" beforeDir="false" afterPath="$PROJECT_DIR$/courses_tutorials/NLP_courses_and_tutorials/sentiment_analysis_sagar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prometheus/BERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/BERT.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prometheus/NLP_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/NLP_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prometheus/NN.py" beforeDir="false" afterPath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/NN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/imdb_5k_reviews.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/prometheus/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/prometheus/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prometheus/simple_classifiers.py" beforeDir="false" afterPath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/simple_classifiers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/.editorconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/.github/ISSUE_TEMPLATE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/.travis.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/AUTHORS.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/CONTRIBUTING.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/HISTORY.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/MANIFEST.in" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/Makefile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/README.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/Makefile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/authors.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/conf.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/contributing.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/history.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/index.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/installation.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/make.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/readme.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/usage.rst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/requirements_dev.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/BERT.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/NLP_utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/NN.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/sentence_classifier.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/simple_classifiers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/setup.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/setup.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/tests/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/tests/test_sentence_classifier.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sentence_classifier/tox.ini" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,9 +82,6 @@
     <expand />
     <select />
   </component>
-  <component name="FavoritesManager">
-    <favorites_list name="NLP-playground" />
-  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -54,7 +99,6 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
@@ -68,28 +112,51 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="PyConsoleConfigurable.Python Console" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.editor" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
-      <console-settings module-name="NLP-playground" sdk-home="C:\Users\K1774755\AppData\Local\Continuum\anaconda3\python.exe">
+      <console-settings module-name="NLP-playground" sdk-home="C:\Users\K1774755\AppData\Local\Continuum\anaconda3\python.exe" is-module-sdk="true">
         <option name="mySdkHome" value="C:\Users\K1774755\AppData\Local\Continuum\anaconda3\python.exe" />
+        <option name="myUseModuleSdk" value="true" />
         <option name="myModuleName" value="NLP-playground" />
       </console-settings>
     </option>
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\sentence_classifier\sentence_classifier" />
-      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier\files" />
-      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\courses_tutorials" />
-      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\code_utils" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier" />
+      <recent name="$PROJECT_DIR$/../prometheus" />
+      <recent name="$PROJECT_DIR$/prometheus" />
+      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\sentence_classifier\sentence_classifier" />
+      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier\files" />
+    </key>
   </component>
   <component name="RunManager">
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="NLP-playground" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="longitudinal_models" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="NLP-playground" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -112,23 +179,88 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration default="true" type="Tox" factoryName="Tox">
+      <module name="NLP-playground" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docs" factoryName="Docutils task">
+      <module name="NLP-playground" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="docutils_input_file" value="" />
+      <option name="docutils_output_file" value="" />
+      <option name="docutils_params" value="" />
+      <option name="docutils_task" value="" />
+      <option name="docutils_open_in_browser" value="false" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docs" factoryName="Sphinx task">
+      <module name="NLP-playground" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="docutils_input_file" value="" />
+      <option name="docutils_output_file" value="" />
+      <option name="docutils_params" value="" />
+      <option name="docutils_task" value="" />
+      <option name="docutils_open_in_browser" value="false" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Doctests">
+      <module name="NLP-playground" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="py.test">
+      <module name="NLP-playground" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.longitudinal_models" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
   </component>
   <component name="SshConsoleOptionsProvider">
     <option name="myEncoding" value="windows-1252" />
@@ -288,34 +420,6 @@
       <workItem from="1604500902670" duration="366000" />
       <workItem from="1604501404876" duration="597000" />
       <workItem from="1605954927689" duration="2138000" />
-    </task>
-    <task id="LOCAL-00158" summary="minor fixes/refactoring">
-      <created>1572003550971</created>
-      <option name="number" value="00158" />
-      <option name="presentableId" value="LOCAL-00158" />
-      <option name="project" value="LOCAL" />
-      <updated>1572003550971</updated>
-    </task>
-    <task id="LOCAL-00159" summary="added references tweak">
-      <created>1572013803825</created>
-      <option name="number" value="00159" />
-      <option name="presentableId" value="LOCAL-00159" />
-      <option name="project" value="LOCAL" />
-      <updated>1572013803825</updated>
-    </task>
-    <task id="LOCAL-00160" summary="added slope*covariates option&#10;general cleanup">
-      <created>1572782216902</created>
-      <option name="number" value="00160" />
-      <option name="presentableId" value="LOCAL-00160" />
-      <option name="project" value="LOCAL" />
-      <updated>1572782216902</updated>
-    </task>
-    <task id="LOCAL-00161" summary="added mask in prep_nn function">
-      <created>1572802777169</created>
-      <option name="number" value="00161" />
-      <option name="presentableId" value="LOCAL-00161" />
-      <option name="project" value="LOCAL" />
-      <updated>1572802777169</updated>
     </task>
     <task id="LOCAL-00162" summary="added mask output from nn_prep (unused but needs to be aligned with new version of function)">
       <created>1572802836269</created>
@@ -632,7 +736,35 @@
       <option name="project" value="LOCAL" />
       <updated>1604501064729</updated>
     </task>
-    <option name="localTasksCounter" value="207" />
+    <task id="LOCAL-00207" summary="added">
+      <created>1606070961244</created>
+      <option name="number" value="00207" />
+      <option name="presentableId" value="LOCAL-00207" />
+      <option name="project" value="LOCAL" />
+      <updated>1606070961245</updated>
+    </task>
+    <task id="LOCAL-00208" summary="removed old test and updated main to use imdb dataset">
+      <created>1606071474221</created>
+      <option name="number" value="00208" />
+      <option name="presentableId" value="LOCAL-00208" />
+      <option name="project" value="LOCAL" />
+      <updated>1606071474221</updated>
+    </task>
+    <task id="LOCAL-00209" summary="fixed loading pre-trained model from cache">
+      <created>1606155019096</created>
+      <option name="number" value="00209" />
+      <option name="presentableId" value="LOCAL-00209" />
+      <option name="project" value="LOCAL" />
+      <updated>1606155019096</updated>
+    </task>
+    <task id="LOCAL-00210" summary="reformatted code and added tests to main">
+      <created>1606155067899</created>
+      <option name="number" value="00210" />
+      <option name="presentableId" value="LOCAL-00210" />
+      <option name="project" value="LOCAL" />
+      <updated>1606155067899</updated>
+    </task>
+    <option name="localTasksCounter" value="211" />
     <servers />
   </component>
   <component name="TodoView">
@@ -652,9 +784,7 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
@@ -673,11 +803,9 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="cleanup / changed covariates" />
-    <MESSAGE value="cleanup" />
-    <MESSAGE value="added totals and excluded unknowns for ttest and chisq" />
     <MESSAGE value="minor fixes" />
     <MESSAGE value="added dropout" />
     <MESSAGE value="replaced tokenizer function with scispacy/huggingface" />
@@ -694,13 +822,16 @@
     <MESSAGE value="reordered confidence intervals" />
     <MESSAGE value="minor fixes on ttest and chisq functions" />
     <MESSAGE value="added stats computations to main function" />
-    <MESSAGE value="added" />
     <MESSAGE value="minor improvements" />
     <MESSAGE value="added function to compute p_value significance" />
     <MESSAGE value="added functions to save/load model" />
     <MESSAGE value="added cohens_d function" />
     <MESSAGE value="more tests for resubmission" />
-    <option name="LAST_COMMIT_MESSAGE" value="more tests for resubmission" />
+    <MESSAGE value="added" />
+    <MESSAGE value="removed old test and updated main to use imdb dataset" />
+    <MESSAGE value="fixed loading pre-trained model from cache" />
+    <MESSAGE value="reformatted code and added tests to main" />
+    <option name="LAST_COMMIT_MESSAGE" value="reformatted code and added tests to main" />
   </component>
   <component name="WindowStateProjectService">
     <state x="234" y="0" key="#Notifications" timestamp="1606065540981">
@@ -712,9 +843,14 @@
     </state>
     <state x="265" y="0" key="CommitChangelistDialog2/0.0.1280.680/-1920.494.1920.1040@0.0.1280.680" timestamp="1604501063421" />
     <state x="210" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1606065501156" />
-    <state x="234" y="79" key="Vcs.Push.Dialog.v2" timestamp="1606065508688">
-      <screen x="0" y="0" width="1280" height="680" />
+    <state x="405" y="146" key="SettingsEditor" timestamp="1606158764247">
+      <screen x="0" y="25" width="1792" height="1010" />
     </state>
+    <state x="405" y="146" key="SettingsEditor/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606158764247" />
+    <state x="328" y="142" key="Vcs.Push.Dialog.v2" timestamp="1606155070573">
+      <screen x="0" y="25" width="1792" height="1010" />
+    </state>
+    <state x="328" y="142" key="Vcs.Push.Dialog.v2/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606155070573" />
     <state x="234" y="79" key="Vcs.Push.Dialog.v2/0.0.1280.680/-1920.494.1920.1040@0.0.1280.680" timestamp="1604501067063" />
     <state x="234" y="79" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1606065508688" />
     <state x="448" y="263" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605955093381">
@@ -732,8 +868,5 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-  </component>
-  <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/NLP_playground$longitudinal_models.coverage" NAME="longitudinal_models Coverage Results" MODIFIED="1567945239052" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/longitudinal_models" />
   </component>
 </project>

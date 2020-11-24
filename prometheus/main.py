@@ -1,16 +1,14 @@
-from sentence_classifier.sentence_classifier.simple_classifiers import *
-from sentence_classifier.sentence_classifier.BERT import *
-from sentence_classifier.sentence_classifier.NN import *
+import gensim.downloader as api
+from sklearn import svm, ensemble, linear_model, neighbors
+
 
 """# Load data"""
 
-df = pd.read_csv('https://raw.githubusercontent.com/KCLaurelie/NLP-playground/master/prometheus/mimic_status_10folds.csv')
-text_col = 'clean_text'
-label_col = 'annotation'
+df = pd.read_csv('https://raw.githubusercontent.com/KCLaurelie/NLP-playground/master/prometheus/imdb_5k_reviews.csv', header=1)
+text_col = 'review'
+label_col = 'sentiment'
 df = df[0:100]
-df[text_col] = df[text_col].apply(lambda x: x.strip())
-#df[label_col] = df[label_col].fillna('irrelevant').replace({'irrelevant':0, 'affirmed':1, 'negated':0})
-#df[label_col] = convert_to_cat(df[label_col], binary=False)['labels']
+df[text_col] = df[text_col].apply(lambda x: x.strip().lower()[0:1000])
 print('num annotations:', len(df), '\n\n', df[label_col].value_counts(), '\n\n', df[[label_col, text_col]].head())
 
 tokenize_spacy(df=pd.Series(['hello my name is link', 'this is cool']), tokenization_type='clean', outfile=None)
@@ -26,15 +24,15 @@ res = train_BERT(sentences=df[text_col], labels=df[label_col], BERT_tokenizer=BE
                  test_size=0.2, n_epochs=n_epochs, output_dir=None, MAX_TKN_LEN=511)
 res['stats']
 
-load_and_run_BERT(sentences=['hello my name is link i am in love with princess zelda', 'this is just a test sentence'], trained_bert_model=data_path+'bert_models', BERT_tokenizer='bert-base-uncased')
+load_and_run_BERT(sentences=['hello my name is link i am in love with princess zelda', 'this is just a test sentence'], trained_bert_model=res['model'], BERT_tokenizer='bert-base-uncased')
 
-kf = BERT_KFOLD(sentences=df[text_col], labels=df[label_col], n_splits=10, BERT_tokenizer=BERT_tokenizer, n_epochs=1, random_state=666)
+kf = BERT_KFOLD(sentences=df[text_col], labels=df[label_col], n_splits=2, BERT_tokenizer=BERT_tokenizer, n_epochs=1, random_state=666)
 print(kf['stats'], '\n\n', kf['stats_classes'])
 
 """# Load embedding (For NN or traditional classifiers - not needed for BERT)"""
 
 # load embeddings model
-emb_model = KeyedVectors.load(emb_model_file)
+emb_model = api.load("glove-wiki-gigaword-50")
 emb_model.wv.most_similar('great', topn=5)
 emb_model_torch = embedding2torch(emb_model, SEED=0)
 
@@ -68,14 +66,14 @@ load_and_run_classifier(sentences=df[text_col][0:2],
 """## train, save and load model with GloVE"""
 
 # train model on dataset
-res = train_classifier(sentences=df[text_col], labels=df[label_col], emb_model=emb_model, 
+res = train_classifier(sentences=df[text_col], labels=df[label_col], emb_model=emb_model,
                        classifier=classifiers[1], test_size=0.2, 
                        output_dir=None)
 res['stats']
 
 # load saved model and test on new data
 load_and_run_classifier(sentences=df[text_col][0:2], 
-                        trained_classifier=data_path+'ML_models/imdb_rf_glove', 
+                        trained_classifier=data_path+'ML_models/imdb_rf_glove',
                         emb_model=emb_model)
 
 """# Run ANN"""

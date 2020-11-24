@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/NLP-playground.iml" filepath="$PROJECT_DIR$/.idea/NLP-playground.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../prometheus/.idea/prometheus.iml" filepath="$PROJECT_DIR$/../prometheus/.idea/prometheus.iml" />
     </modules>
   </component>
 </project>
