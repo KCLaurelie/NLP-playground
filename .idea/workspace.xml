@@ -19,49 +19,15 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="reformatted code and added tests to main">
-      <change beforePath="$PROJECT_DIR$/.idea/NLP-playground.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/NLP-playground.iml" afterDir="false" />
+    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="added longitudinal modelling utils">
       <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prometheus/imdb_5k_reviews.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prometheus/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/prometheus/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/.github/ISSUE_TEMPLATE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/.travis.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/AUTHORS.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/CONTRIBUTING.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/HISTORY.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/MANIFEST.in" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/Makefile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/README.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/Makefile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/authors.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/conf.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/contributing.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/history.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/index.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/installation.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/make.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/readme.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/docs/usage.rst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/requirements_dev.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/BERT.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/NLP_utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/NN.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/sentence_classifier.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/sentence_classifier/simple_classifiers.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/setup.cfg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/setup.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/tests/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/tests/test_sentence_classifier.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sentence_classifier/tox.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../prometheus/sentence_classifier/README.rst" beforeDir="false" afterPath="$PROJECT_DIR$/../prometheus/sentence_classifier/README.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/BERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/BERT.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/sentence_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/sentence_classifier.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,9 +56,8 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../prometheus" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
-    <option name="UPDATE_TYPE" value="MERGE" />
   </component>
   <component name="JupyterTrust" id="1205829d-399a-4630-966f-ac5823a08d3b" />
   <component name="ProjectId" id="1QMtzoSLxyWZpdpGiiHDiKsCsyb" />
@@ -421,27 +386,6 @@
       <workItem from="1604501404876" duration="597000" />
       <workItem from="1605954927689" duration="2138000" />
     </task>
-    <task id="LOCAL-00162" summary="added mask output from nn_prep (unused but needs to be aligned with new version of function)">
-      <created>1572802836269</created>
-      <option name="number" value="00162" />
-      <option name="presentableId" value="LOCAL-00162" />
-      <option name="project" value="LOCAL" />
-      <updated>1572802836269</updated>
-    </task>
-    <task id="LOCAL-00163" summary="added bidirectional lstm and refactored code">
-      <created>1572802989822</created>
-      <option name="number" value="00163" />
-      <option name="presentableId" value="LOCAL-00163" />
-      <option name="project" value="LOCAL" />
-      <updated>1572802989822</updated>
-    </task>
-    <task id="LOCAL-00164" summary="error return if no embedding provided">
-      <created>1572882536680</created>
-      <option name="number" value="00164" />
-      <option name="presentableId" value="LOCAL-00164" />
-      <option name="project" value="LOCAL" />
-      <updated>1572882536680</updated>
-    </task>
     <task id="LOCAL-00165" summary="set use of weights default to false">
       <created>1572904720771</created>
       <option name="number" value="00165" />
@@ -764,7 +708,28 @@
       <option name="project" value="LOCAL" />
       <updated>1606155067899</updated>
     </task>
-    <option name="localTasksCounter" value="211" />
+    <task id="LOCAL-00211" summary="created separate project">
+      <created>1606223799165</created>
+      <option name="number" value="00211" />
+      <option name="presentableId" value="LOCAL-00211" />
+      <option name="project" value="LOCAL" />
+      <updated>1606223799165</updated>
+    </task>
+    <task id="LOCAL-00212" summary="created separate project">
+      <created>1606224244931</created>
+      <option name="number" value="00212" />
+      <option name="presentableId" value="LOCAL-00212" />
+      <option name="project" value="LOCAL" />
+      <updated>1606224244931</updated>
+    </task>
+    <task id="LOCAL-00213" summary="added longitudinal modelling utils">
+      <created>1606227411532</created>
+      <option name="number" value="00213" />
+      <option name="presentableId" value="LOCAL-00213" />
+      <option name="project" value="LOCAL" />
+      <updated>1606227411532</updated>
+    </task>
+    <option name="localTasksCounter" value="214" />
     <servers />
   </component>
   <component name="TodoView">
@@ -806,8 +771,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="minor fixes" />
-    <MESSAGE value="added dropout" />
     <MESSAGE value="replaced tokenizer function with scispacy/huggingface" />
     <MESSAGE value="fixed super_read_csv function" />
     <MESSAGE value="added function to generate k-fold indices" />
@@ -831,7 +794,9 @@
     <MESSAGE value="removed old test and updated main to use imdb dataset" />
     <MESSAGE value="fixed loading pre-trained model from cache" />
     <MESSAGE value="reformatted code and added tests to main" />
-    <option name="LAST_COMMIT_MESSAGE" value="reformatted code and added tests to main" />
+    <MESSAGE value="created separate project" />
+    <MESSAGE value="added longitudinal modelling utils" />
+    <option name="LAST_COMMIT_MESSAGE" value="added longitudinal modelling utils" />
   </component>
   <component name="WindowStateProjectService">
     <state x="234" y="0" key="#Notifications" timestamp="1606065540981">
@@ -843,14 +808,22 @@
     </state>
     <state x="265" y="0" key="CommitChangelistDialog2/0.0.1280.680/-1920.494.1920.1040@0.0.1280.680" timestamp="1604501063421" />
     <state x="210" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1606065501156" />
+    <state x="705" y="433" key="Github.CreateGistDialog" timestamp="1606224063961">
+      <screen x="0" y="25" width="1792" height="1010" />
+    </state>
+    <state x="705" y="433" key="Github.CreateGistDialog/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606224063961" />
+    <state x="746" y="411" key="Github.ShareDialog" timestamp="1606224403516">
+      <screen x="0" y="25" width="1792" height="1010" />
+    </state>
+    <state x="746" y="411" key="Github.ShareDialog/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606224403516" />
     <state x="405" y="146" key="SettingsEditor" timestamp="1606158764247">
       <screen x="0" y="25" width="1792" height="1010" />
     </state>
     <state x="405" y="146" key="SettingsEditor/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606158764247" />
-    <state x="328" y="142" key="Vcs.Push.Dialog.v2" timestamp="1606155070573">
+    <state x="328" y="142" key="Vcs.Push.Dialog.v2" timestamp="1606227414379">
       <screen x="0" y="25" width="1792" height="1010" />
     </state>
-    <state x="328" y="142" key="Vcs.Push.Dialog.v2/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606155070573" />
+    <state x="328" y="142" key="Vcs.Push.Dialog.v2/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606227414379" />
     <state x="234" y="79" key="Vcs.Push.Dialog.v2/0.0.1280.680/-1920.494.1920.1040@0.0.1280.680" timestamp="1604501067063" />
     <state x="234" y="79" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1606065508688" />
     <state x="448" y="263" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605955093381">
