@@ -19,14 +19,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="added longitudinal modelling utils">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="removed">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prometheus/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prometheus/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../prometheus/sentence_classifier/README.rst" beforeDir="false" afterPath="$PROJECT_DIR$/../prometheus/sentence_classifier/README.rst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/BERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/BERT.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/NN.py" beforeDir="false" afterPath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/NN.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/sentence_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/sentence_classifier.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -77,7 +72,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.editor" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
@@ -385,34 +380,6 @@
       <workItem from="1604500902670" duration="366000" />
       <workItem from="1604501404876" duration="597000" />
       <workItem from="1605954927689" duration="2138000" />
-    </task>
-    <task id="LOCAL-00165" summary="set use of weights default to false">
-      <created>1572904720771</created>
-      <option name="number" value="00165" />
-      <option name="presentableId" value="LOCAL-00165" />
-      <option name="project" value="LOCAL" />
-      <updated>1572904720771</updated>
-    </task>
-    <task id="LOCAL-00166" summary="fixed bidirectional (return middle output instead of end)">
-      <created>1572904819625</created>
-      <option name="number" value="00166" />
-      <option name="presentableId" value="LOCAL-00166" />
-      <option name="project" value="LOCAL" />
-      <updated>1572904819625</updated>
-    </task>
-    <task id="LOCAL-00167" summary="fixed to print last epoch">
-      <created>1572904855283</created>
-      <option name="number" value="00167" />
-      <option name="presentableId" value="LOCAL-00167" />
-      <option name="project" value="LOCAL" />
-      <updated>1572904855287</updated>
-    </task>
-    <task id="LOCAL-00168" summary="renamed NN_pytorch to ANN">
-      <created>1573133767903</created>
-      <option name="number" value="00168" />
-      <option name="presentableId" value="LOCAL-00168" />
-      <option name="project" value="LOCAL" />
-      <updated>1573133767903</updated>
     </task>
     <task id="LOCAL-00169" summary="added option to allow already split dataset">
       <created>1573325020047</created>
@@ -729,8 +696,39 @@
       <option name="project" value="LOCAL" />
       <updated>1606227411532</updated>
     </task>
-    <option name="localTasksCounter" value="214" />
+    <task id="LOCAL-00214" summary="commented and cleaned up code">
+      <created>1606236100714</created>
+      <option name="number" value="00214" />
+      <option name="presentableId" value="LOCAL-00214" />
+      <option name="project" value="LOCAL" />
+      <updated>1606236100714</updated>
+    </task>
+    <task id="LOCAL-00215" summary="added more tests">
+      <created>1606236123800</created>
+      <option name="number" value="00215" />
+      <option name="presentableId" value="LOCAL-00215" />
+      <option name="project" value="LOCAL" />
+      <updated>1606236123800</updated>
+    </task>
+    <task id="LOCAL-00216" summary="changed project structure">
+      <created>1606236159927</created>
+      <option name="number" value="00216" />
+      <option name="presentableId" value="LOCAL-00216" />
+      <option name="project" value="LOCAL" />
+      <updated>1606236159927</updated>
+    </task>
+    <task id="LOCAL-00217" summary="removed">
+      <created>1606236289421</created>
+      <option name="number" value="00217" />
+      <option name="presentableId" value="LOCAL-00217" />
+      <option name="project" value="LOCAL" />
+      <updated>1606236289421</updated>
+    </task>
+    <option name="localTasksCounter" value="218" />
     <servers />
+  </component>
+  <component name="TerminalProjectNonSharedOptionsProvider">
+    <option name="startingDirectory" value="$PROJECT_DIR$/../prometheus/sentence_classifier" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -771,10 +769,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="replaced tokenizer function with scispacy/huggingface" />
-    <MESSAGE value="fixed super_read_csv function" />
-    <MESSAGE value="added function to generate k-fold indices" />
-    <MESSAGE value="formatting" />
     <MESSAGE value="removed restriction on num epochs for best score" />
     <MESSAGE value="added bucket_data function" />
     <MESSAGE value="fixed bug for CI display" />
@@ -796,7 +790,11 @@
     <MESSAGE value="reformatted code and added tests to main" />
     <MESSAGE value="created separate project" />
     <MESSAGE value="added longitudinal modelling utils" />
-    <option name="LAST_COMMIT_MESSAGE" value="added longitudinal modelling utils" />
+    <MESSAGE value="commented and cleaned up code" />
+    <MESSAGE value="added more tests" />
+    <MESSAGE value="changed project structure" />
+    <MESSAGE value="removed" />
+    <option name="LAST_COMMIT_MESSAGE" value="removed" />
   </component>
   <component name="WindowStateProjectService">
     <state x="234" y="0" key="#Notifications" timestamp="1606065540981">
@@ -816,20 +814,24 @@
       <screen x="0" y="25" width="1792" height="1010" />
     </state>
     <state x="746" y="411" key="Github.ShareDialog/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606224403516" />
-    <state x="405" y="146" key="SettingsEditor" timestamp="1606158764247">
+    <state x="405" y="146" key="SettingsEditor" timestamp="1606252287112">
       <screen x="0" y="25" width="1792" height="1010" />
     </state>
-    <state x="405" y="146" key="SettingsEditor/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606158764247" />
-    <state x="328" y="142" key="Vcs.Push.Dialog.v2" timestamp="1606227414379">
+    <state x="405" y="146" key="SettingsEditor/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606252287112" />
+    <state x="328" y="142" key="Vcs.Push.Dialog.v2" timestamp="1606236290914">
       <screen x="0" y="25" width="1792" height="1010" />
     </state>
-    <state x="328" y="142" key="Vcs.Push.Dialog.v2/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606227414379" />
+    <state x="328" y="142" key="Vcs.Push.Dialog.v2/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606236290914" />
     <state x="234" y="79" key="Vcs.Push.Dialog.v2/0.0.1280.680/-1920.494.1920.1040@0.0.1280.680" timestamp="1604501067063" />
     <state x="234" y="79" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1606065508688" />
     <state x="448" y="263" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605955093381">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="448" y="263" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1280.680@0.0.1280.680" timestamp="1605955093381" />
+    <state x="740" y="320" key="refactoring.ChangeSignatureDialog" timestamp="1606253156747">
+      <screen x="0" y="25" width="1792" height="1010" />
+    </state>
+    <state x="740" y="320" key="refactoring.ChangeSignatureDialog/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606253156747" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
