@@ -107,6 +107,8 @@ def model_playground():
 
     #######################################################################################
     #  PYTHON STUFF
+    # R formula:
+    r_formula = 'score_combined ~  score_date_centered + age_at_score_baseline + patient_diagnosis_super_class + score_date_centered * age_at_score_baseline + score_date_centered * patient_diagnosis_super_class'
 
     # MODEL 1: python equivalent
     model_py = smf.mixedlm("score_combined ~ score_date_centered ", df_to_use, groups=df_to_use['brcid'])
@@ -114,9 +116,8 @@ def model_playground():
     print(model_py.fit().summary())
 
     # random slope and intercept
-    model_py = smf.mixedlm("score_combined ~ score_date_centered", df_to_use, groups=df_to_use['brcid'],
-                           re_formula="~score_date_centered")
-    model_py = sm.MixedLM.from_formula("score_combined ~ score_date_centered "
+    model_py = smf.mixedlm(r_formula, df_to_use, groups=df_to_use['brcid'], re_formula="~score_date_centered")
+    model_py = sm.MixedLM.from_formula(r_formula
                                        , df_to_use
                                        , re_formula="score_date_centered "
                                        , groups=df_to_use['brcid'])
