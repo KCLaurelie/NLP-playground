@@ -77,14 +77,14 @@ def run_report(dataset=ds.default_dataset):
     dataset.write_report(r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_report_2classes.xlsx')
 
 def playground2():
-    df = pd.read_excel(r'C:\Users\K1774755\PycharmProjects\prometheus\longitudinal_modelling\trajectories_synthetic.xlsx',sheet_name='data')
+    df = pd.read_excel(r'C:\Users\K1774755\PycharmProjects\prometheus\longitudinal_modelling\trajectories_synthetic.xlsm',sheet_name='data')
     # ['brcid', 'diagnosis', 'date', 'score', 'gender', 'med']
-    r_formula = 'score_combined ~  score_date_centered + age_at_score_baseline + patient_diagnosis_super_class + score_date_centered * age_at_score_baseline + score_date_centered * patient_diagnosis_super_class'
+    r_formula = 'score ~  date + age + diagnosis + gender + date * age + date * diagnosis + date * gender'
 
-    model = Lmer('score ~ date  + (1|brcid)', data=df)
+    model = Lmer(r_formula + '  + (1 + date | brcid)', data=df)
     # random slope and intercept
-    model = smf.mixedlm(r_formula, df, groups=df['brcid'], re_formula="~score")
-    model = sm.MixedLM.from_formula(r_formula, df, re_formula="score ", groups=df['brcid'])
+    model = smf.mixedlm(r_formula, df, groups=df['brcid'], re_formula="~date")
+    model = sm.MixedLM.from_formula(r_formula, df, re_formula="date ", groups=df['brcid'])
     result = model.fit()
     print(result.summary())
 
