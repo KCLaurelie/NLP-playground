@@ -8,6 +8,7 @@ import statsmodels.regression.mixed_linear_model as mlm
 
 df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_trajectory_data_20200407_synthetic.xlsx',
                    index_col=None, sheet_name='combined')
+
 df = df.loc[(df.patient_diagnosis_super_class != 'organic only')]
 #df = df.loc[df.duration !=False ,['brcid','duration','patient_diagnosis_super_class']]
 #res=ttest_ind(df, value='score_combined', group_col='patient_diagnosis_super_class')
@@ -75,6 +76,17 @@ def run_report(dataset=ds.default_dataset):
     dataset.cols_to_pivot = ['patient_diagnosis_super_class', 'patient_diagnosis_class']
     dataset.write_report(r'T:\aurelie_mascio\multimorbidity\mmse_work\mmse_report_2classes.xlsx')
 
+def playground2():
+    df = pd.read_excel(r'C:\Users\K1774755\PycharmProjects\prometheus\longitudinal_modelling\trajectories_synthetic.xlsm',sheet_name='data')
+    # ['brcid', 'diagnosis', 'date', 'score', 'gender', 'med']
+    r_formula = 'score ~  date + age + diagnosis + gender + date * age + date * diagnosis + date * gender'
+
+    model = Lmer(r_formula + '  + (1 + date | brcid)', data=df)
+    # random slope and intercept
+    model = smf.mixedlm(r_formula, df, groups=df['brcid'], re_formula="~date")
+    model = sm.MixedLM.from_formula(r_formula, df, re_formula="date ", groups=df['brcid'])
+    result = model.fit()
+    print(result.summary())
 
 def model_playground():
     df = pd.read_excel(r'C:\Users\K1774755\Downloads\phd\mmse_rebecca\mmse_synthetic_data_20190919.xlsx',
@@ -107,6 +119,8 @@ def model_playground():
 
     #######################################################################################
     #  PYTHON STUFF
+    # R formula:
+    r_formula = 'score_combined ~  score_date_centered + age_at_score_baseline + patient_diagnosis_super_class + score_date_centered * age_at_score_baseline + score_date_centered * patient_diagnosis_super_class'
 
     # MODEL 1: python equivalent
     model_py = smf.mixedlm("score_combined ~ score_date_centered ", df_to_use, groups=df_to_use['brcid'])
@@ -114,9 +128,8 @@ def model_playground():
     print(model_py.fit().summary())
 
     # random slope and intercept
-    model_py = smf.mixedlm("score_combined ~ score_date_centered", df_to_use, groups=df_to_use['brcid'],
-                           re_formula="~score_date_centered")
-    model_py = sm.MixedLM.from_formula("score_combined ~ score_date_centered "
+    model_py = smf.mixedlm(r_formula, df_to_use, groups=df_to_use['brcid'], re_formula="~score_date_centered")
+    model_py = sm.MixedLM.from_formula(r_formula
                                        , df_to_use
                                        , re_formula="score_date_centered "
                                        , groups=df_to_use['brcid'])
