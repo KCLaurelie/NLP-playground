@@ -19,10 +19,16 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="removed">
+    <list default="true" id="102a8d9e-ca2c-48af-b2b8-5fbc6ae97fb2" name="Default Changelist" comment="+1">
+      <change afterPath="$PROJECT_DIR$/brainteasers/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brainteasers/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/brainteasers/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/NLP-playground.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/NLP-playground.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/NN.py" beforeDir="false" afterPath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/NN.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/sentence_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier/sentence_classifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../prometheus/brainteasers/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../prometheus/brainteasers/main.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +69,8 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="ASKED_MARK_IGNORED_FILES_AS_EXCLUDED" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/symptoms_classifier" />
@@ -72,7 +80,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
@@ -88,140 +96,46 @@
       <recent name="C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../prometheus/longitudinal_modelling/to delete" />
       <recent name="$PROJECT_DIR$/../prometheus/sentence_classifier/sentence_classifier" />
       <recent name="$PROJECT_DIR$/../prometheus" />
       <recent name="$PROJECT_DIR$/prometheus" />
       <recent name="C:\Users\K1774755\PycharmProjects\toy-models\sentence_classifier\sentence_classifier" />
-      <recent name="C:\Users\K1774755\PycharmProjects\toy-models\symptoms_classifier\files" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
-      <module name="NLP-playground" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
+  <component name="RunManager" selected="Makefile Target.dist">
+    <configuration name="dist" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
+      <makefile filename="$PROJECT_DIR$/../prometheus/sentence_classifier/Makefile" target="dist" workingDirectory="" arguments="">
+        <envs />
+      </makefile>
       <method v="2" />
     </configuration>
-    <configuration name="longitudinal_models" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="NLP-playground" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/longitudinal_models" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/longitudinal_models/longitudinal_models.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
+    <configuration name="docs" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
+      <makefile filename="$PROJECT_DIR$/../prometheus/sentence_classifier/Makefile" target="docs" workingDirectory="" arguments="">
+        <envs />
+      </makefile>
       <method v="2" />
     </configuration>
-    <configuration default="true" type="Tox" factoryName="Tox">
-      <module name="NLP-playground" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
+    <configuration name="install" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
+      <makefile filename="$PROJECT_DIR$/../prometheus/sentence_classifier/Makefile" target="install" workingDirectory="" arguments="">
+        <envs />
+      </makefile>
       <method v="2" />
     </configuration>
-    <configuration default="true" type="docs" factoryName="Docutils task">
-      <module name="NLP-playground" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="docutils_input_file" value="" />
-      <option name="docutils_output_file" value="" />
-      <option name="docutils_params" value="" />
-      <option name="docutils_task" value="" />
-      <option name="docutils_open_in_browser" value="false" />
+    <configuration name="release" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
+      <makefile filename="$PROJECT_DIR$/../prometheus/sentence_classifier/Makefile" target="release" workingDirectory="" arguments="">
+        <envs />
+      </makefile>
       <method v="2" />
     </configuration>
-    <configuration default="true" type="docs" factoryName="Sphinx task">
-      <module name="NLP-playground" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="docutils_input_file" value="" />
-      <option name="docutils_output_file" value="" />
-      <option name="docutils_params" value="" />
-      <option name="docutils_task" value="" />
-      <option name="docutils_open_in_browser" value="false" />
+    <configuration name="servedocs" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
+      <makefile filename="$PROJECT_DIR$/../prometheus/sentence_classifier/Makefile" target="servedocs" workingDirectory="" arguments="">
+        <envs />
+      </makefile>
       <method v="2" />
     </configuration>
-    <configuration default="true" type="tests" factoryName="Doctests">
-      <module name="NLP-playground" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="FOLDER_NAME" value="" />
-      <option name="TEST_TYPE" value="TEST_SCRIPT" />
-      <option name="PATTERN" value="" />
-      <option name="USE_PATTERN" value="false" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="py.test">
-      <module name="NLP-playground" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="_new_keywords" value="&quot;&quot;" />
-      <option name="_new_parameters" value="&quot;&quot;" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method v="2" />
-    </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.longitudinal_models" />
-      </list>
-    </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SshConsoleOptionsProvider">
     <option name="myEncoding" value="windows-1252" />
     <option name="myConnectionType" value="DEFAULT_SDK" />
@@ -381,350 +295,350 @@
       <workItem from="1604501404876" duration="597000" />
       <workItem from="1605954927689" duration="2138000" />
     </task>
-    <task id="LOCAL-00169" summary="added option to allow already split dataset">
-      <created>1573325020047</created>
-      <option name="number" value="00169" />
-      <option name="presentableId" value="LOCAL-00169" />
+    <task id="LOCAL-00255" summary="cleanup">
+      <created>1616956973920</created>
+      <option name="number" value="00255" />
+      <option name="presentableId" value="LOCAL-00255" />
       <option name="project" value="LOCAL" />
-      <updated>1573325020048</updated>
+      <updated>1616956973921</updated>
     </task>
-    <task id="LOCAL-00170" summary="change spacy en path for azure">
-      <created>1573325071186</created>
-      <option name="number" value="00170" />
-      <option name="presentableId" value="LOCAL-00170" />
+    <task id="LOCAL-00256" summary="fixed pb when na values dropped by default">
+      <created>1617287387981</created>
+      <option name="number" value="00256" />
+      <option name="presentableId" value="LOCAL-00256" />
       <option name="project" value="LOCAL" />
-      <updated>1573325071186</updated>
+      <updated>1617287387981</updated>
     </task>
-    <task id="LOCAL-00171" summary="changed to using best f1 (instead of latest run)">
-      <created>1573486739302</created>
-      <option name="number" value="00171" />
-      <option name="presentableId" value="LOCAL-00171" />
+    <task id="LOCAL-00257" summary="added more tests">
+      <created>1617287404310</created>
+      <option name="number" value="00257" />
+      <option name="presentableId" value="LOCAL-00257" />
       <option name="project" value="LOCAL" />
-      <updated>1573486739302</updated>
+      <updated>1617287404310</updated>
     </task>
-    <task id="LOCAL-00172" summary="final model picked by best f1 score instead of last epoch">
-      <created>1573487850812</created>
-      <option name="number" value="00172" />
-      <option name="presentableId" value="LOCAL-00172" />
+    <task id="LOCAL-00258" summary="added more tests">
+      <created>1618420300040</created>
+      <option name="number" value="00258" />
+      <option name="presentableId" value="LOCAL-00258" />
       <option name="project" value="LOCAL" />
-      <updated>1573487850812</updated>
+      <updated>1618420300041</updated>
     </task>
-    <task id="LOCAL-00173" summary="aligned input params to rnn/cnn">
-      <created>1573488569243</created>
-      <option name="number" value="00173" />
-      <option name="presentableId" value="LOCAL-00173" />
+    <task id="LOCAL-00259" summary="moved length tensors to CPU for LSTM (https://github.com/pytorch/pytorch/issues/43227)">
+      <created>1619709257859</created>
+      <option name="number" value="00259" />
+      <option name="presentableId" value="LOCAL-00259" />
       <option name="project" value="LOCAL" />
-      <updated>1573488569243</updated>
+      <updated>1619709257860</updated>
     </task>
-    <task id="LOCAL-00174" summary="minor changes">
-      <created>1574938906645</created>
-      <option name="number" value="00174" />
-      <option name="presentableId" value="LOCAL-00174" />
+    <task id="LOCAL-00260" summary="minor fixes">
+      <created>1620933029034</created>
+      <option name="number" value="00260" />
+      <option name="presentableId" value="LOCAL-00260" />
       <option name="project" value="LOCAL" />
-      <updated>1574938906645</updated>
+      <updated>1620933029035</updated>
     </task>
-    <task id="LOCAL-00175" summary="updated lmer formula building">
-      <created>1576740223209</created>
-      <option name="number" value="00175" />
-      <option name="presentableId" value="LOCAL-00175" />
+    <task id="LOCAL-00261" summary="created">
+      <created>1621601837234</created>
+      <option name="number" value="00261" />
+      <option name="presentableId" value="LOCAL-00261" />
       <option name="project" value="LOCAL" />
-      <updated>1576740223209</updated>
+      <updated>1621601837234</updated>
     </task>
-    <task id="LOCAL-00176" summary="fixed bug to format model output for slopes">
-      <created>1577181887262</created>
-      <option name="number" value="00176" />
-      <option name="presentableId" value="LOCAL-00176" />
+    <task id="LOCAL-00262" summary="+1">
+      <created>1621607112873</created>
+      <option name="number" value="00262" />
+      <option name="presentableId" value="LOCAL-00262" />
       <option name="project" value="LOCAL" />
-      <updated>1577181887262</updated>
+      <updated>1621607112873</updated>
     </task>
-    <task id="LOCAL-00177" summary="added bidirectional lstm without simulated attention">
-      <created>1578348564172</created>
-      <option name="number" value="00177" />
-      <option name="presentableId" value="LOCAL-00177" />
+    <task id="LOCAL-00263" summary="+1">
+      <created>1621611870942</created>
+      <option name="number" value="00263" />
+      <option name="presentableId" value="LOCAL-00263" />
       <option name="project" value="LOCAL" />
-      <updated>1578348564172</updated>
+      <updated>1621611870942</updated>
     </task>
-    <task id="LOCAL-00178" summary="added">
-      <created>1579348574698</created>
-      <option name="number" value="00178" />
-      <option name="presentableId" value="LOCAL-00178" />
+    <task id="LOCAL-00264" summary="+1">
+      <created>1621615539507</created>
+      <option name="number" value="00264" />
+      <option name="presentableId" value="LOCAL-00264" />
       <option name="project" value="LOCAL" />
-      <updated>1579348574698</updated>
+      <updated>1621615539507</updated>
     </task>
-    <task id="LOCAL-00179" summary="improved my_pivot to deal with single columns grouping">
-      <created>1579348650004</created>
-      <option name="number" value="00179" />
-      <option name="presentableId" value="LOCAL-00179" />
+    <task id="LOCAL-00265" summary="+1">
+      <created>1621687984331</created>
+      <option name="number" value="00265" />
+      <option name="presentableId" value="LOCAL-00265" />
       <option name="project" value="LOCAL" />
-      <updated>1579348650004</updated>
+      <updated>1621687984331</updated>
     </task>
-    <task id="LOCAL-00180" summary="general cleaning / added load_data function">
-      <created>1579619359976</created>
-      <option name="number" value="00180" />
-      <option name="presentableId" value="LOCAL-00180" />
+    <task id="LOCAL-00266" summary="+1">
+      <created>1621694342753</created>
+      <option name="number" value="00266" />
+      <option name="presentableId" value="LOCAL-00266" />
       <option name="project" value="LOCAL" />
-      <updated>1579619359977</updated>
+      <updated>1621694342753</updated>
     </task>
-    <task id="LOCAL-00181" summary="fixed final merging (was picking up brcid instead of key)">
-      <created>1579619416124</created>
-      <option name="number" value="00181" />
-      <option name="presentableId" value="LOCAL-00181" />
+    <task id="LOCAL-00267" summary="+1">
+      <created>1621697122850</created>
+      <option name="number" value="00267" />
+      <option name="presentableId" value="LOCAL-00267" />
       <option name="project" value="LOCAL" />
-      <updated>1579619416124</updated>
+      <updated>1621697122850</updated>
     </task>
-    <task id="LOCAL-00182" summary="cleanup / changed covariates">
-      <created>1579619449722</created>
-      <option name="number" value="00182" />
-      <option name="presentableId" value="LOCAL-00182" />
+    <task id="LOCAL-00268" summary="+1">
+      <created>1621711280292</created>
+      <option name="number" value="00268" />
+      <option name="presentableId" value="LOCAL-00268" />
       <option name="project" value="LOCAL" />
-      <updated>1579619449722</updated>
+      <updated>1621711280292</updated>
     </task>
-    <task id="LOCAL-00183" summary="cleanup">
-      <created>1579619488935</created>
-      <option name="number" value="00183" />
-      <option name="presentableId" value="LOCAL-00183" />
+    <task id="LOCAL-00269" summary="+1">
+      <created>1621711361782</created>
+      <option name="number" value="00269" />
+      <option name="presentableId" value="LOCAL-00269" />
       <option name="project" value="LOCAL" />
-      <updated>1579619488935</updated>
+      <updated>1621711361782</updated>
     </task>
-    <task id="LOCAL-00184" summary="added totals and excluded unknowns for ttest and chisq">
-      <created>1579785363076</created>
-      <option name="number" value="00184" />
-      <option name="presentableId" value="LOCAL-00184" />
+    <task id="LOCAL-00270" summary="+1">
+      <created>1621777547205</created>
+      <option name="number" value="00270" />
+      <option name="presentableId" value="LOCAL-00270" />
       <option name="project" value="LOCAL" />
-      <updated>1579785363076</updated>
+      <updated>1621777547205</updated>
     </task>
-    <task id="LOCAL-00185" summary="minor fixes">
-      <created>1580228863173</created>
-      <option name="number" value="00185" />
-      <option name="presentableId" value="LOCAL-00185" />
+    <task id="LOCAL-00271" summary="+1">
+      <created>1621787399090</created>
+      <option name="number" value="00271" />
+      <option name="presentableId" value="LOCAL-00271" />
       <option name="project" value="LOCAL" />
-      <updated>1580228863173</updated>
+      <updated>1621787399090</updated>
     </task>
-    <task id="LOCAL-00186" summary="added dropout">
-      <created>1582632723373</created>
-      <option name="number" value="00186" />
-      <option name="presentableId" value="LOCAL-00186" />
+    <task id="LOCAL-00272" summary="+1">
+      <created>1621788802982</created>
+      <option name="number" value="00272" />
+      <option name="presentableId" value="LOCAL-00272" />
       <option name="project" value="LOCAL" />
-      <updated>1582632723374</updated>
+      <updated>1621788802982</updated>
     </task>
-    <task id="LOCAL-00187" summary="replaced tokenizer function with scispacy/huggingface">
-      <created>1582632781249</created>
-      <option name="number" value="00187" />
-      <option name="presentableId" value="LOCAL-00187" />
+    <task id="LOCAL-00273" summary="+1">
+      <created>1621790247270</created>
+      <option name="number" value="00273" />
+      <option name="presentableId" value="LOCAL-00273" />
       <option name="project" value="LOCAL" />
-      <updated>1582632781249</updated>
+      <updated>1621790247270</updated>
     </task>
-    <task id="LOCAL-00188" summary="fixed super_read_csv function">
-      <created>1582656623852</created>
-      <option name="number" value="00188" />
-      <option name="presentableId" value="LOCAL-00188" />
+    <task id="LOCAL-00274" summary="+1">
+      <created>1621793136438</created>
+      <option name="number" value="00274" />
+      <option name="presentableId" value="LOCAL-00274" />
       <option name="project" value="LOCAL" />
-      <updated>1582656623852</updated>
+      <updated>1621793136438</updated>
     </task>
-    <task id="LOCAL-00189" summary="added function to generate k-fold indices">
-      <created>1583537551017</created>
-      <option name="number" value="00189" />
-      <option name="presentableId" value="LOCAL-00189" />
+    <task id="LOCAL-00275" summary="+1">
+      <created>1621880038316</created>
+      <option name="number" value="00275" />
+      <option name="presentableId" value="LOCAL-00275" />
       <option name="project" value="LOCAL" />
-      <updated>1583537551017</updated>
+      <updated>1621880038316</updated>
     </task>
-    <task id="LOCAL-00190" summary="formatting">
-      <created>1583537584354</created>
-      <option name="number" value="00190" />
-      <option name="presentableId" value="LOCAL-00190" />
+    <task id="LOCAL-00276" summary="+1">
+      <created>1621952560834</created>
+      <option name="number" value="00276" />
+      <option name="presentableId" value="LOCAL-00276" />
       <option name="project" value="LOCAL" />
-      <updated>1583537584354</updated>
+      <updated>1621952560834</updated>
     </task>
-    <task id="LOCAL-00191" summary="removed restriction on num epochs for best score">
-      <created>1583537625236</created>
-      <option name="number" value="00191" />
-      <option name="presentableId" value="LOCAL-00191" />
+    <task id="LOCAL-00277" summary="+1">
+      <created>1621953956253</created>
+      <option name="number" value="00277" />
+      <option name="presentableId" value="LOCAL-00277" />
       <option name="project" value="LOCAL" />
-      <updated>1583537625236</updated>
+      <updated>1621953956253</updated>
     </task>
-    <task id="LOCAL-00192" summary="added bucket_data function">
-      <created>1585665938119</created>
-      <option name="number" value="00192" />
-      <option name="presentableId" value="LOCAL-00192" />
+    <task id="LOCAL-00278" summary="+1">
+      <created>1621961325128</created>
+      <option name="number" value="00278" />
+      <option name="presentableId" value="LOCAL-00278" />
       <option name="project" value="LOCAL" />
-      <updated>1585665938119</updated>
+      <updated>1621961325128</updated>
     </task>
-    <task id="LOCAL-00193" summary="fixed bug for CI display">
-      <created>1585675388349</created>
-      <option name="number" value="00193" />
-      <option name="presentableId" value="LOCAL-00193" />
+    <task id="LOCAL-00279" summary="+1">
+      <created>1621962483790</created>
+      <option name="number" value="00279" />
+      <option name="presentableId" value="LOCAL-00279" />
       <option name="project" value="LOCAL" />
-      <updated>1585675388349</updated>
+      <updated>1621962483791</updated>
     </task>
-    <task id="LOCAL-00194" summary="minor changes">
-      <created>1585675415231</created>
-      <option name="number" value="00194" />
-      <option name="presentableId" value="LOCAL-00194" />
+    <task id="LOCAL-00280" summary="+1">
+      <created>1621966376001</created>
+      <option name="number" value="00280" />
+      <option name="presentableId" value="LOCAL-00280" />
       <option name="project" value="LOCAL" />
-      <updated>1585675415232</updated>
+      <updated>1621966376001</updated>
     </task>
-    <task id="LOCAL-00195" summary="changed how different rnn models are dealt with (and restricted bidirectional to lstm)">
-      <created>1585747686631</created>
-      <option name="number" value="00195" />
-      <option name="presentableId" value="LOCAL-00195" />
+    <task id="LOCAL-00281" summary="+1">
+      <created>1621966852435</created>
+      <option name="number" value="00281" />
+      <option name="presentableId" value="LOCAL-00281" />
       <option name="project" value="LOCAL" />
-      <updated>1585747686631</updated>
+      <updated>1621966852435</updated>
     </task>
-    <task id="LOCAL-00196" summary="added simulated attention for gru/rnn">
-      <created>1585784268310</created>
-      <option name="number" value="00196" />
-      <option name="presentableId" value="LOCAL-00196" />
+    <task id="LOCAL-00282" summary="+1">
+      <created>1621976589943</created>
+      <option name="number" value="00282" />
+      <option name="presentableId" value="LOCAL-00282" />
       <option name="project" value="LOCAL" />
-      <updated>1585784268310</updated>
+      <updated>1621976589943</updated>
     </task>
-    <task id="LOCAL-00197" summary="added input columns as input">
-      <created>1586864532378</created>
-      <option name="number" value="00197" />
-      <option name="presentableId" value="LOCAL-00197" />
+    <task id="LOCAL-00283" summary="+1">
+      <created>1622031597479</created>
+      <option name="number" value="00283" />
+      <option name="presentableId" value="LOCAL-00283" />
       <option name="project" value="LOCAL" />
-      <updated>1586864532378</updated>
+      <updated>1622031597479</updated>
     </task>
-    <task id="LOCAL-00198" summary="reordered confidence intervals">
-      <created>1586864565761</created>
-      <option name="number" value="00198" />
-      <option name="presentableId" value="LOCAL-00198" />
+    <task id="LOCAL-00284" summary="+1">
+      <created>1622039889493</created>
+      <option name="number" value="00284" />
+      <option name="presentableId" value="LOCAL-00284" />
       <option name="project" value="LOCAL" />
-      <updated>1586864565761</updated>
+      <updated>1622039889494</updated>
     </task>
-    <task id="LOCAL-00199" summary="minor fixes on ttest and chisq functions">
-      <created>1586864604617</created>
-      <option name="number" value="00199" />
-      <option name="presentableId" value="LOCAL-00199" />
+    <task id="LOCAL-00285" summary="+1">
+      <created>1622048550362</created>
+      <option name="number" value="00285" />
+      <option name="presentableId" value="LOCAL-00285" />
       <option name="project" value="LOCAL" />
-      <updated>1586864604617</updated>
+      <updated>1622048550362</updated>
     </task>
-    <task id="LOCAL-00200" summary="added stats computations to main function">
-      <created>1586864659457</created>
-      <option name="number" value="00200" />
-      <option name="presentableId" value="LOCAL-00200" />
+    <task id="LOCAL-00286" summary="+1">
+      <created>1622050676119</created>
+      <option name="number" value="00286" />
+      <option name="presentableId" value="LOCAL-00286" />
       <option name="project" value="LOCAL" />
-      <updated>1586864659457</updated>
+      <updated>1622050676119</updated>
     </task>
-    <task id="LOCAL-00201" summary="added">
-      <created>1586865163331</created>
-      <option name="number" value="00201" />
-      <option name="presentableId" value="LOCAL-00201" />
+    <task id="LOCAL-00287" summary="+1">
+      <created>1622055298971</created>
+      <option name="number" value="00287" />
+      <option name="presentableId" value="LOCAL-00287" />
       <option name="project" value="LOCAL" />
-      <updated>1586865163331</updated>
+      <updated>1622055298971</updated>
     </task>
-    <task id="LOCAL-00202" summary="minor improvements">
-      <created>1586948062419</created>
-      <option name="number" value="00202" />
-      <option name="presentableId" value="LOCAL-00202" />
+    <task id="LOCAL-00288" summary="+1">
+      <created>1622125964143</created>
+      <option name="number" value="00288" />
+      <option name="presentableId" value="LOCAL-00288" />
       <option name="project" value="LOCAL" />
-      <updated>1586948062419</updated>
+      <updated>1622125964143</updated>
     </task>
-    <task id="LOCAL-00203" summary="added function to compute p_value significance">
-      <created>1586948114191</created>
-      <option name="number" value="00203" />
-      <option name="presentableId" value="LOCAL-00203" />
+    <task id="LOCAL-00289" summary="+1">
+      <created>1622130251594</created>
+      <option name="number" value="00289" />
+      <option name="presentableId" value="LOCAL-00289" />
       <option name="project" value="LOCAL" />
-      <updated>1586948114191</updated>
+      <updated>1622130251594</updated>
     </task>
-    <task id="LOCAL-00204" summary="added functions to save/load model">
-      <created>1586948489305</created>
-      <option name="number" value="00204" />
-      <option name="presentableId" value="LOCAL-00204" />
+    <task id="LOCAL-00290" summary="+1">
+      <created>1622130919455</created>
+      <option name="number" value="00290" />
+      <option name="presentableId" value="LOCAL-00290" />
       <option name="project" value="LOCAL" />
-      <updated>1586948489305</updated>
+      <updated>1622130919455</updated>
     </task>
-    <task id="LOCAL-00205" summary="added cohens_d function">
-      <created>1604500946280</created>
-      <option name="number" value="00205" />
-      <option name="presentableId" value="LOCAL-00205" />
+    <task id="LOCAL-00291" summary="+1">
+      <created>1622140884073</created>
+      <option name="number" value="00291" />
+      <option name="presentableId" value="LOCAL-00291" />
       <option name="project" value="LOCAL" />
-      <updated>1604500946280</updated>
+      <updated>1622140884073</updated>
     </task>
-    <task id="LOCAL-00206" summary="more tests for resubmission">
-      <created>1604501064729</created>
-      <option name="number" value="00206" />
-      <option name="presentableId" value="LOCAL-00206" />
+    <task id="LOCAL-00292" summary="+1">
+      <created>1622192579671</created>
+      <option name="number" value="00292" />
+      <option name="presentableId" value="LOCAL-00292" />
       <option name="project" value="LOCAL" />
-      <updated>1604501064729</updated>
+      <updated>1622192579671</updated>
     </task>
-    <task id="LOCAL-00207" summary="added">
-      <created>1606070961244</created>
-      <option name="number" value="00207" />
-      <option name="presentableId" value="LOCAL-00207" />
+    <task id="LOCAL-00293" summary="+1">
+      <created>1622199235852</created>
+      <option name="number" value="00293" />
+      <option name="presentableId" value="LOCAL-00293" />
       <option name="project" value="LOCAL" />
-      <updated>1606070961245</updated>
+      <updated>1622199235852</updated>
     </task>
-    <task id="LOCAL-00208" summary="removed old test and updated main to use imdb dataset">
-      <created>1606071474221</created>
-      <option name="number" value="00208" />
-      <option name="presentableId" value="LOCAL-00208" />
+    <task id="LOCAL-00294" summary="+1">
+      <created>1622199881128</created>
+      <option name="number" value="00294" />
+      <option name="presentableId" value="LOCAL-00294" />
       <option name="project" value="LOCAL" />
-      <updated>1606071474221</updated>
+      <updated>1622199881128</updated>
     </task>
-    <task id="LOCAL-00209" summary="fixed loading pre-trained model from cache">
-      <created>1606155019096</created>
-      <option name="number" value="00209" />
-      <option name="presentableId" value="LOCAL-00209" />
+    <task id="LOCAL-00295" summary="+1">
+      <created>1622200027011</created>
+      <option name="number" value="00295" />
+      <option name="presentableId" value="LOCAL-00295" />
       <option name="project" value="LOCAL" />
-      <updated>1606155019096</updated>
+      <updated>1622200027011</updated>
     </task>
-    <task id="LOCAL-00210" summary="reformatted code and added tests to main">
-      <created>1606155067899</created>
-      <option name="number" value="00210" />
-      <option name="presentableId" value="LOCAL-00210" />
+    <task id="LOCAL-00296" summary="+1">
+      <created>1622210090631</created>
+      <option name="number" value="00296" />
+      <option name="presentableId" value="LOCAL-00296" />
       <option name="project" value="LOCAL" />
-      <updated>1606155067899</updated>
+      <updated>1622210090632</updated>
     </task>
-    <task id="LOCAL-00211" summary="created separate project">
-      <created>1606223799165</created>
-      <option name="number" value="00211" />
-      <option name="presentableId" value="LOCAL-00211" />
+    <task id="LOCAL-00297" summary="+1">
+      <created>1622211930182</created>
+      <option name="number" value="00297" />
+      <option name="presentableId" value="LOCAL-00297" />
       <option name="project" value="LOCAL" />
-      <updated>1606223799165</updated>
+      <updated>1622211930182</updated>
     </task>
-    <task id="LOCAL-00212" summary="created separate project">
-      <created>1606224244931</created>
-      <option name="number" value="00212" />
-      <option name="presentableId" value="LOCAL-00212" />
+    <task id="LOCAL-00298" summary="+1">
+      <created>1622213354808</created>
+      <option name="number" value="00298" />
+      <option name="presentableId" value="LOCAL-00298" />
       <option name="project" value="LOCAL" />
-      <updated>1606224244931</updated>
+      <updated>1622213354808</updated>
     </task>
-    <task id="LOCAL-00213" summary="added longitudinal modelling utils">
-      <created>1606227411532</created>
-      <option name="number" value="00213" />
-      <option name="presentableId" value="LOCAL-00213" />
+    <task id="LOCAL-00299" summary="+1">
+      <created>1622280812174</created>
+      <option name="number" value="00299" />
+      <option name="presentableId" value="LOCAL-00299" />
       <option name="project" value="LOCAL" />
-      <updated>1606227411532</updated>
+      <updated>1622280812175</updated>
     </task>
-    <task id="LOCAL-00214" summary="commented and cleaned up code">
-      <created>1606236100714</created>
-      <option name="number" value="00214" />
-      <option name="presentableId" value="LOCAL-00214" />
+    <task id="LOCAL-00300" summary="+1">
+      <created>1622283013062</created>
+      <option name="number" value="00300" />
+      <option name="presentableId" value="LOCAL-00300" />
       <option name="project" value="LOCAL" />
-      <updated>1606236100714</updated>
+      <updated>1622283013062</updated>
     </task>
-    <task id="LOCAL-00215" summary="added more tests">
-      <created>1606236123800</created>
-      <option name="number" value="00215" />
-      <option name="presentableId" value="LOCAL-00215" />
+    <task id="LOCAL-00301" summary="+1">
+      <created>1622300836699</created>
+      <option name="number" value="00301" />
+      <option name="presentableId" value="LOCAL-00301" />
       <option name="project" value="LOCAL" />
-      <updated>1606236123800</updated>
+      <updated>1622300836699</updated>
     </task>
-    <task id="LOCAL-00216" summary="changed project structure">
-      <created>1606236159927</created>
-      <option name="number" value="00216" />
-      <option name="presentableId" value="LOCAL-00216" />
+    <task id="LOCAL-00302" summary="+1">
+      <created>1622300932405</created>
+      <option name="number" value="00302" />
+      <option name="presentableId" value="LOCAL-00302" />
       <option name="project" value="LOCAL" />
-      <updated>1606236159927</updated>
+      <updated>1622300932405</updated>
     </task>
-    <task id="LOCAL-00217" summary="removed">
-      <created>1606236289421</created>
-      <option name="number" value="00217" />
-      <option name="presentableId" value="LOCAL-00217" />
+    <task id="LOCAL-00303" summary="+1">
+      <created>1622302706677</created>
+      <option name="number" value="00303" />
+      <option name="presentableId" value="LOCAL-00303" />
       <option name="project" value="LOCAL" />
-      <updated>1606236289421</updated>
+      <updated>1622302706677</updated>
     </task>
-    <option name="localTasksCounter" value="218" />
+    <option name="localTasksCounter" value="304" />
     <servers />
   </component>
   <component name="TerminalProjectNonSharedOptionsProvider">
@@ -769,69 +683,32 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="removed restriction on num epochs for best score" />
-    <MESSAGE value="added bucket_data function" />
-    <MESSAGE value="fixed bug for CI display" />
-    <MESSAGE value="minor changes" />
-    <MESSAGE value="changed how different rnn models are dealt with (and restricted bidirectional to lstm)" />
-    <MESSAGE value="added simulated attention for gru/rnn" />
-    <MESSAGE value="added input columns as input" />
-    <MESSAGE value="reordered confidence intervals" />
-    <MESSAGE value="minor fixes on ttest and chisq functions" />
-    <MESSAGE value="added stats computations to main function" />
+    <MESSAGE value="minor bug fixes" />
     <MESSAGE value="minor improvements" />
-    <MESSAGE value="added function to compute p_value significance" />
-    <MESSAGE value="added functions to save/load model" />
-    <MESSAGE value="added cohens_d function" />
-    <MESSAGE value="more tests for resubmission" />
-    <MESSAGE value="added" />
-    <MESSAGE value="removed old test and updated main to use imdb dataset" />
-    <MESSAGE value="fixed loading pre-trained model from cache" />
-    <MESSAGE value="reformatted code and added tests to main" />
-    <MESSAGE value="created separate project" />
-    <MESSAGE value="added longitudinal modelling utils" />
-    <MESSAGE value="commented and cleaned up code" />
+    <MESSAGE value="reformatted and cleaned code" />
+    <MESSAGE value="reformatted and cleaned code (moved mlm code to separate module)" />
+    <MESSAGE value="added dummify function" />
+    <MESSAGE value="minor changes" />
+    <MESSAGE value="added log regression code" />
+    <MESSAGE value="added more regression code" />
+    <MESSAGE value="added function to generate ward stays" />
+    <MESSAGE value="fixed minor limitations in regression models" />
+    <MESSAGE value="fixed report for logistic regression" />
+    <MESSAGE value="major cleanup in data loading/cleaning" />
+    <MESSAGE value="more cleanup" />
+    <MESSAGE value="change return type for mlm functions" />
+    <MESSAGE value="minor additions" />
+    <MESSAGE value="added new tests" />
+    <MESSAGE value="minor cleanup&#10;added possibility to force reload for LongitudinalDataset objects" />
+    <MESSAGE value="added options to dummify function" />
+    <MESSAGE value="cleanup" />
+    <MESSAGE value="fixed pb when na values dropped by default" />
     <MESSAGE value="added more tests" />
-    <MESSAGE value="changed project structure" />
-    <MESSAGE value="removed" />
-    <option name="LAST_COMMIT_MESSAGE" value="removed" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="234" y="0" key="#Notifications" timestamp="1606065540981">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="234" y="0" key="#Notifications/0.0.1280.680@0.0.1280.680" timestamp="1606065540981" />
-    <state x="210" y="0" key="CommitChangelistDialog2" timestamp="1606065501156">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="265" y="0" key="CommitChangelistDialog2/0.0.1280.680/-1920.494.1920.1040@0.0.1280.680" timestamp="1604501063421" />
-    <state x="210" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1606065501156" />
-    <state x="705" y="433" key="Github.CreateGistDialog" timestamp="1606224063961">
-      <screen x="0" y="25" width="1792" height="1010" />
-    </state>
-    <state x="705" y="433" key="Github.CreateGistDialog/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606224063961" />
-    <state x="746" y="411" key="Github.ShareDialog" timestamp="1606224403516">
-      <screen x="0" y="25" width="1792" height="1010" />
-    </state>
-    <state x="746" y="411" key="Github.ShareDialog/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606224403516" />
-    <state x="405" y="146" key="SettingsEditor" timestamp="1606252287112">
-      <screen x="0" y="25" width="1792" height="1010" />
-    </state>
-    <state x="405" y="146" key="SettingsEditor/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606252287112" />
-    <state x="328" y="142" key="Vcs.Push.Dialog.v2" timestamp="1606236290914">
-      <screen x="0" y="25" width="1792" height="1010" />
-    </state>
-    <state x="328" y="142" key="Vcs.Push.Dialog.v2/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606236290914" />
-    <state x="234" y="79" key="Vcs.Push.Dialog.v2/0.0.1280.680/-1920.494.1920.1040@0.0.1280.680" timestamp="1604501067063" />
-    <state x="234" y="79" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1606065508688" />
-    <state x="448" y="263" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605955093381">
-      <screen x="0" y="0" width="1280" height="680" />
-    </state>
-    <state x="448" y="263" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1280.680@0.0.1280.680" timestamp="1605955093381" />
-    <state x="740" y="320" key="refactoring.ChangeSignatureDialog" timestamp="1606253156747">
-      <screen x="0" y="25" width="1792" height="1010" />
-    </state>
-    <state x="740" y="320" key="refactoring.ChangeSignatureDialog/-1920.40.1920.1080/0.25.1792.1010@0.25.1792.1010" timestamp="1606253156747" />
+    <MESSAGE value="moved length tensors to CPU for LSTM (https://github.com/pytorch/pytorch/issues/43227)" />
+    <MESSAGE value="minor fixes" />
+    <MESSAGE value="created" />
+    <MESSAGE value="+1" />
+    <option name="LAST_COMMIT_MESSAGE" value="+1" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

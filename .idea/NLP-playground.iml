@@ -20,6 +20,7 @@
     <orderEntry type="module" module-name="mimic-code" />
     <orderEntry type="module" module-name="tdy_ehr" />
     <orderEntry type="module" module-name="prometheus" />
+    <orderEntry type="module" module-name="longitudinal_modelling" />
   </component>
   <component name="TestRunnerService">
     <option name="PROJECT_TEST_RUNNER" value="pytest" />
