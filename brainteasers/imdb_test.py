@@ -1,5 +1,10 @@
 """
 QUESTION 1
+
+during a flight, passengers can watch movies up to 30 minutes before the flight lands.
+Given the list of movie durations available in the flight, pick 2 distinct movies that will last exactly the entire flight
+If several pairs are possible, pick the pair that contains the longest lasting movie
+return the indices of the optimal pair
 """
 flightDuration=90
 movieDuration=[1,10,25,35,60]
@@ -35,6 +40,12 @@ print(timeit.timeit('foo(90, [1, 10, 25, 35, 60, 40, 20, 10, 15, 60])', globals=
 
 """
 QUESTION 2
+
+amazon has a list of items '*' contained in containers ('||') or not
+e.g. |**| means 2 items in a container, |*|***| means 1 and 3 items in 2 containers
+given a string of items and containers, count the number of items that are inside containers
+e.g. |*|***|** --> 4
+start/end indicate which portion of the string to look at
 """
 s = '|**|*|*'
 starti = [1,1]
