@@ -49,7 +49,7 @@ Solution6().is_bst(root)
 
 #endregion
 
-#region 5. Level order Binary Tree Traversal
+#region 5. Level order Binary Tree Traversal (Breadth First Search)
 """
 5. Level order Binary Tree Traversal in python
 
@@ -123,7 +123,7 @@ array = [1, 2, 5, 7, 13, 15, 16, 18, 24, 28, 29]
 SolutionBinarySearch().binary_search_rec(element, array)
 #endregion
 
-#region minimum swaps to order a list
+#region Minimum swaps to sort a list
 def minimumSwaps(arr):
     swaps = 0
     n = len(arr)
@@ -388,5 +388,75 @@ Memory complexity:
 """
 #endregion
 
-#region breadth first traversal of a graph TODO
+#region Breadth First Dearch / Depth First Search of a graph TODO
+"""
+BFS and DFS are both simple algorithms, and they are quite similar. 
+With both algorithms, we explore individual nodes — one by one — until we find a node matching a particular condition
+https://medium.com/tebs-lab/breadth-first-search-and-depth-first-search-4310f3bf8416
+
+DFS:    prioritizes searching deepest node
+        we wont try to search other neighbors of start_node until 1st neighbor fully explored
+        1. go to the specified start node.
+        2. arbitrarily pick 1 neighbor of start_node and go there. 
+        3. If that node has neighbors, arbitrarily pick one of those and go there unless we’ve already seen it
+        4. When: node with no neighbors/only neighbors seen before -> go back 1 step and try other neighbor
+        
+BFS:    prioritizes most shallow nodes
+        explore all neighbors of start node before going to other level
+        1. go to the specified start_node
+        2. explore all neighbors of start_node
+        3. explore all nodes that are 2 hops away from start_node, then 3 hops...
+        
+unweighted graph: BFS will find shortest path
+"""
+
+
+# Directed graph using adjacency list representation
+class Graph:
+    def __init__(self):
+        # default dictionary to store graph
+        self.graph = defaultdict(list)
+
+    # function to add an edge to graph
+    def addEdge(self, u, v):
+        self.graph[u].append(v)
+
+    def __repr__(self):
+        return str(dict(self.graph))
+
+    def BFS(self, start_node):
+        # initialize all vertices as unvisited
+        visited = [False] * (max(self.graph)+1)
+        queue =[]
+        res = ''
+        # mark start_node as visited and enqueue it
+        visited[start_node] = True
+        queue.append(start_node)
+
+        while queue:
+            visited_node = queue.pop(0)
+            res += str(visited_node)+'-->'
+            for node in self.graph[visited_node]: # look at all neighbors
+                if not visited[node]:
+                    queue.append(node)
+                    visited[node] = True
+        return res[:-3]
+
+"""
+ 0 ---------> 1 ----
+ |                  |
+ |            ^     |
+ 2 ---------> 3     |
+ ^__________________|
+                    
+"""
+g = Graph()
+g.addEdge(0, 1)
+g.addEdge(0, 2)
+g.addEdge(1, 2)
+g.addEdge(2, 0)
+g.addEdge(2, 3)
+g.addEdge(3, 3)
+print(g)
 #endregion
+
