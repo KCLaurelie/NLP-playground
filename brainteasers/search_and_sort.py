@@ -393,6 +393,9 @@ Memory complexity:
 BFS and DFS are both simple algorithms, and they are quite similar. 
 With both algorithms, we explore individual nodes — one by one — until we find a node matching a particular condition
 https://medium.com/tebs-lab/breadth-first-search-and-depth-first-search-4310f3bf8416
+https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
+https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/
+
 
 DFS:    prioritizes searching deepest node
         we wont try to search other neighbors of start_node until 1st neighbor fully explored
@@ -424,7 +427,7 @@ class Graph:
     def __repr__(self):
         return str(dict(self.graph))
 
-    def BFS(self, start_node):
+    def BFS(self, start_node=0):
         # initialize all vertices as unvisited
         visited = [False] * (max(self.graph)+1)
         queue =[]
@@ -442,6 +445,20 @@ class Graph:
                     visited[node] = True
         return res[:-3]
 
+    def DFS(self, start_node=0):
+        # recursion
+        def DFS_rec(current_node, visited, res=""):
+            visited.add(current_node)
+            res += str(current_node) + '-->'
+
+            for neighbor in self.graph[current_node]:
+                if neighbor not in visited:
+                    res = DFS_rec(neighbor, visited, res)
+            return res
+
+        visited = set()
+        return DFS_rec(start_node, visited)[:-3]
+
 """
  0 ---------> 1 ----
  |                  |
@@ -458,5 +475,7 @@ g.addEdge(2, 0)
 g.addEdge(2, 3)
 g.addEdge(3, 3)
 print(g)
+g.BFS(start_node=2)
+g.DFS(start_node=2)
 #endregion
 
