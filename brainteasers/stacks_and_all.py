@@ -16,45 +16,6 @@ Memory Complexity: Linear, O(n)
 
 #endregion
 
-#region 13. Deep copy of a directed graph  TODO
-"""
-In a diagram of a graph, a vertex is usually represented by a circle with a label, 
-and an edge is represented by a line or arrow extending from one vertex to another
-https://www.educative.io/m/clone-directed-graph
-
-Runtime Complexity: Linear, O(n)
-Memory Complexity: Logarithmic, O(logn)
-"""
-class DGNode:
-    def __init__(self, d):
-        self.data = d
-        self.neighbors = []
-
-class Solution13(object):
-    def clone_rec(self, root, nodes_completed={}):
-        if root == None: return None
-
-        pNew = DGNode(root.data)
-        nodes_completed[root] = pNew
-
-        for p in root.neighbors:
-            x = nodes_completed.get(p)
-        if x is None:
-            pNew.neighbors += [self.clone_rec(p, nodes_completed)]
-        else:
-            pNew.neighbors += [x]
-        return pNew
-
-root = DGNode(1)
-root.neighbors = DGNode(2)
-root.neighbors = DGNode(3)
-
-Solution13().clone_rec(root)
-#endregion
-
-#region 17 Convert a Binary tree to a Doubly Linked List TODO
-#endregion
-
 #region 21. Implement a stack with push(), min(), and pop() in O(1)O(1) time TODO
 #endregion
 
@@ -104,3 +65,4 @@ qobj.enQueue(queue=q, item=20)
 qobj.deQueue(queue=q)
 
 #endregion
+
