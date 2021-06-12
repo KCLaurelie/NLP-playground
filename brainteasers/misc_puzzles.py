@@ -78,7 +78,7 @@ def maxSubsetSum(arr):
     return ans
 #endregion
 
-#region Triple Sum
+#region Find triplets in arrays
 """
 Given 3 arrays a, b, c find all triples (i,j,k) such as i<=j and j>=k
 (with i in a, j in b, k in c)
@@ -148,6 +148,12 @@ def rotLeft(a, d):
 arr = [1, 2, 3, 4, 5, 6]
 rotLeft(arr, 14)
 
+#endregion
+
+#region Common elements in lists
+def common_els(l1,l2):
+    return set(l1) & set(l2)
+common_els([1, 2, 3, 4, 5], [5, 6, 7, 8, 9])
 #endregion
 
 #region hourglass array TODO
@@ -249,6 +255,10 @@ class Solution2(object):
 
 print(Solution2().find_sum_of_two([3,7,1,2,8,4,5],10))
 #endregion
+
+"""
+BRAINTEASERS
+"""
 
 #region 9. Coin change problem (dynamic programming solution)
 """

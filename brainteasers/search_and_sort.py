@@ -38,8 +38,8 @@ def minimumSwaps(arr):
 
     for idx in range(n):
         while arr[idx] - 1 != idx:  # check if element in its right place
-            ele = arr[idx]  # this is the misplaced element
-            arr[ele - 1], arr[idx] = arr[idx], arr[ele - 1]  # we swap it back where it belongs
+            el = arr[idx]  # this is the misplaced element
+            arr[el - 1], arr[idx] = arr[idx], arr[el - 1]  # we swap it back where it belongs
             swaps += 1  # and increase the swap counter
     return swaps
 minimumSwaps([1,2,3,5,4,6,7,8])

@@ -326,3 +326,27 @@ SolutionNegex().negex_words(string, target, neg_terms = ['no', "n't", 'deni', 'd
 SolutionNegex().negex_chars(string, target, neg_terms = ['no', "n't", 'deni', 'deny'])
 
 #endregion
+
+#region all permutations in string (without itertool)
+def all_perms(elements):
+    if len(elements) <=1:
+        return elements
+    else:
+        tmp = []
+        for perm in all_perms(elements[1:]):
+            for i in range(len(elements)):
+                tmp.append(perm[:i] + elements[0:1] + perm[i:])
+        return tmp
+
+def permute(data, i=0):
+    n = len(data)
+    if i==n: print(''.join(data) )
+    else:
+        for j in range(i,n):
+            data[i], data[j] = data[j], data[i] #swap
+            permute(data, i+1)
+            data[i], data[j] = data[j], data[i]
+
+all_perms('abcd')
+permute(list('abcd'))
+#endregion
