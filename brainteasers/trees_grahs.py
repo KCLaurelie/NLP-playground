@@ -178,7 +178,8 @@ With both algorithms, we explore individual nodes — one by one — until we fi
 https://medium.com/tebs-lab/breadth-first-search-and-depth-first-search-4310f3bf8416
 https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
 https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/
-
+Time complexity: O(V + E), where V is the number of vertices and E is the number of edges in the graph.
+Space Complexity: O(V)
 
 DFS:    prioritizes searching deepest node
         we wont try to search other neighbors of start_node until 1st neighbor fully explored

@@ -1,5 +1,6 @@
 from itertools import groupby
 import re
+from collections import Counter
 
 #region 7. String segmentation
 """
@@ -73,10 +74,9 @@ def get_unordered_anagram_count(string):
     return count
 
 get_unordered_anagram_count('mom')
+#endregion
 
-
-from collections import Counter
-
+#region sherlock anagrams
 def sherlockAndAnagrams(s):
     all_subs = []
     # get all possible substrings of s

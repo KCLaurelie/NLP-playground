@@ -7,7 +7,7 @@ from random import randint
 #region Divide and Conquer (binary search of given element in an array)
 
 """
-EARCH ELEMENT IN A SORTED ARRAY
+SEARCH ELEMENT IN A SORTED ARRAY
 Binary Search works on a divide-and-conquer approach and relies on the fact that the array is sorted to eliminate half of possible candidates in each iteration. 
 More specifically, it compares the middle element of the sorted array to the element it's searching for in order to decide where to continue the search.
 Runtime complexity: O(logn)
