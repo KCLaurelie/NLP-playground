@@ -7,258 +7,38 @@ from collections import Counter
 from collections import defaultdict
 from itertools import groupby
 
-#region 1. find missing number in array
-"""
-1. find missing number in array
-You are given an array of positive numbers from 1 to n, such that all numbers from 1 to n are present except one number x. Y
-ou have to find x.
 
-Runtime Complexity: Linear, O(n)
-Memory Complexity: Constant, O(1)
-"""
 
-class Solution1(object):
-    def find_missing(self,input):
-        # calculate sum of all elements
-        # in input list
-        sum_of_elements = sum(input)
+#region Largest Rectangle
+# https://www.hackerrank.com/challenges/largest-rectangle/problem?h_l=interview&playlist_slugs%5B%5D=interview-preparation-kit&playlist_slugs%5B%5D=stacks-queues
+# https://www.geeksforgeeks.org/largest-rectangle-under-histogram/
+# Runtime: O(n)
 
-        # There is exactly 1 number missing
-        n = len(input) + 1
-        actual_sum = (n * (n + 1)) / 2
-        return actual_sum - sum_of_elements
+def getMaxArea(arr):
+    s = [-1]
+    n = len(arr)
+    area = 0
+    i = 0
+    left_smaller = [-1] * n
+    right_smaller = [n] * n
+    while i < n:
+        while s and (s[-1] != -1) and (arr[s[-1]] > arr[i]):
+            right_smaller[s[-1]] = i
+            s.pop()
+        if ((i > 0) and (arr[i] == arr[i - 1])):
+            left_smaller[i] = left_smaller[i - 1]
+        else:
+            left_smaller[i] = s[-1]
+        s.append(i)
+        i += 1
+    for j in range(0, n):
+        area = max(area, arr[j] * (right_smaller[j] - left_smaller[j] - 1))
+    return area
 
-starttime = timeit.default_timer()
-print(Solution1().find_missing([3,7,1,2,8,4,5]))
-print("The time difference is :", timeit.default_timer() - starttime)
+
+hist = [6, 2, 5, 4, 5, 1, 6]
+print("maxArea = ", getMaxArea(hist))
 #endregion
-
-#region Min Max array
-"""
-You are given a list of integers arr and a single integer n.
-You must create an array of length n from arr such that the difference between its max and min is minimum
-"""
-arr = [1,2,3,4,10,20,30,40,100,200]
-k=4
-# solution: selecting [1,2,3,4] gives max diff=3
-
-arr = [100,200,300,350,400,401,402]
-k=3
-# solution: selecting [400,401,402] gives max diff=2
-def maxMin(k, arr):
-    arr.sort()
-    min_diff=arr[len(arr)-1]-arr[0]
-    for idx in range(len(arr)-k+1):
-        curr_diff = arr[idx+k-1]-arr[idx]
-        print(idx, arr[idx:idx+k], curr_diff)
-        if curr_diff<min_diff:
-            min_diff=curr_diff
-    return min_diff
-#endregion
-
-#region MaxArray sum
-"""
-Given an array of integers, 
-find the subset of non-adjacent elements with the maximum sum. 
-Calculate the sum of that subset. 
-It is possible that the maximum sum is 0, the case when all elements are negative.
-Returns:  int: the maximum subset sum
-"""
-arr = [3, 5, -7, 8, 10] #res=15 (10+5)
-arr = [2, 1, 5, 8, 4] # res=11 (4+5+2)
-def maxSubsetSum(arr):
-    dp = list()
-    dp.append(arr[0])
-    dp.append(max(arr[:2]))
-    ans = dp[-1]
-    for i in arr[2:]:
-        print(i, dp)
-        dp.append(max(i, dp[-2] + i, ans))
-        ans = max(ans, dp[-1])
-    return ans
-#endregion
-
-#region Find triplets in arrays
-"""
-Given 3 arrays a, b, c find all triples (i,j,k) such as i<=j and j>=k
-(with i in a, j in b, k in c)
-return: number of triples
-"""
-a=[1, 3, 5, 7]
-b=[5, 7, 9]
-c=[7, 9, 11, 13]
-# expected output: 12
-def triplets(a, b, c):
-    a = sorted(set(a))
-    b = sorted(set(b),reverse=True)
-    c = sorted(set(c))
-
-    nb_triplets=0
-    for i in a:
-        for j in b:
-            if j<i: break
-            for k in c:
-                if k>j: break
-                nb_triplets+=1
-    return nb_triplets
-
-
-#endregion
-
-#region Count geometric progression triplets in list
-"""
-You are given an array and you need to find number of tripets of indices  
-such that the elements at those indices are in geometric progression of ratio r
-https://www.geeksforgeeks.org/number-gp-geometric-progression-subsequences-size-3/
-"""
-from collections import defaultdict
-def countTriplets(arr, r):
-    res = 0
-    # keep track of left and right elements
-    left = defaultdict(lambda:0) #to store arra[elem]/r
-    right = defaultdict(lambda:0) #to store arra[elem]*r
-
-    # count the nb f occurences of each element present in the arrays
-    for elem in arr:
-        right[elem] +=1
-
-    for elem in arr:
-        cl, cr = 0, 0  # initialize counters
-        if elem % r == 0: # if divisible by ratio
-            cl = left[elem//r]  # count elements in left hash
-        right[elem] -= 1  # remove from right hash
-        left[elem] += 1  # increase count in left hash
-        cr = right[elem*r]  # count candidate elements in right hash
-
-        res += cl * cr
-    return res
-
-arr = [3, 1, 2, 6, 2, 3, 6, 9, 18, 3, 9]
-countTriplets(arr, r=3)
-#endregion
-
-#region 22. Rotate an array by K
-
-def rotLeft(a, d):
-    if d > len(arr):
-        d = d % len(arr)
-    print(d)
-    return arr[d:]+arr[0:d]
-
-arr = [1, 2, 3, 4, 5, 6]
-rotLeft(arr, 14)
-
-#endregion
-
-#region Common elements in lists
-def common_els(l1,l2):
-    return set(l1) & set(l2)
-common_els([1, 2, 3, 4, 5], [5, 6, 7, 8, 9])
-#endregion
-
-#region hourglass array TODO
-arr = [[1, 2, 3, 0, 0],
-       [0, 0, 0, 0, 0],
-       [2, 1, 4, 0, 0],
-       [0, 0, 0, 0, 0],
-       [1, 1, 0, 1, 0]]
-#endregion
-
-#region X. Finding 2 numbers from given list that add to a total
-
-class SolutionX(object):
-    def find_2_nbs_giving_total(self, total, numbers):
-        n2 = total//2
-        goodnums = {total-x for x in numbers if x<=n2} & {x for x in numbers if x>n2}
-        pairs = {(total-x, x) for x in goodnums}
-        return pairs
-SolutionX().find_2_nbs_giving_total(total=181, numbers= [80, 98, 83, 92, 1, 38, 37, 54, 58, 89])
-#endregion
-
-#region 10. Find k_th permutation
-"""
-given a set of n elements, find the k-th permutation (given permutations are in ascending order
-e.g. for the set 123
-the ordered permutations are: 123, 132, 213, 231, 312, 321
-
-Runtime Complexity: Linear, O(n)
-Memory Complexity: Linear, O(n)
-"""
-set=[1,2,3,4,5,6]
-k = 4 # we want the 4th permutation
-nb_permutations = math.factorial(len(set)) # number of permutations using 6 numbers
-nb_ind_permutations = nb_permutations/(len(set))# nb of permutations for each number (=factorial n-1)
-first_nb_perm= math.floor(k/nb_ind_permutations) # the kth permutation starts with that number
-
-
-class Solution10(object):
-    def kth_permutation(self, k, set, res):
-        print('set',set,'res',res)
-        if not set: # if set is empty we reached the end of the algo
-            return res
-        n = len(set)
-        nb_ind_permutations = math.factorial(n-1) if n > 0 else 1 # nb of permutations starting with each number
-        perm_group = (k-1)//nb_ind_permutations # the kth permutation starts with that number
-        res = res + str(set[perm_group])
-        # now we want to find permutations in reduced set
-        set.pop(perm_group)
-        k = k - (nb_ind_permutations*perm_group)
-        self.kth_permutation(k, set, res)
-Solution10().kth_permutation(k=4, set=[1,2,3,4,5,6], res='')
-
-#endregion
-
-#region 11. Find all subsets of a given set of integers
-"""
-given the set [1,2,3]
-the possible subsets are 1, 2, 3, [1,2], [1,3],[2,3],[1,2,3]
-https://www.geeksforgeeks.org/find-the-k-th-permutation-sequence-of-first-n-natural-numbers/
-
-Runtime Complexity: Exponential, O(2^n*n)
-Memory Complexity: Exponential, O(2^n*n)
-"""
-
-# solution using recursion
-class Solution11(object):
-    def all_subsets(self, set, res=[], to_return=[]):
-        for size_subset in range(len(set)):
-            print('res',res)
-            new_res = res.copy()
-            new_res.append(set[size_subset])
-            new_set = set[size_subset+1:]
-            print('new_res', new_res)
-            to_return.append(new_res)
-            self.all_subsets(new_set, new_res)
-        return to_return
-Solution11().all_subsets(set=[2,3,4])
-#endregion
-
-#region 2. Determine if the sum of two integers is equal to the given value
-"""
-2. Determine if the sum of two integers is equal to the given value
-Given an array of integers and a value, determine if there are any two integers in the array whose sum is equal to the given value. 
-Return true if the sum exists and return false if it does not.
-
-Runtime Complexity: Linear, O(n)
-Memory Complexity: Linear, O(n)
-"""
-class Solution2(object):
-    def find_sum_of_two(self, A, val):
-        found_values = set()
-        for a in A:
-            if val - a in found_values:
-                return True
-
-            found_values.add(a)
-
-        return False
-
-print(Solution2().find_sum_of_two([3,7,1,2,8,4,5],10))
-#endregion
-
-"""
-BRAINTEASERS
-"""
 
 #region 9. Coin change problem (dynamic programming solution)
 """
