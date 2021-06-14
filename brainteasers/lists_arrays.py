@@ -389,7 +389,18 @@ class Node(object):
         self.next = next_node
 
 def insertNodeAtPosition(llist, data, position):
-    pass
+    new = Node(data)
+    pointer = head
+    counter = 1
+
+    while pointer.next is not None:
+        if counter == position:
+            new.next = pointer.next
+            pointer.next = new
+            break
+        counter += 1
+        pointer = pointer.next
+    return head
 
 
 head = Node(1)
