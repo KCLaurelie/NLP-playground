@@ -73,6 +73,46 @@ def maxSubsetSum(arr):
     return ans
 #endregion
 
+#region 22. Rotate an array by K
+
+def rotLeft(a, d):
+    if d > len(arr):
+        d = d % len(arr)
+    print(d)
+    return arr[d:]+arr[0:d]
+
+arr = [1, 2, 3, 4, 5, 6]
+rotLeft(arr, 14)
+
+#endregion
+
+#region min max of windows in array
+#https://www.hackerrank.com/challenges/min-max-riddle/problem?h_l=interview&playlist_slugs%5B%5D=interview-preparation-kit&playlist_slugs%5B%5D=stacks-queues
+def riddle(arr):
+    stack = []
+    arr.append(0)
+    d=defaultdict(int)
+    for i,j in enumerate(arr):           #making of step 2
+        t=i
+        while stack and stack[-1][0]>=j:
+            val,li = stack.pop()
+            d[j]=max(d[j],i-li+1)
+            d[val]=max(d[val],i-li)
+            t=li
+        stack.append((j,t))
+    del d[0]
+    e=defaultdict(int)
+    for i in d:                           #making of step 3
+        e[d[i]]=max(e[d[i]],i)
+    #print(e)
+    l=len(arr)
+    ans=[e[l-1]]                          #at the end, "ans" is our resulted list of step 4
+    for i in range(len(arr)-2,0,-1):      #making of step 4; step4: we have to add the largest value in ans(i.e. last value in ans) if the current value of e[i] is less than last value in ans, else we have to just append e[i] to ans.
+        if e[i]<ans[-1]: ans.append(ans[-1])
+        else: ans.append(e[i])
+    print(*ans[::-1])                   #step 5: print reverse ans
+#endregion
+
 #region Find triplets in arrays
 """
 Given 3 arrays a, b, c find all triples (i,j,k) such as i<=j and j>=k
@@ -98,6 +138,29 @@ def triplets(a, b, c):
     return nb_triplets
 
 
+#endregion
+
+#region 2. Find 2 numbers from array that add up to a total
+"""
+2. Determine if the sum of two integers is equal to the given value
+Given an array of integers and a value, determine if there are any two integers in the array whose sum is equal to the given value. 
+Return true if the sum exists and return false if it does not.
+
+Runtime Complexity: Linear, O(n)
+Memory Complexity: Linear, O(n)
+"""
+class Solution2(object):
+    def find_sum_of_two(self, A, val):
+        found_values = set()
+        for a in A:
+            if val - a in found_values:
+                return True
+
+            found_values.add(a)
+
+        return False
+
+print(Solution2().find_sum_of_two([3,7,1,2,8,4,5],10))
 #endregion
 
 #region Count geometric progression triplets in list
@@ -132,19 +195,6 @@ arr = [3, 1, 2, 6, 2, 3, 6, 9, 18, 3, 9]
 countTriplets(arr, r=3)
 #endregion
 
-#region 22. Rotate an array by K
-
-def rotLeft(a, d):
-    if d > len(arr):
-        d = d % len(arr)
-    print(d)
-    return arr[d:]+arr[0:d]
-
-arr = [1, 2, 3, 4, 5, 6]
-rotLeft(arr, 14)
-
-#endregion
-
 #region Common elements in lists
 # Complexity O(n), worst case O(n^2)
 def common_els(l1,l2):
@@ -152,15 +202,7 @@ def common_els(l1,l2):
 common_els([1, 2, 3, 4, 5], [5, 6, 7, 8, 9])
 #endregion
 
-#region hourglass array TODO
-arr = [[1, 2, 3, 0, 0],
-       [0, 0, 0, 0, 0],
-       [2, 1, 4, 0, 0],
-       [0, 0, 0, 0, 0],
-       [1, 1, 0, 1, 0]]
-#endregion
-
-#region X. Finding 2 numbers from given list that add to a total
+#region Finding 2 numbers from given list that add to a total
 
 class SolutionX(object):
     def find_2_nbs_giving_total(self, total, numbers):
@@ -169,6 +211,32 @@ class SolutionX(object):
         pairs = {(total-x, x) for x in goodnums}
         return pairs
 SolutionX().find_2_nbs_giving_total(total=181, numbers= [80, 98, 83, 92, 1, 38, 37, 54, 58, 89])
+#endregion
+
+#region Pairs that have a difference equal to the target value
+# https://www.hackerrank.com/challenges/pairs/problem?h_l=interview&playlist_slugs%5B%5D=interview-preparation-kit&playlist_slugs%5B%5D=search
+"""
+arr=[1,2,3,6,7]
+k=5
+
+"""
+def pairs(k, arr):
+    a = set(arr)
+    # make a set of all a[i] + k
+    b = set(x + k for x in arr)
+    # return the length of the intersection set
+    return len(a&b)
+
+def pairs2(k, arr):
+    res=0
+    for x in arr:
+        if x+k in arr:
+            #print(x, x+k)
+            res+=1
+    return res
+
+print(timeit.timeit('pairs(5, [1,2,3,6,7])', globals=globals()))
+print(timeit.timeit('pairs2(5, [1,2,3,6,7])', globals=globals()))
 #endregion
 
 #region 10. Find k_th permutation
@@ -229,73 +297,6 @@ class Solution11(object):
 Solution11().all_subsets(set=[2,3,4])
 #endregion
 
-#region 2. Determine if the sum of two integers is equal to the given value
-"""
-2. Determine if the sum of two integers is equal to the given value
-Given an array of integers and a value, determine if there are any two integers in the array whose sum is equal to the given value. 
-Return true if the sum exists and return false if it does not.
-
-Runtime Complexity: Linear, O(n)
-Memory Complexity: Linear, O(n)
-"""
-class Solution2(object):
-    def find_sum_of_two(self, A, val):
-        found_values = set()
-        for a in A:
-            if val - a in found_values:
-                return True
-
-            found_values.add(a)
-
-        return False
-
-print(Solution2().find_sum_of_two([3,7,1,2,8,4,5],10))
-#endregion
-
-#region min max of windows in array
-#https://www.hackerrank.com/challenges/min-max-riddle/problem?h_l=interview&playlist_slugs%5B%5D=interview-preparation-kit&playlist_slugs%5B%5D=stacks-queues
-def riddle(arr):
-    stack = []
-    arr.append(0)
-    d=defaultdict(int)
-    for i,j in enumerate(arr):           #making of step 2
-        t=i
-        while stack and stack[-1][0]>=j:
-            val,li = stack.pop()
-            d[j]=max(d[j],i-li+1)
-            d[val]=max(d[val],i-li)
-            t=li
-        stack.append((j,t))
-    del d[0]
-    e=defaultdict(int)
-    for i in d:                           #making of step 3
-        e[d[i]]=max(e[d[i]],i)
-    #print(e)
-    l=len(arr)
-    ans=[e[l-1]]                          #at the end, "ans" is our resulted list of step 4
-    for i in range(len(arr)-2,0,-1):      #making of step 4; step4: we have to add the largest value in ans(i.e. last value in ans) if the current value of e[i] is less than last value in ans, else we have to just append e[i] to ans.
-        if e[i]<ans[-1]: ans.append(ans[-1])
-        else: ans.append(e[i])
-    print(*ans[::-1])                   #step 5: print reverse ans
-#endregion
-
-#region 4. Deep copy linked list with arbitrary pointer TODO
-"""
-4. Copy linked list with arbitrary pointer
-You are given a linked list where the node has two pointers.
-The first is the regular next pointer.
-The second pointer is called arbitrary_pointer and it can point to any node in the linked list.
-Your job is to write code to make a deep copy of the given linked list.
-Here, deep copy means that any operations on the original list should not affect the copied list.
-
-Runtime Complexity: Linear, O(n)
-Memory Complexity: Linear, O(n)
-"""
-
-# TODO
-
-#endregion
-
 #region 21. Implement a stack with push(), min(), and pop() in O(1)O(1) time TODO
 #endregion
 
@@ -346,28 +347,54 @@ qobj.deQueue(queue=q)
 
 #endregion
 
-#region Pairs that have a difference equal to the target value
-# https://www.hackerrank.com/challenges/pairs/problem?h_l=interview&playlist_slugs%5B%5D=interview-preparation-kit&playlist_slugs%5B%5D=search
+#region Find cycle in a linked list
 """
-arr=[1,2,3,6,7]
-k=5
+https://www.hackerrank.com/challenges/ctci-linked-list-cycle/problem?h_l=interview&playlist_slugs%5B%5D=interview-preparation-kit&playlist_slugs%5B%5D=linked-lists
+https://www.geeksforgeeks.org/detect-loop-in-a-linked-list/
 
+Solution using Floyd's cycles
+Time complexity: O(n) (Only one traversal of the loop is needed)
+Auxiliary Space:O(1)
 """
-def pairs(k, arr):
-    a = set(arr)
-    # make a set of all a[i] + k
-    b = set(x + k for x in arr)
-    # return the length of the intersection set
-    return len(a&b)
 
-def pairs2(k, arr):
-    res=0
-    for x in arr:
-        if x+k in arr:
-            #print(x, x+k)
-            res+=1
-    return res
+class Node(object):
+    def __init__(self, data=None, next_node=None):
+        self.data = data
+        self.next = next_node
 
-print(timeit.timeit('pairs(5, [1,2,3,6,7])', globals=globals()))
-print(timeit.timeit('pairs2(5, [1,2,3,6,7])', globals=globals()))
+def has_cycle(head):
+    slow_p = head
+    fast_p = head
+    while slow_p and fast_p and fast_p.next:
+        slow_p = slow_p.next
+        fast_p = fast_p.next.next
+        if slow_p == fast_p:
+            return True
+    return False
+
+
+head = Node(1)
+head.next = Node(2)
+head.next.next = Node(3)
+head.next.next.next = Node(4)
+head.next.next.next.next = Node(5)
+# Create a loop for testing(5 is pointing to 3)
+head.next.next.next.next.next = head.next.next
+#endregion
+
+#region Insert Node in a linked list
+class Node(object):
+    def __init__(self, data=None, next_node=None):
+        self.data = data
+        self.next = next_node
+
+def insertNodeAtPosition(llist, data, position):
+    pass
+
+
+head = Node(1)
+head.next = Node(2)
+head.next.next = Node(3)
+head.next.next.next = Node(4)
+head.next.next.next.next = Node(5)
 #endregion
