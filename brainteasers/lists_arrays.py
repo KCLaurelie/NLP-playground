@@ -168,8 +168,8 @@ print(Solution2().find_sum_of_two([3,7,1,2,8,4,5],10))
 You are given an array and you need to find number of tripets of indices  
 such that the elements at those indices are in geometric progression of ratio r
 https://www.geeksforgeeks.org/number-gp-geometric-progression-subsequences-size-3/
+Time complexity: O(n)
 """
-from collections import defaultdict
 def countTriplets(arr, r):
     res = 0
     # keep track of left and right elements
@@ -187,7 +187,7 @@ def countTriplets(arr, r):
         right[elem] -= 1  # remove from right hash
         left[elem] += 1  # increase count in left hash
         cr = right[elem*r]  # count candidate elements in right hash
-
+        print(elem, cl, cr)
         res += cl * cr
     return res
 
@@ -244,6 +244,8 @@ print(timeit.timeit('pairs2(5, [1,2,3,6,7])', globals=globals()))
 given a set of n elements, find the k-th permutation (given permutations are in ascending order
 e.g. for the set 123
 the ordered permutations are: 123, 132, 213, 231, 312, 321
+https://www.geeksforgeeks.org/find-the-k-th-permutation-sequence-of-first-n-natural-numbers/
+
 
 Runtime Complexity: Linear, O(n)
 Memory Complexity: Linear, O(n)
@@ -276,7 +278,6 @@ Solution10().kth_permutation(k=4, set=[1,2,3,4,5,6], res='')
 """
 given the set [1,2,3]
 the possible subsets are 1, 2, 3, [1,2], [1,3],[2,3],[1,2,3]
-https://www.geeksforgeeks.org/find-the-k-th-permutation-sequence-of-first-n-natural-numbers/
 
 Runtime Complexity: Exponential, O(2^n*n)
 Memory Complexity: Exponential, O(2^n*n)
@@ -284,20 +285,52 @@ Memory Complexity: Exponential, O(2^n*n)
 
 # solution using recursion
 class Solution11(object):
-    def all_subsets(self, set, res=[], to_return=[]):
-        for size_subset in range(len(set)):
-            print('res',res)
+    def all_subsets(self, _set, res=[], to_return=[]):
+        for size_subset in range(len(_set)):
+            print('res', res)
             new_res = res.copy()
-            new_res.append(set[size_subset])
-            new_set = set[size_subset+1:]
+            new_res.append(_set[size_subset])
+            new_set = _set[size_subset+1:]
             print('new_res', new_res)
             to_return.append(new_res)
             self.all_subsets(new_set, new_res)
         return to_return
 Solution11().all_subsets(set=[2,3,4])
+
+def powerset(s):
+    x = len(s)
+    for i in range(1 << x):
+        print([s[j] for j in range(x) if (i & (1 << j))])
 #endregion
 
-#region 21. Implement a stack with push(), min(), and pop() in O(1)O(1) time TODO
+#region 21. Implement a stack with push(), min(), and pop() in O(1)O(1) time
+# https://www.geeksforgeeks.org/design-and-implement-special-stack-data-structure/
+# https://www.geeksforgeeks.org/design-a-stack-that-supports-getmin-in-o1-time-and-o1-extra-space/
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def isEmpty(self):
+        return self.items == []
+
+    def push(self, item):
+        self.items.append(item)
+
+    def pop(self):
+        return self.items.pop()
+
+    def peek(self):
+        return self.items[len(self.items) - 1]
+
+    def size(self):
+        return len(self.items)
+s=Stack()
+
+print(s.isEmpty())
+s.push(4)
+s.push('dog')
+print(s.peek())
+s.push(True)
 #endregion
 
 #region 25 Implement a queue using a linked list
